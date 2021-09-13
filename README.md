@@ -1,11 +1,33 @@
-# bad-user-bad-video
+# 外挂信息收集服务
 
 #### 介绍
-上传视频、分片上传、断点续传、秒传
-XX游戏外挂视频举报服务
+该项目首先是个练手项目。后台管理直接使用了人人开源。
+ **起因** ：玩吃鸡游戏被各种外挂追杀，举报无果，想自己收集悲惨素材的初衷。
+主要流程：用户新增举报信息（账号，等级等）；上传悲惨视频待审核；管理人员进行视频及外挂信息审核；审核通过，大厅展示；
+ **唯一特点** ：上传视频实现分片上传、秒传以及断点续传的功能.
 
 #### 软件架构
-软件架构说明
+
+- one-common         公共的依赖，bean，工具类等
+- one-fileServer     文件上传下载服务(分片上传、秒传及断点续传功能)
+- one-gateway        网关服务
+- one-third-party    第三方服务(短信接口)
+- one-waiguagg       外挂信息服务(业务模块)
+- renren-fast        人人开源后台管理服务
+- renren-fast-vue    人人开源前台页面(视频上传等页面)
+
+
+
+技术选型：
+
+- 核心框架：Spring Boot
+- 注册中心：alibaba-nacos-discovery
+- 配置中心：alibaba-nacos-config
+- 视图框架：Spring MVC
+- 持久层框架：MyBatis
+- 文件服务器：Minio
+- 定时任务：ShedLock
+- 页面交互：Vue
 
 
 #### 安装教程
@@ -16,23 +38,23 @@ XX游戏外挂视频举报服务
 
 #### 使用说明
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+ **外挂举报列表** 
 
-#### 参与贡献
+![外挂举报列表](https://images.gitee.com/uploads/images/2021/0912/184423_0a60dd84_2217964.png "project2.PNG")
 
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
+ **举报表单** 
 
+![举报表单](https://images.gitee.com/uploads/images/2021/0912/184149_f3bdcc5b_2217964.png "project-ttt1.PNG")
 
-#### 特技
+ **上传视频** 
 
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+![上传视频](https://images.gitee.com/uploads/images/2021/0912/213327_02271871_2217964.gif "1.gif")
+
+ **断点续传** 
+
+![断点续传](https://images.gitee.com/uploads/images/2021/0912/213603_f8942566_2217964.gif "2.gif")
+
+ **视频预览** 
+
+![视频预览](https://images.gitee.com/uploads/images/2021/0912/215415_8e363a18_2217964.gif "7.gif")
+
