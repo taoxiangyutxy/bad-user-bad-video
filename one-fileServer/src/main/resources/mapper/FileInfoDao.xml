@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ttt.one.fileServer.dao.FileInfoDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.ttt.one.fileServer.entity.FileInfoEntity" id="fileInfoMap">
+        <result property="id" column="id"/>
+        <result property="filename" column="filename"/>
+        <result property="identifier" column="identifier"/>
+        <result property="location" column="location"/>
+        <result property="totalSize" column="total_size"/>
+        <result property="type" column="type"/>
+        <result property="waiguaInfoId" column="waigua_info_id"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+    <update id="updateByIdentifiers">
+        UPDATE  waigua_file_info  SET  waigua_info_id = #{waiguaInfoId}  , create_time= #{createTime}   WHERE  identifier  in
+        <foreach collection="identifiers" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+
+</mapper>

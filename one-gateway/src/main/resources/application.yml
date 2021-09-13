@@ -1,0 +1,59 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+#        - id: test_rout
+#          #满足断言去哪?
+#          uri: https://www.baidu.com
+#          #断言数组 ：多个规则
+#          predicates:
+#            - Query=url,baidu
+#
+#        - id: qq_rout
+#            #满足断言去哪?
+#          uri: https://www.qq.com
+#            #断言数组 ：多个规则
+#          predicates:
+#            - Query=url,qq
+        - id: waiguagg_route
+            #lb 代表负载均衡
+          uri: lb://one-waiguagg
+          predicates:
+              #按照路径断言 http
+            - Path=/api/waiguagg/**
+          filters:
+              #过滤掉api前缀
+            - RewritePath=/api/(?<segment>.*),/$\{segment}
+
+        - id: third_party_route
+          uri: lb://one-third-party
+          predicates:
+            - Path=/api/thirdparty/**
+          filters:
+            - RewritePath=/api/thirdparty/(?<segment>.*),/$\{segment}
+
+        - id: fileServer_route
+            #lb 代表负载均衡
+          uri: lb://one-fileServer
+          predicates:
+              #按照路径断言 http
+            - Path=/api/fileServer/**
+          filters:
+              #过滤掉api前缀
+            - RewritePath=/api/(?<segment>.*),/$\{segment}
+
+        - id: admin_route
+          #lb 代表负载均衡
+          uri: lb://renren-fast
+          predicates:
+            #按照路径断言 http
+            - Path=/api/**
+          filters:
+            #过滤掉api前缀
+            - RewritePath=/api/(?<segment>.*),/renren-fast/$\{segment}
+
+
+        - id: gulimall_host_route
+          uri: lb://renren-fast
+          predicates:
+            - Host=waiguattt.com,*.waiguattt.com

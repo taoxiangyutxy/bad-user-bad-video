@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ttt.one.waiguagg.dao.UnmberDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.ttt.one.waiguagg.entity.UnmberEntity" id="unmberMap">
+        <result property="id" column="id"/>
+        <result property="waiguaUsername" column="waigua_username"/>
+        <result property="waiguaGrade" column="waigua_grade"/>
+        <result property="hatefulType" column="hateful_type"/>
+        <result property="sealState" column="seal_state"/>
+        <result property="sealStartTime" column="seal_start_time"/>
+        <result property="sealEndTime" column="seal_end_time"/>
+    </resultMap>
+
+
+</mapper>
