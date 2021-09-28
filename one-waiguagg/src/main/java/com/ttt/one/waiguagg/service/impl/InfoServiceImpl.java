@@ -1,5 +1,6 @@
 package com.ttt.one.waiguagg.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.ttt.one.common.utils.Constant;
 import com.ttt.one.common.utils.PageUtils;
@@ -14,15 +15,19 @@ import com.ttt.one.waiguagg.vo.FileInfoVO;
 import com.ttt.one.waiguagg.vo.SysUserVO;
 import com.ttt.one.waiguagg.vo.VideoPreviewVO;
 import com.ttt.one.waiguagg.vo.WaiGuaInfoVO;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -48,6 +53,10 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
     private FileServer fileServer;
     @Autowired
     private ThirdPartyFeginServer thirdPartyFeginServer;
+    @Autowired
+    private StringRedisTemplate redisTemplate;
+    @Autowired
+    RedissonClient redisson;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -180,8 +189,8 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
 
     @Override
     public PageUtils queryPageAllByReview(Map<String, Object> params, Long reviewVal) {
-        //TODO  管理员是不是可以看所有状态下的呢？
-        QueryWrapper<InfoEntity> wrapper = new QueryWrapper<InfoEntity>().eq("status", Constant.STATUS_0);//.eq("review_status",reviewVal);
+        //TODO  管理员是不是可以看所有状态下的呢？ 返回待审核的
+        QueryWrapper<InfoEntity> wrapper = new QueryWrapper<InfoEntity>().eq("status", Constant.STATUS_0).eq("review_status",Constant.REVIEWSTATUS_0);
         String key = (String) params.get("key");
         //是否关键字查询
         if(!StringUtils.isEmpty(key)){
@@ -223,9 +232,10 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
             }else if(waiGuaInfoVO.getReviewStatus()==3){
                 code="44";
             }
-            //todo 手机号关联用户id 查
-
-            R r = thirdPartyFeginServer.sendCode("18753571460", code);
+            //todo 手机号关联用户id 查   没钱发短信啦
+          //  R r = thirdPartyFeginServer.sendCode("18753571460", code);
+            //审核通过  门户网站数据多一条  将缓存清空
+            redisTemplate.delete("allWaiGuaData");
         }
 
         this.updateById(infoEntity);
@@ -254,4 +264,50 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
         return voList;
     }
 
+    @Override
+    public  List<WaiGuaInfoVO>  pageAllWaiGua(Map<String, Object> params) {
+        String s = redisTemplate.opsForValue().get("allWaiGuaData");
+        if(StringUtils.isEmpty(s)){
+            List<WaiGuaInfoVO> data = getAllWaiGuaData();
+            return data;
+        }
+        System.out.println("缓存命中，直接返回");
+        List<WaiGuaInfoVO> listMap = JSON.parseObject(s, new TypeReference<List<WaiGuaInfoVO>>(){});
+        return listMap;
+    }
+
+    private List<WaiGuaInfoVO> getAllWaiGuaData(){
+        //获取锁,10秒后自动解锁
+        RLock lock = redisson.getLock("waiguaData-lock");
+        lock.lock(10, TimeUnit.SECONDS);
+        System.out.println("获取分布式锁成功..");
+        List<WaiGuaInfoVO> collect = new ArrayList<>();
+        try {
+            QueryWrapper<InfoEntity> wrapper = new QueryWrapper<InfoEntity>().eq("status", Constant.STATUS_0);
+            wrapper.eq("review_status",Constant.REVIEWSTATUS_2);
+            List<InfoEntity> infoEntities = this.list(wrapper);
+             collect = infoEntities.stream().map(infoEntity -> {
+                WaiGuaInfoVO waiGuaInfoVO = new WaiGuaInfoVO();
+                BeanUtils.copyProperties(infoEntity, waiGuaInfoVO);
+                waiGuaInfoVO.setWaiguaType(infoEntity.getWaiguaType().split(","));
+                R r = fileServer.videoInfo(infoEntity.getId());
+                if (r.getCode() == 0) { //远程服务调用成功
+                    List<FileInfoVO> fileList = r.getData("fileList", new TypeReference<List<FileInfoVO>>() {
+                    });
+                    if (fileList != null && fileList.size() > 0) {
+                        waiGuaInfoVO.setLocation(fileList.get(0).getLocation());
+                    }
+                } else {
+                    log.error("远程服务调用失败--- fileServer.videoInfo");
+                }
+                return waiGuaInfoVO;
+            }).collect(Collectors.toList());
+             //加入缓存
+             String s = JSON.toJSONString(collect);
+             redisTemplate.opsForValue().set("allWaiGuaData",s,1,TimeUnit.DAYS);
+        }finally {
+            lock.unlock();
+        }
+        return collect;
+    }
 }

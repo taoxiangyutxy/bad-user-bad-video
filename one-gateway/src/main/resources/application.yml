@@ -53,7 +53,7 @@ spring:
             - RewritePath=/api/(?<segment>.*),/renren-fast/$\{segment}
 
 
-        - id: gulimall_host_route
-          uri: lb://renren-fast
+        - id: waigua_host_route
+          uri: lb://one-waiguagg
           predicates:
             - Host=waiguattt.com,*.waiguattt.com

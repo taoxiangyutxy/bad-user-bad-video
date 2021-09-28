@@ -71,4 +71,11 @@ public class WaiGuaInfoVO {
      * 举报用户名称
      */
     private String reportuserName;
+
+    /****************视频相关**********************/
+    /**
+     * 下载链接
+     */
+    private String location;
+    //视频时长？ TODO
 }

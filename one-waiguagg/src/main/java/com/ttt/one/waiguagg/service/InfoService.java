@@ -72,5 +72,12 @@ public interface InfoService extends IService<InfoEntity> {
      * @return
      */
     List<VideoPreviewVO> videolistByInfoId(Long id);
+
+    /**
+     * 门户网站信息列表
+     * @param params
+     * @return
+     */
+    List<WaiGuaInfoVO>  pageAllWaiGua(Map<String, Object> params);
 }
 
