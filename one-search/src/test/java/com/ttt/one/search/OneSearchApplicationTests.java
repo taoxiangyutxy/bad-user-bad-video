@@ -1,12 +1,7 @@
-package com.ttt.one.waiguagg;
+package com.ttt.one.search;
 
 import com.alibaba.fastjson.JSON;
-import com.ttt.one.waiguagg.config.MyElasticsearchConfig;
-import com.ttt.one.waiguagg.entity.InfoEntity;
-import com.ttt.one.waiguagg.entity.UnmberEntity;
-import com.ttt.one.waiguagg.service.InfoService;
-import com.ttt.one.waiguagg.service.UnmberService;
-
+import com.ttt.one.search.config.MyElasticsearchConfig;
 import lombok.Data;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
@@ -14,7 +9,6 @@ import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
@@ -24,15 +18,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.IOException;
-import java.util.List;
 
 @SpringBootTest
-class OneWaiguaggApplicationTests {
-    @Autowired
-    UnmberService service;
+class OneSearchApplicationTests {
 
-    @Autowired
-    InfoService infoService;
+    @Test
+    void contextLoads() {
+    }
 
     @Autowired
     private RestHighLevelClient client;
@@ -63,7 +55,7 @@ class OneWaiguaggApplicationTests {
         System.out.println("条件="+searchSourceBuilder.toString());
         searchRequest.source(searchSourceBuilder);
         //执行检索
-        SearchResponse searchResponse = client.search(searchRequest,MyElasticsearchConfig.COMMON_OPTIONS);
+        SearchResponse searchResponse = client.search(searchRequest, MyElasticsearchConfig.COMMON_OPTIONS);
         System.out.println(searchResponse.toString());
         SearchHits hits = searchResponse.getHits();
         SearchHit[] searchHits = hits.getHits();
@@ -81,7 +73,7 @@ class OneWaiguaggApplicationTests {
     void indexData(){
         IndexRequest indexRequest = new IndexRequest("users");
         indexRequest.id("1");
- //       indexRequest.source("userName","zhangsan","age","18","gender","男");
+        //       indexRequest.source("userName","zhangsan","age","18","gender","男");
 
         User user = new User(18,"nan","zhangsan");
         String s = JSON.toJSONString(user);
@@ -95,7 +87,7 @@ class OneWaiguaggApplicationTests {
         System.out.println(index);
     }
     @Data
-   static class User{
+    static class User{
         private String userName;
         private String gender;
         private int age;
@@ -119,15 +111,4 @@ class OneWaiguaggApplicationTests {
                     '}';
         }
     }
-    @Test
-    void contextLoads() {
-
-        System.out.println(client);
-
-     /*   UnmberEntity unmberEntity = new UnmberEntity();
-        unmberEntity.setWaiguaUsername("rr221");
-        service.save(unmberEntity);*/
-
-    }
-
 }

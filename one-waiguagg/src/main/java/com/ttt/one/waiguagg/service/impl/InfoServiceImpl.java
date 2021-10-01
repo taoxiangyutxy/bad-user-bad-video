@@ -2,11 +2,13 @@ package com.ttt.one.waiguagg.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
+import com.ttt.one.common.to.es.WaiguaEsModel;
 import com.ttt.one.common.utils.Constant;
 import com.ttt.one.common.utils.PageUtils;
 import com.ttt.one.common.utils.Query;
 import com.ttt.one.common.utils.R;
 import com.ttt.one.waiguagg.entity.UnmberEntity;
+import com.ttt.one.waiguagg.fegin.EsSearchFeginServer;
 import com.ttt.one.waiguagg.fegin.FileServer;
 import com.ttt.one.waiguagg.fegin.ThirdPartyFeginServer;
 import com.ttt.one.waiguagg.fegin.UserFeginServer;
@@ -57,6 +59,8 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
     private StringRedisTemplate redisTemplate;
     @Autowired
     RedissonClient redisson;
+    @Autowired
+    private EsSearchFeginServer esSearchFeginServer;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -178,11 +182,12 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
                 try {
                     fileServer.deleAllIn(infoEntity.getId());
                 }catch (Exception e){
-                    log.error("调用文件上传远程服务报错:{}",e);
+                    log.error("调用文件上传远程服务fileServer.deleAllIn报错:{}",e);
                 }
                 //4 根据info id删info信息
                 this.removeById(infoEntity.getId());
-
+                //删除后  门户网站数据少一条  将缓存清空
+                redisTemplate.delete("allWaiGuaData");
             }
         }
     }
@@ -220,6 +225,7 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
     }
 
     @Override
+    @Transactional
     public void updateByIdAndReview(WaiGuaInfoVO waiGuaInfoVO) {
         InfoEntity infoEntity = new InfoEntity();
         infoEntity.setId(waiGuaInfoVO.getWaiguaInfoId());
@@ -228,17 +234,48 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
         if(waiGuaInfoVO.getReviewStatus()!= 0 && waiGuaInfoVO.getReviewStatus()!=1){
             String code = "";
             if(waiGuaInfoVO.getReviewStatus()==2){
-                code="666";
+                code="审核通过";
+                //获取info信息
+                WaiGuaInfoVO infoVO = this.getByIdAndUnmber(waiGuaInfoVO.getWaiguaInfoId());
+                //调用远程服务 获取视频路径
+                R rFile = fileServer.videoInfo(infoEntity.getId());
+                if (rFile.getCode() == 0) { //远程服务调用成功
+                    List<FileInfoVO> fileList = rFile.getData("fileList", new TypeReference<List<FileInfoVO>>() {
+                    });
+                    if (fileList != null && fileList.size() > 0) {
+                        infoVO.setLocation(fileList.get(0).getLocation());
+                    }
+                } else {
+                    log.error("远程服务调用失败--- fileServer.videoInfo");
+                }
+                //存入ES数据
+                WaiguaEsModel waiguaEsModel = new WaiguaEsModel();
+                waiguaEsModel.setInfoId(infoVO.getWaiguaInfoId());
+                waiguaEsModel.setWaiguaType(StringUtils.arrayToDelimitedString(infoVO.getWaiguaType(),","));
+                waiguaEsModel.setWaiguaDescribe(infoVO.getWaiguaDescribe());
+                waiguaEsModel.setCreateTime(infoVO.getCreateTime());
+                waiguaEsModel.setLocation(infoVO.getLocation());
+                waiguaEsModel.setWaiguaUsername(infoVO.getWaiguaUsername());
+                R r = esSearchFeginServer.waiguaInfoSaveES(waiguaEsModel);
+                if(r.getCode() == 0){
+                    //成功
+                    //审核通过  门户网站数据多一条  将缓存清空
+                    redisTemplate.delete("allWaiGuaData");
+                    this.updateById(infoEntity);
+                }else{
+                    //失败
+                    log.error("远程服务调用失败:{esSearchFeginServer.waiguaInfoSaveES}");
+                }
+
             }else if(waiGuaInfoVO.getReviewStatus()==3){
-                code="44";
+                code="驳回";
+                this.updateById(infoEntity);
             }
             //todo 手机号关联用户id 查   没钱发短信啦
           //  R r = thirdPartyFeginServer.sendCode("18753571460", code);
-            //审核通过  门户网站数据多一条  将缓存清空
-            redisTemplate.delete("allWaiGuaData");
+
         }
 
-        this.updateById(infoEntity);
     }
 
     @Override

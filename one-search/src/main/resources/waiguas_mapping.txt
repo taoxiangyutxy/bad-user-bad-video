@@ -1,0 +1,30 @@
+PUT waiguas
+{
+  "mappings" : {
+      "properties" : {
+        "waiguaId" : {
+          "type" : "long"
+        },
+        "waiguaInfoId" : {
+          "type" : "long"
+        },
+        "waiguaType" : {
+          "type" : "text"
+        },
+         "waiguaUsername" : {
+          "type" : "keyword"
+        },
+        "waiguaDescribe" : {
+          "type" : "keyword"
+        },
+        "createTime" : {
+          "type" : "keyword"
+        },
+        "location" : {
+          "type" : "text",
+          "index" : false,
+          "doc_values" : false
+        }
+      }
+    }
+}

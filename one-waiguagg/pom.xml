@@ -19,6 +19,13 @@
         <spring-cloud.version>Hoxton.SR9</spring-cloud.version>
     </properties>
     <dependencies>
+        <!--elasticsearch 全局搜索-->
+        <dependency>
+            <groupId>org.elasticsearch.client</groupId>
+            <artifactId>elasticsearch-rest-high-level-client</artifactId>
+            <version>7.4.2</version>
+        </dependency>
+
         <!--spring cache缓存 使用注解 [未使用]-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
