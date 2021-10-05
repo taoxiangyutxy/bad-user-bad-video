@@ -18,7 +18,14 @@
         <!--解决版本过高 调用远程服务报错问题-->
         <spring-cloud.version>Hoxton.SR9</spring-cloud.version>
     </properties>
+
     <dependencies>
+        <!--devtools 前台页面热部署-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <optional>true</optional>
+        </dependency>
         <!--thymeleaf  前台模板引擎-->
         <dependency>
             <groupId>org.springframework.boot</groupId>

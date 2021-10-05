@@ -56,4 +56,9 @@ spring:
         - id: waigua_host_route
           uri: lb://one-waiguagg
           predicates:
-            - Host=waiguattt.com,*.waiguattt.com
+            - Host=waiguattt.com
+
+        - id: waigua_search_route
+          uri: lb://one-search
+          predicates:
+            - Host=search.waiguattt.com

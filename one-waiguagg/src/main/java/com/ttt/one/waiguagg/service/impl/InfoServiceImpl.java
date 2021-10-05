@@ -186,6 +186,8 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
                 }
                 //4 根据info id删info信息
                 this.removeById(infoEntity.getId());
+                //5 TODO 使用工具删除 MINIO服务器视频文件
+
                 //删除后  门户网站数据少一条  将缓存清空
                 redisTemplate.delete("allWaiGuaData");
             }
@@ -251,7 +253,7 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
                 //存入ES数据
                 WaiguaEsModel waiguaEsModel = new WaiguaEsModel();
                 waiguaEsModel.setInfoId(infoVO.getWaiguaInfoId());
-                waiguaEsModel.setWaiguaType(StringUtils.arrayToDelimitedString(infoVO.getWaiguaType(),","));
+                waiguaEsModel.setWaiguaType(StringUtils.arrayToDelimitedString(infoVO.getWaiguaType()," "));
                 waiguaEsModel.setWaiguaDescribe(infoVO.getWaiguaDescribe());
                 waiguaEsModel.setCreateTime(infoVO.getCreateTime());
                 waiguaEsModel.setLocation(infoVO.getLocation());
