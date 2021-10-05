@@ -11,6 +11,7 @@
 - one-common         公共的依赖，bean，工具类等
 - one-fileServer     文件上传下载服务(分片上传、秒传及断点续传功能)
 - one-gateway        网关服务
+- one-search         搜索服务（Elasticsearch全文检索）
 - one-third-party    第三方服务(短信接口)
 - one-waiguagg       外挂信息服务(业务模块)
 - renren-fast        人人开源后台管理服务
