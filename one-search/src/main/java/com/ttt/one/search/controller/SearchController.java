@@ -18,6 +18,7 @@ public class SearchController {
     public String list(SearchParam searchParam, Model model){
         SearchResult result = waiGuaSearchService.search(searchParam);
         model.addAttribute("lists",result);
+        model.addAttribute("keyword",searchParam.getKeyword());
         return "list";
     }
 }
