@@ -29,6 +29,7 @@
 - 文件服务器：Minio
 - 定时任务：ShedLock
 - 页面交互：Vue
+- 全文检索：Elasticsearch
 
 
 #### 安装教程
