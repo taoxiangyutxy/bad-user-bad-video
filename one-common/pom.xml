@@ -16,6 +16,13 @@
         <java.version>1.8</java.version>
     </properties>
     <dependencies>
+        <!--js303校验-->
+        <!-- https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator -->
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>6.2.0.Final</version>
+        </dependency>
         <!-- JSON转换依赖 -->
         <dependency>
             <groupId>com.alibaba</groupId>

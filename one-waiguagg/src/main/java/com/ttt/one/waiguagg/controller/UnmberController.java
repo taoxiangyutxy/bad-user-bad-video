@@ -2,6 +2,7 @@ package com.ttt.one.waiguagg.controller;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.concurrent.*;
 
 import com.ttt.one.common.utils.PageUtils;
 import com.ttt.one.common.utils.R;
@@ -24,6 +25,9 @@ import com.ttt.one.waiguagg.service.UnmberService;
 @RefreshScope
 @RequestMapping("waiguagg/unmber")
 public class UnmberController {
+
+ public static    ExecutorService executorService = Executors.newFixedThreadPool(10);
+
     @Autowired
     private UnmberService unmberService;
 
@@ -88,4 +92,39 @@ public class UnmberController {
         return R.ok();
     }
 
+    public static void main(String[] args) throws ExecutionException, InterruptedException {
+        System.out.println("111111");
+        Future<Integer> submit = executorService.submit(new Callable01());
+        Integer integer = submit.get();
+        System.out.println("jieguo="+integer);
+        System.out.println("222222");
+
+    }
+    public static class Callable01 implements Callable<Integer>{
+
+        @Override
+        public Integer call() throws Exception {
+            System.out.println("当前线程:"+Thread.currentThread().getId());
+            int i = 10 / 2;
+            System.out.println("运行结果:"+i);
+            return i;
+        }
+    }
+    public static class Runnable01 implements Runnable{
+        @Override
+        public void run() {
+            System.out.println("当前线程:"+Thread.currentThread().getId());
+            int i = 10 / 2;
+            System.out.println("运行结果:"+i);
+        }
+    }
+
+    public static class Thread01 extends Thread{
+        @Override
+        public void run() {
+            System.out.println("当前线程:"+Thread.currentThread().getId());
+            int i = 10 / 2;
+            System.out.println("运行结果:"+i);
+        }
+    }
 }

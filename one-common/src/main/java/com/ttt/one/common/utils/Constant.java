@@ -7,6 +7,11 @@ package com.ttt.one.common.utils;
  *
  */
 public class Constant {
+    /**
+     * 验证码前缀
+     */
+    public static final String SMS_CODE_CACHE_PREFIX = "sms:code:";
+
 	/** 超级管理员ID */
 	public static final int SUPER_ADMIN = 1;
     /**

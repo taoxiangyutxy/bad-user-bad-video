@@ -62,3 +62,8 @@ spring:
           uri: lb://one-search
           predicates:
             - Host=search.waiguattt.com
+
+        - id: waigua_auth_route
+          uri: lb://one-auth-server
+          predicates:
+            - Host=auth.waiguattt.com
