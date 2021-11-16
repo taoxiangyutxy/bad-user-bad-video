@@ -43,9 +43,12 @@ public interface UserService extends IService<UserEntity> {
     void checkUserNameUnique(String username) throws UsernameExistException;
 
     /**
-     * 用户登录
-     * @param vo
-     * @return
+     *登录
+     * @param vo:  实体类
+     * @return UserEntity
+     * @author txy
+     * @description
+     * @date 2021/11/6 19:08
      */
     UserEntity login(UserLoginVo vo);
 }

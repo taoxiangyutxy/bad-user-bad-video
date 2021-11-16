@@ -2,6 +2,7 @@ package com.ttt.one.auth.controller;
 import com.alibaba.fastjson.TypeReference;
 import com.ttt.one.auth.fegin.UserFeginServer;
 import com.ttt.one.auth.service.AuthService;
+import com.ttt.one.auth.vo.UserEntity;
 import com.ttt.one.auth.vo.UserLoginVo;
 import com.ttt.one.auth.vo.UserRegistVo;
 import com.ttt.one.common.utils.Constant;
@@ -19,6 +20,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
@@ -119,9 +122,12 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    public  String login(UserLoginVo vo,RedirectAttributes redirectAttributes){
+    public  String login(UserLoginVo vo, RedirectAttributes redirectAttributes, HttpSession session){
         R r = userFeginServer.login(vo);
         if(r.getCode()==0){
+            UserEntity data = r.getData("data", new TypeReference<UserEntity>() {
+            });
+            session.setAttribute("userName",data.getUsername());
             //登录成功
             return "redirect:http://waiguattt.com";
         }else{

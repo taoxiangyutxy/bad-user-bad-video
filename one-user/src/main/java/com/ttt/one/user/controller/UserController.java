@@ -37,7 +37,7 @@ public class UserController {
     public R login(@RequestBody UserLoginVo vo){
        UserEntity userEntity =  userService.login(vo);
        if(userEntity!=null){
-           return R.ok();
+           return R.ok().put("data",userEntity);
        }else {
            return R.error("登录失败！");
        }

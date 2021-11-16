@@ -19,6 +19,11 @@
         <spring-cloud.version>Hoxton.SR9</spring-cloud.version>
     </properties>
     <dependencies>
+        <!--分布式session共享-->
+        <dependency>
+            <groupId>org.springframework.session</groupId>
+            <artifactId>spring-session-data-redis</artifactId>
+        </dependency>
         <!--elasticsearch 全局搜索-->
         <dependency>
             <groupId>org.elasticsearch.client</groupId>
