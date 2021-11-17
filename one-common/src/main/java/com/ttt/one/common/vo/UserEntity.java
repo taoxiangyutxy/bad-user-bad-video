@@ -1,5 +1,7 @@
-package com.ttt.one.auth.vo;
+package com.ttt.one.common.vo;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -12,9 +14,8 @@ import java.util.Date;
  * @date 2021-10-17 16:24:20
  */
 @Data
+@ToString
 public class UserEntity implements Serializable {
-	private static final long serialVersionUID = 1L;
-
 	/**
 	 * id
 	 */

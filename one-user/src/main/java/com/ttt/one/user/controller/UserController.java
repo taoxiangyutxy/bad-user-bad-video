@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 //import org.apache.shiro.authz.annotation.RequiresPermissions;
+import com.ttt.one.common.exception.BizCodeEnum;
 import com.ttt.one.common.utils.PageUtils;
 import com.ttt.one.common.utils.R;
 import com.ttt.one.user.exception.PhoneExistException;
@@ -37,9 +38,9 @@ public class UserController {
     public R login(@RequestBody UserLoginVo vo){
        UserEntity userEntity =  userService.login(vo);
        if(userEntity!=null){
-           return R.ok().put("data",userEntity);
+           return R.ok().setData(userEntity);
        }else {
-           return R.error("登录失败！");
+           return R.error(BizCodeEnum.LOGIN_ACCOUNT_PASSWORD_EXCEPTION.getCode(),BizCodeEnum.LOGIN_ACCOUNT_PASSWORD_EXCEPTION.getMsg());
        }
     }
 

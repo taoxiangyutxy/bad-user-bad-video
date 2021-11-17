@@ -61,7 +61,10 @@ public class Constant {
      * 驳回
      */
     public static final int REVIEWSTATUS_3 = 3;
-
+    /**
+     * 登录成功的用户 session-key
+     */
+    public static final String LOGIN_USER ="loginUser";
 
 	/**
 	 * 菜单类型

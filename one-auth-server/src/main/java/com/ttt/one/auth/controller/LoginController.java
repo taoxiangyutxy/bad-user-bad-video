@@ -2,25 +2,22 @@ package com.ttt.one.auth.controller;
 import com.alibaba.fastjson.TypeReference;
 import com.ttt.one.auth.fegin.UserFeginServer;
 import com.ttt.one.auth.service.AuthService;
-import com.ttt.one.auth.vo.UserEntity;
 import com.ttt.one.auth.vo.UserLoginVo;
 import com.ttt.one.auth.vo.UserRegistVo;
 import com.ttt.one.common.utils.Constant;
 import com.ttt.one.common.utils.R;
+import com.ttt.one.common.vo.UserEntity;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.util.HashMap;
@@ -127,12 +124,13 @@ public class LoginController {
         if(r.getCode()==0){
             UserEntity data = r.getData("data", new TypeReference<UserEntity>() {
             });
-            session.setAttribute("userName",data.getUsername());
+            session.setAttribute(Constant.LOGIN_USER,data);
             //登录成功
             return "redirect:http://waiguattt.com";
         }else{
             Map<String,String> errors = new HashMap<>();
-            errors.put("msg",r.getData("msg",new TypeReference<String>(){}));
+            errors.put("msg", r.getData("msg", new TypeReference<String>() {
+            }));
             redirectAttributes.addFlashAttribute("errors",errors);
             return "redirect:http://auth.waiguattt.com/login.html";
         }
