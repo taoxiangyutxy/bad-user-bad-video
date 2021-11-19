@@ -11,12 +11,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequestMapping("search")
 public class ElasticsearchController {
     @Autowired
     private WaiGuaSearchService waiGuaSearchService;
+    /**
+     *  描述: 单条插入ES
+     * @param esModel:
+     * @return R
+     * @author txy
+     * @description
+     * @date 2021/11/19 14:26
+     */
     @RequestMapping("/waiguaInfoSaveES")
    public R waiguaInfoSaveES(@RequestBody WaiguaEsModel esModel)  {
         boolean b = false;
@@ -29,4 +39,18 @@ public class ElasticsearchController {
         if(!b){ return R.ok();}
         else {return  R.error("数据存入ES异常");}
    }
+
+    /**
+     *  描述:  根据条件 更新ES库里的链接  每6天更新一次链接
+     * @param esModelList:
+     * @return R
+     * @author txy
+     * @description
+     * @date 2021/11/19 16:58
+     */
+    @RequestMapping("/waiguaInfoBatchUpdate")
+    public R waiguaInfoBatchUpdate(@RequestBody(required = false) List<WaiguaEsModel> esModelList){
+        waiGuaSearchService.waiguaInfoBatchUpdate(esModelList);
+        return R.ok();
+    }
 }

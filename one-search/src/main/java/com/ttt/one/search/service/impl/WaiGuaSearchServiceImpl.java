@@ -8,17 +8,24 @@ import com.ttt.one.search.service.WaiGuaSearchService;
 import com.ttt.one.search.vo.SearchParam;
 import com.ttt.one.search.vo.SearchResult;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.action.bulk.BulkItemResponse;
-import org.elasticsearch.action.bulk.BulkRequest;
-import org.elasticsearch.action.bulk.BulkResponse;
+import org.elasticsearch.action.DocWriteRequest;
+import org.elasticsearch.action.bulk.*;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.update.UpdateRequest;
+import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.common.unit.ByteSizeUnit;
+import org.elasticsearch.common.unit.ByteSizeValue;
+import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.reindex.BulkByScrollResponse;
+import org.elasticsearch.index.reindex.UpdateByQueryRequest;
+import org.elasticsearch.script.Script;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.Aggregation;
@@ -37,13 +44,17 @@ import org.springframework.util.StringUtils;
 import javax.swing.*;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class WaiGuaSearchServiceImpl implements WaiGuaSearchService {
     @Autowired
-    RestHighLevelClient restHighLevelClient;
+    private  RestHighLevelClient restHighLevelClient;
+    //批量操作的对象
     @Override
     public boolean waiguaInfoSaveEs(WaiguaEsModel esModel) throws IOException {
         //1.ES中建立索引，建立好映射关系 waiguas_mapping.txt
@@ -79,7 +90,62 @@ public class WaiGuaSearchServiceImpl implements WaiGuaSearchService {
         return result;
     }
 
-
+    @Override
+    public void waiguaInfoBatchUpdate(List<WaiguaEsModel> esModelList) {
+        //updateByWhere();
+        //TODO 搞成批量修改
+      //  List<UpdateRequest> updateRequests=new ArrayList<>();
+        //更新的数据
+        esModelList.forEach(e->{
+            //获取id
+            UpdateRequest updateRequest = new UpdateRequest();
+            updateRequest.index(EsConstant.WAIGUA_INDEX);
+            //更新的id
+            updateRequest.id(e.getInfoId()+"");
+            //更新的数据
+            Map<String,Object> map=new HashMap<>();
+            map.put("location",e.getLocation());
+            map.put("createTime",e.getCreateTime());
+            updateRequest.doc(map);
+           // updateRequests.add(updateRequest);
+            try {
+                restHighLevelClient.update(updateRequest, RequestOptions.DEFAULT);
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+            }
+        });
+        //updateRequests.forEach(bulkProcessor::add);
+    }
+    /**
+     *  描述:  根据条件修改  成功的
+     * @param :
+     * @return void
+     * @author txy
+     * @description
+     * @date 2021/11/19 15:26
+     */
+    private void updateByWhere() {
+        UpdateByQueryRequest updateByQuery  = new UpdateByQueryRequest(EsConstant.WAIGUA_INDEX);
+        //设置分片并行
+        updateByQuery.setSlices(2);
+        //设置版本冲突时继续执行
+        updateByQuery.setConflicts("proceed");
+        //设置更新完成后刷新索引 ps很重要如果不加可能数据不会实时刷新
+        updateByQuery.setRefresh(true);
+        //查询条件如果是and关系使用must 如何是or关系使用should
+        BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery()
+                .must(QueryBuilders.termQuery("infoId","24"));
+        updateByQuery.setQuery(boolQueryBuilder);
+        //设置要修改的内容可以多个值多个用；隔开
+        updateByQuery.setScript(new Script("ctx._source['location']='北京'"));
+        try {
+            BulkByScrollResponse response= restHighLevelClient.updateByQuery(updateByQuery, RequestOptions.DEFAULT);
+            boolean b = response.getStatus().getUpdated() > 0 ? true : false;
+            System.out.println("************************************"+b);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * 构造检索请求
