@@ -2,6 +2,7 @@ package com.ttt.one.auth.controller;
 import com.alibaba.fastjson.TypeReference;
 import com.ttt.one.auth.fegin.UserFeginServer;
 import com.ttt.one.auth.service.AuthService;
+import com.ttt.one.auth.utils.TokenUtil;
 import com.ttt.one.auth.vo.UserLoginVo;
 import com.ttt.one.auth.vo.UserRegistVo;
 import com.ttt.one.common.utils.Constant;
@@ -10,6 +11,7 @@ import com.ttt.one.common.vo.UserEntity;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -18,8 +20,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -34,6 +40,9 @@ public class LoginController {
 
     @Autowired
     UserFeginServer userFeginServer;
+
+    @Autowired
+    private TokenUtil tokenUtil;
 
     /*@GetMapping("/login.html")
     public String loginPage(){
@@ -119,12 +128,20 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    public  String login(UserLoginVo vo, RedirectAttributes redirectAttributes, HttpSession session){
+    public  String login(UserLoginVo vo, RedirectAttributes redirectAttributes, HttpSession session, HttpServletResponse response){
         R r = userFeginServer.login(vo);
         if(r.getCode()==0){
             UserEntity data = r.getData("data", new TypeReference<UserEntity>() {
             });
             session.setAttribute(Constant.LOGIN_USER,data);
+            Map<String, String> map = tokenUtil.getToken("123456", "1");
+            session.setAttribute("token",map);
+            response.setCharacterEncoding("UTF-8");
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.addHeader("Access-Control-Expose-Headers","token");
+            //token放至请求头给前端
+            response.addHeader("token",map.get("token"));
+            System.out.println("---------------"+map.get("token"));
             //登录成功
             return "redirect:http://waiguattt.com";
         }else{
@@ -136,4 +153,24 @@ public class LoginController {
         }
 
     }
+
+    @GetMapping(value = "/login.html")
+    public String loginPage(HttpSession session) {
+
+        //从session先取出来用户的信息，判断用户是否已经登录过了
+        Object attribute = session.getAttribute(Constant.LOGIN_USER);
+        //如果用户没登录那就跳转到登录页面
+        if (attribute == null) {
+            return "login";
+        } else {
+            return "redirect:http://waiguattt.com";
+        }
+    }
+
+    @GetMapping(value = "/loguot.html")
+     public String logout(HttpServletRequest request) {
+         request.getSession().removeAttribute(Constant.LOGIN_USER);
+         request.getSession().invalidate();
+        return "redirect:http://waiguattt.com";
+     }
 }
