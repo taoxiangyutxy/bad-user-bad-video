@@ -60,4 +60,12 @@ public class InfoEntity implements Serializable {
 	 * 外挂账号名字
 	 */
 	private String waiguaUsername;
+	/**
+	 * 点赞总数
+	 */
+	private Integer thumbUpNumber;
+	/**
+	 * 阅读总数
+	 */
+	private Integer readNumber;
 }

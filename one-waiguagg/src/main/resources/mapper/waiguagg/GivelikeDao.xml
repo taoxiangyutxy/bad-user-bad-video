@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ttt.one.waiguagg.dao.GivelikeDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.ttt.one.waiguagg.entity.GivelikeEntity" id="givelikeMap">
+        <result property="id" column="id"/>
+        <result property="relationId" column="relation_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="type" column="type"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="createTime" column="create_time"/>
+        <result property="deleteTime" column="delete_time"/>
+    </resultMap>
+
+
+</mapper>

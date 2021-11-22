@@ -7,6 +7,7 @@ import java.util.Map;
 //import org.apache.shiro.authz.annotation.RequiresPermissions;
 import com.ttt.one.common.utils.PageUtils;
 import com.ttt.one.common.utils.R;
+import com.ttt.one.waiguagg.entity.GivelikeEntity;
 import com.ttt.one.waiguagg.vo.VideoPreviewVO;
 import com.ttt.one.waiguagg.vo.WaiGuaInfoVO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -117,5 +118,30 @@ public class InfoController {
 
         return R.ok();
     }
-
+    /**
+     *  描述: 点赞
+     * @param givelikeEntity:
+     * @return R
+     * @author txy
+     * @description
+     * @date 2021/11/22 16:52
+     */
+    @RequestMapping(value = "/giveLikeInfo",method = RequestMethod.POST)
+    public R giveLikeInfo(@RequestBody GivelikeEntity givelikeEntity){
+        infoService.giveLikeInfo(givelikeEntity.getRelationId(),1L,0);
+        return R.ok("点赞成功");
+    }
+    /**
+     *  描述: 取消点赞
+     * @param givelikeEntity:
+     * @return R
+     * @author txy
+     * @description
+     * @date 2021/11/22 16:52
+     */
+    @RequestMapping(value = "/unGiveLikeInfo",method = RequestMethod.POST)
+    public R unGiveLikeInfo(@RequestBody GivelikeEntity givelikeEntity){
+        infoService.unGiveLikeInfo(givelikeEntity.getRelationId(),1L,0);
+        return R.ok("取消点赞成功");
+    }
 }

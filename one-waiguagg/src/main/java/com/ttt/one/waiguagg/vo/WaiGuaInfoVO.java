@@ -72,10 +72,24 @@ public class WaiGuaInfoVO {
      */
     private String reportuserName;
 
+    /**
+     * 点赞总数
+     */
+    private Integer thumbUpNumber;
+    /**
+     * 阅读总数
+     */
+    private Integer readNumber;
+    /**
+     * 是否点赞 0否 1是
+     */
+    private Integer isSupport;
+
     /****************视频相关**********************/
     /**
      * 下载链接
      */
     private String location;
-    //视频时长？ TODO
+
+
 }

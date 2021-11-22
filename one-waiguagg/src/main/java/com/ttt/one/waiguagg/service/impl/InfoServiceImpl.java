@@ -2,23 +2,30 @@ package com.ttt.one.waiguagg.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
+import com.ttt.one.common.exception.RRException;
 import com.ttt.one.common.to.es.WaiguaEsModel;
 import com.ttt.one.common.utils.Constant;
 import com.ttt.one.common.utils.PageUtils;
 import com.ttt.one.common.utils.Query;
 import com.ttt.one.common.utils.R;
+import com.ttt.one.common.utils.constant.InfoConstant;
+import com.ttt.one.waiguagg.entity.GivelikeEntity;
 import com.ttt.one.waiguagg.entity.UnmberEntity;
 import com.ttt.one.waiguagg.fegin.EsSearchFeginServer;
 import com.ttt.one.waiguagg.fegin.FileServer;
 import com.ttt.one.waiguagg.fegin.ThirdPartyFeginServer;
 import com.ttt.one.waiguagg.fegin.UserFeginServer;
+import com.ttt.one.waiguagg.service.GivelikeService;
 import com.ttt.one.waiguagg.service.UnmberService;
 import com.ttt.one.waiguagg.vo.FileInfoVO;
 import com.ttt.one.waiguagg.vo.SysUserVO;
 import com.ttt.one.waiguagg.vo.VideoPreviewVO;
 import com.ttt.one.waiguagg.vo.WaiGuaInfoVO;
+import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -43,6 +50,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 @Service("infoService")
+@Slf4j
 public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements InfoService {
 
     @Autowired
@@ -61,7 +69,8 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
     RedissonClient redisson;
     @Autowired
     private EsSearchFeginServer esSearchFeginServer;
-
+    @Autowired
+    private GivelikeService givelikeService;
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<InfoEntity> page = this.page(
@@ -87,6 +96,9 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
         PageUtils pageUtils = new PageUtils(page);
         //获取查出来的记录数据
         List<InfoEntity> records = page.getRecords();
+        /**
+         * 数据汇总
+         */
         List<WaiGuaInfoVO> collect = records.stream().map(infoEntity -> {
             WaiGuaInfoVO waiGuaInfoVO = new WaiGuaInfoVO();
             BeanUtils.copyProperties(infoEntity, waiGuaInfoVO);
@@ -109,8 +121,26 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
             }*/
             waiGuaInfoVO.setReportuserName(infoEntity.getReportuserId()+"");
             waiGuaInfoVO.setWaiguaInfoId(infoEntity.getId());
+            /**
+             *汇总缓存点赞数
+             */
+            Long countRelationLike = countRelationLike(infoEntity.getId());
+            Long countRelationLikeDb = Long.valueOf(infoEntity.getThumbUpNumber());
+            if(countRelationLikeDb == null){
+                countRelationLikeDb = 0L;
+            }
+            countRelationLike = countRelationLike + countRelationLikeDb;
+            waiGuaInfoVO.setThumbUpNumber(Math.toIntExact(countRelationLike));
+            /**
+             * 当前登录用户是否点赞了
+             */
+            Long currentUser = 1L;
+            Integer isSupport = whetherThumbUp(infoEntity.getId(), currentUser, 1);
+            waiGuaInfoVO.setIsSupport(isSupport);
+
             return waiGuaInfoVO;
         }).collect(Collectors.toList());
+
         pageUtils.setList(collect);
         return pageUtils;
     }
@@ -151,6 +181,22 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
         //2 根据id查出外挂账号
         UnmberEntity unmberEntity = unmberService.getById(infoEntity.getWaiguaId());
         BeanUtils.copyProperties(unmberEntity,waiGuaInfoVO);
+        /**
+         *汇总缓存点赞数
+         */
+        Long countRelationLike = countRelationLike(infoEntity.getId());
+        Long countRelationLikeDb = Long.valueOf(infoEntity.getThumbUpNumber());
+        if(countRelationLikeDb == null){
+            countRelationLikeDb = 0L;
+        }
+        countRelationLike = countRelationLike + countRelationLikeDb;
+        waiGuaInfoVO.setThumbUpNumber(Math.toIntExact(countRelationLike));
+        /**
+         * 当前登录用户是否点赞了
+         */
+        Long currentUser = 1L;
+        Integer isSupport = whetherThumbUp(infoEntity.getId(), currentUser, 1);
+        waiGuaInfoVO.setIsSupport(isSupport);
         //3 合并返回
         return waiGuaInfoVO;
     }
@@ -313,6 +359,238 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
         System.out.println("缓存命中，直接返回");
         List<WaiGuaInfoVO> listMap = JSON.parseObject(s, new TypeReference<List<WaiGuaInfoVO>>(){});
         return listMap;
+    }
+
+    @Override
+    public void giveLikeInfo(Long relationId, Long likedUserId, Integer type) {
+        validateParam(relationId,likedUserId);
+        log.info("点赞数据存入redis开始，relationId:{}，likedUserId:{}", relationId, likedUserId);
+        likeValidate(relationId,likedUserId,type);
+        synchronized (this){
+            //1.用户点赞评论记录
+            redisTemplate.opsForHash().put(InfoConstant.INFO_LIKED_USER_KEY,relationId+"::"+likedUserId, "1");
+            //2.评论点赞数+1
+            String relationLikedResult = (String) redisTemplate.opsForHash().get(InfoConstant.TOTAL_LIKE_COUNT_KEY, String.valueOf(relationId));
+            Long likeCount = relationLikedResult == null ? 0L : Long.parseLong(relationLikedResult);
+            redisTemplate.opsForHash().put(InfoConstant.TOTAL_LIKE_COUNT_KEY, String.valueOf(relationId), (likeCount+1L)+"");
+            log.info("点赞数据存入redis结束，relationId:{}，likedUserId:{}", relationId, likedUserId);
+        }
+    }
+
+    @Override
+    public void unGiveLikeInfo(Long relationId, Long likedUserId, Integer type) {
+        validateParam(relationId,likedUserId);
+        log.info("取消点赞数据存入redis开始，relationId:{}，likedUserId:{}", relationId, likedUserId);
+        unLikeValidate(relationId,likedUserId,type);
+        synchronized (this){
+            //1.评论点赞数-1
+            String relationLikedCountResult = (String) redisTemplate.opsForHash().get(InfoConstant.TOTAL_LIKE_COUNT_KEY, String.valueOf(relationId));
+            Long likeCount = relationLikedCountResult == null ? 0L :Long.parseLong(relationLikedCountResult);
+            likeCount = likeCount - 1L;
+            redisTemplate.opsForHash().put(InfoConstant.TOTAL_LIKE_COUNT_KEY, String.valueOf(relationId),likeCount+"");
+
+            //2.修改用户点赞评论记录
+            redisTemplate.opsForHash().put(InfoConstant.INFO_LIKED_USER_KEY,relationId+"::"+likedUserId,"0");
+            log.info("取消点赞数据存入redis结束，relationId:{}，likedUserId:{}", relationId, likedUserId);
+        }
+    }
+
+    @Override
+    public void redisDataToMysql() {
+        //1.更新评论点赞记录表
+        Map<Object, Object> entries = redisTemplate.opsForHash().entries(InfoConstant.INFO_LIKED_USER_KEY);
+        for (Map.Entry<Object, Object> entry : entries.entrySet()) {
+            String key = (String) entry.getKey();
+            String value = (String)entry.getValue();
+            String[] split = key.split("::");
+            GivelikeEntity givelikeEntity = new GivelikeEntity();
+            givelikeEntity.setType(0);
+            givelikeEntity.setRelationId(Long.parseLong(split[0]));
+            givelikeEntity.setUserId(Long.parseLong(split[1]));
+            QueryWrapper<GivelikeEntity> queryWrapper = new QueryWrapper<GivelikeEntity>()
+                    .eq("relation_id", givelikeEntity.getRelationId()).eq("user_id", givelikeEntity.getUserId())
+                    .eq("type", givelikeEntity.getType()).eq("del_flag", Constant.STATUS_0);
+            Integer count  = givelikeService.getBaseMapper().selectCount(queryWrapper);
+            if(value.equals("1")){//是点赞记录
+                if(count==0) {//避免重复点赞
+                    givelikeService.save(givelikeEntity);
+                }
+            }else{//取消点赞记录
+                if(count>0){
+                    givelikeService.remove(queryWrapper);
+                }
+            }
+        }
+        //2.更新评论点赞总数
+        Map<Object, Object> entriesTotal = redisTemplate.opsForHash().entries(InfoConstant.TOTAL_LIKE_COUNT_KEY);
+        for (Map.Entry<Object, Object> entry : entriesTotal.entrySet()) {
+            String key = (String) entry.getKey();
+            String value =  (String) entry.getValue();
+            InfoEntity infoEntity = this.baseMapper.selectById(Long.parseLong(key));
+            if(infoEntity!=null){
+                infoEntity.setThumbUpNumber(infoEntity.getThumbUpNumber()+Integer.parseInt(value));
+                this.updateById(infoEntity);
+            }
+        }
+        /**
+         * 结束后 清空记录数据
+         */
+        redisTemplate.delete(InfoConstant.INFO_LIKED_USER_KEY);
+        redisTemplate.delete(InfoConstant.TOTAL_LIKE_COUNT_KEY);
+    }
+
+    /**
+     *  描述: 统计评论的总点赞数
+     * @param relationId:
+     * @return Long
+     * @author txy
+     * @description
+     * @date 2021/11/9 16:02
+     */
+    public synchronized Long countRelationLike(Long relationId) {
+        validateParam(relationId);
+        String relationLikedResult = (String) redisTemplate.opsForHash().get(InfoConstant.TOTAL_LIKE_COUNT_KEY, String.valueOf(relationId));
+        Long likeCount = 0L;
+        if(!org.apache.commons.lang3.StringUtils.isEmpty(relationLikedResult)){
+            likeCount = Long.parseLong(relationLikedResult);
+            if (likeCount == null) {
+                return 0L;
+            }
+        }
+        return likeCount;
+    }
+    /**
+     *  描述: 该用户对该评论是否点过赞
+     * @param relationId:
+     * @param likedUserId:
+     * @param type:
+     * @return Integer
+     * @author txy
+     * @description
+     * @date 2021/11/22 14:41
+     */
+    public  Integer whetherThumbUp(Long relationId,Long likedUserId,Integer type) {
+        Integer likeCount = 0;
+        /**
+         * 先去缓存  缓存有 直接按缓存的 return
+         */
+        //获取缓存值
+        String value =(String) redisTemplate.opsForHash()
+                .get(InfoConstant.INFO_LIKED_USER_KEY, relationId + "::" + likedUserId);
+        if(!org.apache.commons.lang3.StringUtils.isEmpty(value)){
+            return Integer.valueOf(value);
+        }
+        /**
+         * 缓存没有  去数据库查
+         */
+        likeCount  = givelikeService.getBaseMapper().selectCount(new QueryWrapper<GivelikeEntity>()
+                .eq("relation_id",relationId).eq("user_id",likedUserId)
+                .eq("type",type).eq("del_flag",Constant.STATUS_0));
+        return likeCount;
+    }
+
+    /**
+     *  描述: 点赞逻辑校验: 查该条记录  有则点过赞了
+     * @param relationId: 被点赞对象id
+     * @param likedUserId: 点赞用户
+     * @param type: 点赞对象类型
+     * @return void
+     * @author txy
+     * @description
+     * @date 2021/11/9 16:03
+     */
+    private void likeValidate(Long relationId, Long likedUserId,Integer type) {
+        /**
+         * 查数据库
+         */
+        Integer count  = givelikeService.getBaseMapper().selectCount(new QueryWrapper<GivelikeEntity>()
+        .eq("relation_id",relationId).eq("user_id",likedUserId)
+                .eq("type",type).eq("del_flag",Constant.STATUS_0));
+        //获取缓存值
+        String value =(String) redisTemplate.opsForHash()
+                .get(InfoConstant.INFO_LIKED_USER_KEY, relationId + "::" + likedUserId);
+        if(count>0){//库里有
+            if(!org.apache.commons.lang3.StringUtils.isEmpty(value)){
+                if(value.equals("1")){//点过了
+                    log.error("数据库有但是缓存取消了又点过攒了，relationId:{}，likedUserId:{}", relationId, likedUserId);
+                    throw new RRException("该评论已被当前用户点赞，重复点赞!");
+                }
+            }else{
+                log.error("数据库有，relationId:{}，likedUserId:{}", relationId, likedUserId);
+                throw new RRException("该评论已被当前用户点赞，重复点赞!");
+            }
+        }else{
+            /**
+             * 查缓存
+             */
+            if(!org.apache.commons.lang3.StringUtils.isEmpty(value)){
+                if(value.equals("1")){// 点过赞了
+                    log.error("缓存有并点过了，relationId:{}，likedUserId:{}", relationId, likedUserId);
+                    throw new RRException("该评论已被当前用户点赞，重复点赞!");
+                }
+            }
+        }
+    }
+
+    /**
+     *  描述: 点赞逻辑校验: 查该条记录  无则未点过赞
+     * @param relationId: 被点赞对象id
+     * @param likedUserId: 点赞用户
+     * @param type: 点赞对象类型
+     * @return void
+     * @author txy
+     * @description
+     * @date 2021/11/9 16:03
+     */
+    private void unLikeValidate(Long relationId, Long likedUserId,Integer type) {
+        /**
+         * 查数据库
+         */
+        Integer count  = givelikeService.getBaseMapper().selectCount(new QueryWrapper<GivelikeEntity>()
+                .eq("relation_id",relationId).eq("user_id",likedUserId)
+                .eq("type",type).eq("del_flag",Constant.STATUS_0));
+        String value =(String) redisTemplate.opsForHash()
+                .get(InfoConstant.INFO_LIKED_USER_KEY, relationId + "::" + likedUserId);
+        if(count == 0 ){
+            log.error("数据库没有，relationId:{}，likedUserId:{}", relationId, likedUserId);
+            /**
+             * 查缓存
+             */
+            boolean b = redisTemplate.opsForHash()
+                    .hasKey(InfoConstant.INFO_LIKED_USER_KEY, relationId + "::" + likedUserId);
+            if(!b){
+                log.error("缓存没有，commentId:{}，likedUserId:{}", relationId, likedUserId);
+                throw new RRException("该评论未被当前用户点赞，不可以进行取消点赞操作!");
+            }else {
+                if(value.equals("0")){
+                    log.error("缓存有但是取消了已经，commentId:{}，likedUserId:{}", relationId, likedUserId);
+                    throw new RRException("该评论未被当前用户点赞，不可以进行取消点赞操作!");
+                }
+            }
+        }else{//库里有
+            if(!org.apache.commons.lang3.StringUtils.isBlank(value)){
+                if(value.equals("0")){//但是缓存已经取消过了
+                    throw new RRException("该评论已经取消点赞，不可以进行取消点赞操作!");
+                }
+            }
+        }
+    }
+
+    /**
+     *  描述: 入参验证
+     * @param params:
+     * @return void
+     * @author txy
+     * @description
+     * @date 2021/11/9 16:03
+     */
+    private void validateParam(Long... params) {
+        for (Long param : params) {
+            if (null == param) {
+                log.error("入参存在null值");
+                throw new RRException("参数不能为null!");
+            }
+        }
     }
 
     private List<WaiGuaInfoVO> getAllWaiGuaData(){

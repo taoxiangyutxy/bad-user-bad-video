@@ -79,5 +79,37 @@ public interface InfoService extends IService<InfoEntity> {
      * @return
      */
     List<WaiGuaInfoVO>  pageAllWaiGua(Map<String, Object> params);
+
+    /**
+     *  描述: 点赞
+     * @param relationId: 被点赞对象id
+     * @param likedUserId: 点赞用户
+     * @param type: 点赞对象类型
+     * @return void
+     * @author txy
+     * @description
+     * @date 2021/11/9 15:02
+     */
+    void giveLikeInfo(Long relationId,Long likedUserId,Integer type);
+    /**
+     *  描述: 取消点赞
+     * @param relationId: 被点赞对象id
+     * @param likedUserId: 点赞用户
+     * @param type: 点赞对象类型
+     * @return void
+     * @author txy
+     * @description
+     * @date 2021/11/9 15:02
+     */
+    void unGiveLikeInfo(Long relationId, Long likedUserId,Integer type);
+    /**
+     *  描述: redis定时任务同步数据库 加事务
+     * @param :
+     * @return void
+     * @author txy
+     * @description
+     * @date 2021/11/12 10:40
+     */
+    void redisDataToMysql();
 }
 
