@@ -1,5 +1,6 @@
 package com.ttt.one.waiguagg.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
@@ -68,4 +69,9 @@ public class InfoEntity implements Serializable {
 	 * 阅读总数
 	 */
 	private Integer readNumber;
+	/**
+	 * 是否点赞 0否 1是
+	 */
+	@TableField(exist = false)
+	private Integer isSupport;
 }

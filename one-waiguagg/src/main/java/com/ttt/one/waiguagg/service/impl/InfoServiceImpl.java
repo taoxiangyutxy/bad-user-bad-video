@@ -2,6 +2,7 @@ package com.ttt.one.waiguagg.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ttt.one.common.exception.RRException;
 import com.ttt.one.common.to.es.WaiguaEsModel;
 import com.ttt.one.common.utils.Constant;
@@ -89,13 +90,20 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
         if(!StringUtils.isEmpty(key)){
             wrapper.like("waigua_username",key);
         }
-        IPage<InfoEntity> page = this.page(
+        IPage<InfoEntity> page =new Page<>();
+                /*this.page(
                 new Query<InfoEntity>().getPage(params),
                 wrapper
-        );
+        );*/
         PageUtils pageUtils = new PageUtils(page);
-        //获取查出来的记录数据
-        List<InfoEntity> records = page.getRecords();
+        /**
+         * 当前登录用户
+         */
+        Long currentUser = 1L;
+        /**
+         * 查询集合 sql拼接是否点赞
+         */
+        List<InfoEntity> records = this.baseMapper.findListAll(key,currentUser); //page.getRecords();
         /**
          * 数据汇总
          */
@@ -125,19 +133,19 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
              *汇总缓存点赞数
              */
             Long countRelationLike = countRelationLike(infoEntity.getId());
-            Long countRelationLikeDb = Long.valueOf(infoEntity.getThumbUpNumber());
-            if(countRelationLikeDb == null){
-                countRelationLikeDb = 0L;
+            Long countRelationLikeDb = 0L;
+            if(infoEntity.getThumbUpNumber()!=null){
+                countRelationLikeDb =  Long.valueOf(infoEntity.getThumbUpNumber());
             }
             countRelationLike = countRelationLike + countRelationLikeDb;
             waiGuaInfoVO.setThumbUpNumber(Math.toIntExact(countRelationLike));
             /**
-             * 当前登录用户是否点赞了
+             * 缓存是否点过赞了
              */
-            Long currentUser = 1L;
             Integer isSupport = whetherThumbUp(infoEntity.getId(), currentUser, 1);
-            waiGuaInfoVO.setIsSupport(isSupport);
-
+            if(isSupport!=null){
+                waiGuaInfoVO.setIsSupport(isSupport);
+            }
             return waiGuaInfoVO;
         }).collect(Collectors.toList());
 
@@ -171,8 +179,12 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
     @Override
     public WaiGuaInfoVO getByIdAndUnmber(Long id) {
         WaiGuaInfoVO waiGuaInfoVO = new WaiGuaInfoVO();
+        /**
+         * 当前登录用户
+         */
+        Long currentUser = 1L;
         //1 根据id查询info信息
-        InfoEntity infoEntity = this.getById(id);
+        InfoEntity infoEntity = this.baseMapper.getByIdAndCuser(id,currentUser);
         BeanUtils.copyProperties(infoEntity,waiGuaInfoVO);
         if(null!=infoEntity.getWaiguaType()){
             waiGuaInfoVO.setWaiguaType(infoEntity.getWaiguaType().split(","));
@@ -185,18 +197,19 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
          *汇总缓存点赞数
          */
         Long countRelationLike = countRelationLike(infoEntity.getId());
-        Long countRelationLikeDb = Long.valueOf(infoEntity.getThumbUpNumber());
-        if(countRelationLikeDb == null){
-            countRelationLikeDb = 0L;
+        Long countRelationLikeDb = 0L;
+        if(infoEntity.getThumbUpNumber()!=null){
+            countRelationLikeDb =  Long.valueOf(infoEntity.getThumbUpNumber());
         }
         countRelationLike = countRelationLike + countRelationLikeDb;
         waiGuaInfoVO.setThumbUpNumber(Math.toIntExact(countRelationLike));
         /**
-         * 当前登录用户是否点赞了
+         * 缓存 是否点过赞了
          */
-        Long currentUser = 1L;
         Integer isSupport = whetherThumbUp(infoEntity.getId(), currentUser, 1);
-        waiGuaInfoVO.setIsSupport(isSupport);
+        if(isSupport!=null){
+            waiGuaInfoVO.setIsSupport(isSupport);
+        }
         //3 合并返回
         return waiGuaInfoVO;
     }
@@ -470,7 +483,6 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
      * @date 2021/11/22 14:41
      */
     public  Integer whetherThumbUp(Long relationId,Long likedUserId,Integer type) {
-        Integer likeCount = 0;
         /**
          * 先去缓存  缓存有 直接按缓存的 return
          */
@@ -483,10 +495,10 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
         /**
          * 缓存没有  去数据库查
          */
-        likeCount  = givelikeService.getBaseMapper().selectCount(new QueryWrapper<GivelikeEntity>()
+        /*likeCount  = givelikeService.getBaseMapper().selectCount(new QueryWrapper<GivelikeEntity>()
                 .eq("relation_id",relationId).eq("user_id",likedUserId)
-                .eq("type",type).eq("del_flag",Constant.STATUS_0));
-        return likeCount;
+                .eq("type",type).eq("del_flag",Constant.STATUS_0));*/
+        return null;
     }
 
     /**

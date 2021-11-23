@@ -128,7 +128,7 @@ public class InfoController {
      */
     @RequestMapping(value = "/giveLikeInfo",method = RequestMethod.POST)
     public R giveLikeInfo(@RequestBody GivelikeEntity givelikeEntity){
-        infoService.giveLikeInfo(givelikeEntity.getRelationId(),1L,0);
+        infoService.giveLikeInfo(givelikeEntity.getRelationId(),givelikeEntity.getUserId(),0);
         return R.ok("点赞成功");
     }
     /**
@@ -141,7 +141,7 @@ public class InfoController {
      */
     @RequestMapping(value = "/unGiveLikeInfo",method = RequestMethod.POST)
     public R unGiveLikeInfo(@RequestBody GivelikeEntity givelikeEntity){
-        infoService.unGiveLikeInfo(givelikeEntity.getRelationId(),1L,0);
+        infoService.unGiveLikeInfo(givelikeEntity.getRelationId(),givelikeEntity.getUserId(),0);
         return R.ok("取消点赞成功");
     }
 }

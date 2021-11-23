@@ -26,7 +26,7 @@ import com.ttt.one.common.utils.R;
  * @date 2021-11-22 16:21:39
  */
 @RestController
-@RequestMapping("user/givelike")
+@RequestMapping("/givelike")
 public class GivelikeController {
     @Autowired
     private GivelikeService givelikeService;
