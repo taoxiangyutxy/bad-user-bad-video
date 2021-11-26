@@ -16,7 +16,7 @@ import java.util.List;
 @Mapper
 public interface InfoDao extends BaseMapper<InfoEntity> {
 
-    List<InfoEntity> findListAll(String key, Long currentUser);
+    List<InfoEntity> findListAll(String key,String reviewStatus, Long currentUser);
 
     InfoEntity getByIdAndCuser(Long id, Long currentUser);
 }

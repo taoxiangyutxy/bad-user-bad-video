@@ -23,7 +23,10 @@
             ( g.id IS NULL, 0, 1 ) AS isSupport
         FROM waigua_info i
                  LEFT JOIN waigua_giveLike g ON g.relation_id = i.id AND g.user_id = #{currentUser}
-        WHERE i.`status` = 0 AND i.review_status = 2
+        WHERE i.`status` = 0
+        <if test="reviewStatus != null and reviewStatus != ''">
+            AND i.review_status = #{reviewStatus}
+        </if>
         <if test="key != null and key != ''">
             AND c.waiguaDescribe LIKE CONCAT( '%', #{key}, '%' )
         </if>
@@ -34,7 +37,7 @@
             ( g.id IS NULL, 0, 1 ) AS isSupport
         FROM waigua_info i
                  LEFT JOIN waigua_giveLike g ON g.relation_id = i.id AND g.user_id = #{currentUser}
-        WHERE i.`status` = 0 AND i.review_status = 2 AND i.id = #{id}
+        WHERE i.`status` = 0 AND i.id = #{id}
     </select>
 
 

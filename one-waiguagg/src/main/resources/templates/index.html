@@ -8,9 +8,6 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="description" content="Free HTML5 Template by FREEHTML5" />
 	<meta name="keywords" content="free html5, free template, free bootstrap, html5, css3, mobile first, responsive" />
-	
-
-  
 
   	<!-- Facebook and Twitter integration -->
 	<meta property="og:title" content=""/>
@@ -43,7 +40,10 @@
 	<!--[if lt IE 9]>
 	<script src="static/waiguaindex/js/respond.min.js"></script>
 	<![endif]-->
-
+	<style>
+		.like{ font-size:16px;  color:#ccc; cursor:pointer;float: left;margin-left: 8px;}
+		.cs{color:#f00;}
+	</style>
 	</head>
 	<body>
 	<div id="fh5co-offcanvas">
@@ -102,7 +102,6 @@
 		</div>
 
 	</header>
-    <div class="copyrights">Collect from <a href="http://www.cssmoban.com/" >企业网站模板</a></div>
 	<!-- END #fh5co-header -->
 	<div class="container-fluid">
 		<div class="row fh5co-post-entry">
@@ -112,9 +111,12 @@
 					<video width="320" height="240" controls>
 						<source th:src="${waigua.getLocation()}" type="video/mp4">
 					</video>
+					<P class="like" >&#10084;</P> <span id="countLike" style="margin-left: 10px;float: left" th:text="${waigua.getThumbUpNumber()}"></span>
+					<font style="margin-left: 9px;float: left;font-size: small;margin-top: 4px;" >人喜欢</font>
+
 				</figure>
-				<span class="fh5co-meta"><a href="single.html" th:text="${waigua.getWaiguaUsername()}">Food &amp; Drink</a></span>
-				<h2 class="fh5co-article-title"><a href="single.html" th:text="${waigua.getWaiguaDescribe()}">We Eat and Drink All Night</a></h2>
+				<span class="fh5co-meta"><a th:href="@{/single.html(id=${waigua.getWaiguaInfoId()})}"  th:text="${waigua.getWaiguaUsername()}">Food &amp; Drink</a></span>
+				<h2 class="fh5co-article-title"><a href="http://waiguattt.com/single.html" th:text="${waigua.getWaiguaDescribe()}">We Eat and Drink All Night</a></h2>
 				<span class="fh5co-meta fh5co-date" th:text="${#dates.format(waigua.getCreateTime(),'yyyy-MM-dd HH:mm:ss')}">March 6th, 2016</span>
 			</article>
 			<div class="clearfix visible-xs-block"></div>
@@ -140,6 +142,22 @@
 
 	</body>
 <script type="text/javascript">
+	$(function () {
+		/*let isLiked = false;
+		$(".like").click(function () {
+			$(this).toggleClass('cs');
+			let countLike = document.getElementById("countLike").innerText;
+			isLiked = !isLiked;
+			console.log(countLike);
+			let newCountLike ;
+			if (isLiked) {
+				newCountLike = parseInt(countLike) +1;
+			} else {
+				newCountLike = parseInt(countLike) -1;
+			}
+			document.getElementById('countLike').innerHTML=newCountLike;
+		})*/
+	})
 	function search() {
 		var keyword=$("#searchText").val();
 		window.location.href="http://search.waiguattt.com/list.html?keyword="+keyword;

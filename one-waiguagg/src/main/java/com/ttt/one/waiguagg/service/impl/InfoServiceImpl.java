@@ -90,11 +90,11 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
         if(!StringUtils.isEmpty(key)){
             wrapper.like("waigua_username",key);
         }
-        IPage<InfoEntity> page =new Page<>();
-                /*this.page(
+        IPage<InfoEntity> page =
+                this.page(
                 new Query<InfoEntity>().getPage(params),
-                wrapper
-        );*/
+                new QueryWrapper<InfoEntity>()
+        );
         PageUtils pageUtils = new PageUtils(page);
         /**
          * 当前登录用户
@@ -103,7 +103,7 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
         /**
          * 查询集合 sql拼接是否点赞
          */
-        List<InfoEntity> records = this.baseMapper.findListAll(key,currentUser); //page.getRecords();
+        List<InfoEntity> records = this.baseMapper.findListAll(key,null,currentUser); //page.getRecords();
         /**
          * 数据汇总
          */
@@ -137,8 +137,8 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
             if(infoEntity.getThumbUpNumber()!=null){
                 countRelationLikeDb =  Long.valueOf(infoEntity.getThumbUpNumber());
             }
-            countRelationLike = countRelationLike + countRelationLikeDb;
-            waiGuaInfoVO.setThumbUpNumber(Math.toIntExact(countRelationLike));
+            Integer coutLike = Math.toIntExact(countRelationLike + countRelationLikeDb);
+            waiGuaInfoVO.setThumbUpNumber(coutLike);
             /**
              * 缓存是否点过赞了
              */
@@ -170,6 +170,8 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
         infoEntity.setWaiguaId(unmberEntity.getId());
         infoEntity.setWaiguaType(StringUtils.arrayToDelimitedString(waiGuaInfoVO.getWaiguaType(),","));
         infoEntity.setStatus(Constant.STATUS_0);
+        infoEntity.setThumbUpNumber(0);
+        infoEntity.setReadNumber(0);
         infoEntity.setCreateTime(new Date());
         infoEntity.setUpdataTime(infoEntity.getCreateTime());
         infoEntity.setReviewStatus(Constant.REVIEWSTATUS_0);
@@ -201,14 +203,27 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
         if(infoEntity.getThumbUpNumber()!=null){
             countRelationLikeDb =  Long.valueOf(infoEntity.getThumbUpNumber());
         }
-        countRelationLike = countRelationLike + countRelationLikeDb;
-        waiGuaInfoVO.setThumbUpNumber(Math.toIntExact(countRelationLike));
+        Integer coutLike = Math.toIntExact(countRelationLike + countRelationLikeDb);
+        waiGuaInfoVO.setThumbUpNumber(coutLike);
         /**
          * 缓存 是否点过赞了
          */
         Integer isSupport = whetherThumbUp(infoEntity.getId(), currentUser, 1);
         if(isSupport!=null){
             waiGuaInfoVO.setIsSupport(isSupport);
+        }
+        /**
+         * 获取视频链接
+         */
+        R r = fileServer.videoInfo(infoEntity.getId());
+        if (r.getCode() == 0) { //远程服务调用成功
+            List<FileInfoVO> fileList = r.getData("fileList", new TypeReference<List<FileInfoVO>>() {
+            });
+            if (fileList != null && fileList.size() > 0) {
+                waiGuaInfoVO.setLocation(fileList.get(0).getLocation());
+            }
+        } else {
+            log.error("远程服务调用失败--- fileServer.videoInfo");
         }
         //3 合并返回
         return waiGuaInfoVO;
@@ -426,6 +441,8 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
             Integer count  = givelikeService.getBaseMapper().selectCount(queryWrapper);
             if(value.equals("1")){//是点赞记录
                 if(count==0) {//避免重复点赞
+                    givelikeEntity.setDelFlag(0);
+                    givelikeEntity.setCreateTime(new Date());
                     givelikeService.save(givelikeEntity);
                 }
             }else{//取消点赞记录
@@ -612,13 +629,45 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
         System.out.println("获取分布式锁成功..");
         List<WaiGuaInfoVO> collect = new ArrayList<>();
         try {
-            QueryWrapper<InfoEntity> wrapper = new QueryWrapper<InfoEntity>().eq("status", Constant.STATUS_0);
+            /*QueryWrapper<InfoEntity> wrapper = new QueryWrapper<InfoEntity>().eq("status", Constant.STATUS_0);
             wrapper.eq("review_status",Constant.REVIEWSTATUS_2);
-            List<InfoEntity> infoEntities = this.list(wrapper);
+            List<InfoEntity> infoEntities = this.list(wrapper);*/
+            /**
+             * 当前登录用户
+             */
+            Long currentUser = 1L;
+            /**
+             * 查询集合 sql拼接是否点赞
+             */
+            List<InfoEntity> infoEntities = this.baseMapper.findListAll(null,"2",currentUser);
              collect = infoEntities.stream().map(infoEntity -> {
                 WaiGuaInfoVO waiGuaInfoVO = new WaiGuaInfoVO();
                 BeanUtils.copyProperties(infoEntity, waiGuaInfoVO);
+                 /**
+                  * 外挂信息主键 注入
+                  */
+                waiGuaInfoVO.setWaiguaInfoId(infoEntity.getId());
                 waiGuaInfoVO.setWaiguaType(infoEntity.getWaiguaType().split(","));
+                 /**
+                  *汇总缓存点赞数
+                  */
+                 Long countRelationLike = countRelationLike(infoEntity.getId());
+                 Long countRelationLikeDb = 0L;
+                 if(infoEntity.getThumbUpNumber()!=null){
+                     countRelationLikeDb =  Long.valueOf(infoEntity.getThumbUpNumber());
+                 }
+                 Integer coutLike = Math.toIntExact(countRelationLike + countRelationLikeDb);
+                 waiGuaInfoVO.setThumbUpNumber(coutLike);
+                 /**
+                  * 缓存是否点过赞了
+                  */
+                 Integer isSupport = whetherThumbUp(infoEntity.getId(), currentUser, 1);
+                 if(isSupport!=null){
+                     waiGuaInfoVO.setIsSupport(isSupport);
+                 }
+                 /**
+                  * 获取视频链接
+                  */
                 R r = fileServer.videoInfo(infoEntity.getId());
                 if (r.getCode() == 0) { //远程服务调用成功
                     List<FileInfoVO> fileList = r.getData("fileList", new TypeReference<List<FileInfoVO>>() {
