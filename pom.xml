@@ -10,10 +10,13 @@
     <packaging>pom</packaging>
     <modules>
         <module>one-waiguagg</module>
-        <module>renren-fast</module>
-        <module>renren-generator</module>
+       <!-- <module>renren-fast</module>-->
         <module>one-common</module>
         <module>one-fileServer</module>
+        <module>one-gateway</module>
+        <module>one-auth-server</module>
+        <module>one-search</module>
+        <module>one-user</module>
     </modules>
 
 </project>
