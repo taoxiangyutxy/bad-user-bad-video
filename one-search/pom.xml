@@ -82,7 +82,7 @@
     </dependencies>
 
     <build>
-        <finalName>search</finalName>
+        <finalName>one-search</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

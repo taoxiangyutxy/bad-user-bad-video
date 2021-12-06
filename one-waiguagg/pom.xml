@@ -133,7 +133,7 @@
     </dependencyManagement>
 
     <build>
-        <finalName>waiguagg</finalName>
+        <finalName>one-waiguagg</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

@@ -96,7 +96,7 @@
     </dependencyManagement>
 
     <build>
-        <finalName>auth</finalName>
+        <finalName>one-auth-server</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

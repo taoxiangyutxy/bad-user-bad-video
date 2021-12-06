@@ -41,7 +41,7 @@
     </dependencies>
 
     <build>
-        <finalName>user</finalName>
+        <finalName>one-user</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

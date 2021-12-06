@@ -120,7 +120,7 @@
     </dependencyManagement>
 
     <build>
-        <finalName>file</finalName>
+        <finalName>one-fileServer</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
