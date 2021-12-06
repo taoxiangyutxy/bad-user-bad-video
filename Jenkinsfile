@@ -35,7 +35,7 @@ node {
     }
     stage('移动至工作目录') {
         dir("/var/lib/jenkins/workspace/tttOne") {
-            sh "cp -f ./target/${CURRENT_JOB}.jar /app/data/"
+            sh "cp -f ./${CURRENT_JOB}/target/${CURRENT_JOB}.jar /app/data/"
         }
     }
     stage('启动当前模块') { //怎么启动？
