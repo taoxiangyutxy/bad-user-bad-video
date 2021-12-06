@@ -23,7 +23,7 @@ node {
             sh "echo GIT_PREVIOUS_SUCCESSFUL_COMMIT:${GIT_PREVIOUS_SUCCESSFUL_COMMIT}"
             sh "echo CURRENT_JOB:${CURRENT_JOB}"
             if ("${GIT_PREVIOUS_SUCCESSFUL_COMMIT}" != "${GIT_COMMIT}") {
-                sh "mvn -f common clean install"
+                sh "mvn -f one-common clean install"
             }
         }
     }
