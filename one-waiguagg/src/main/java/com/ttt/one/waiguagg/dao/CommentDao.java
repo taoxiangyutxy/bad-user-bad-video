@@ -2,7 +2,6 @@ package com.ttt.one.waiguagg.dao;
 
 import com.ttt.one.waiguagg.entity.CommentEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.ttt.one.waiguagg.vo.CommentsVO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -18,4 +17,8 @@ import java.util.List;
 public interface CommentDao extends BaseMapper<CommentEntity> {
 
     List<CommentEntity> commentsList(Long infoId);
+
+    List<CommentEntity> selectCommentById(Long infoId ,Long parentId,Long currentUser);
+
+    CommentEntity selectCommentByCommentId(Long parentId);
 }

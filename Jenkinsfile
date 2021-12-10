@@ -29,7 +29,7 @@ node {
     }
     stage('构建当前模块') {
         dir("/var/lib/jenkins/workspace/tttOne") {
-            sh "mvn -f ${CURRENT_JOB} clean compile install package  -Dmaven.test.skip=true " //-P dev  区分构建环境
+            sh "mvn -f ${CURRENT_JOB} clean compile install package  -Dmaven.test.skip=true " //-P dev  区分构建环境  -Dmaven.test.skip=true过滤测试用例
          //   sh "mvn  clean compile install package  "
         }
     }

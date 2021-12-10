@@ -4,9 +4,11 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
 //import org.apache.shiro.authz.annotation.RequiresPermissions;
-import com.ttt.one.waiguagg.vo.CommentsVO;
+import com.alibaba.fastjson.TypeReference;
+import com.ttt.one.common.utils.Constant;
+import com.ttt.one.waiguagg.fegin.UserFeginServer;
+import com.ttt.one.waiguagg.vo.UserEntityVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,7 +21,7 @@ import com.ttt.one.waiguagg.service.CommentService;
 import com.ttt.one.common.utils.PageUtils;
 import com.ttt.one.common.utils.R;
 
-
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * 外挂评论表
@@ -33,11 +35,16 @@ import com.ttt.one.common.utils.R;
 public class CommentController {
     @Autowired
     private CommentService commentService;
-
+    @Autowired
+    private UserFeginServer userFeginServer;
     @RequestMapping("/commentsList")
-    public R commentsList(@RequestParam Long infoId){
-        List<CommentsVO>  list= commentService.commentsList(infoId);
-
+    public R commentsList(@RequestParam Long infoId, HttpServletRequest request){
+        UserEntityVO userEntityVO = (UserEntityVO) request.getSession().getAttribute(Constant.LOGIN_USER);
+        Long currentUser = -1L;
+        if(userEntityVO!=null){
+            currentUser = userEntityVO.getId();
+        }
+        List<CommentEntity>  list= commentService.commentsList(infoId,2,currentUser);
         return R.ok().put("list", list);
     }
 
@@ -71,6 +78,20 @@ public class CommentController {
     @RequestMapping("/save")
    // @RequiresPermissions("comment:comment:save")
     public R save(@RequestBody CommentEntity comment){
+
+       /* R r = userFeginServer.info(comment.getUserId());
+        if(r.getCode()==0){
+            UserEntityVO data = r.getData("user", new TypeReference<UserEntityVO>() {
+            });
+            //获取当前登录人信息存入
+            comment.setNickname(data.getUsername());
+        }*/
+        //获取被回复人名称
+        CommentEntity commentEntity = commentService.selectCommentByCommentId(comment.getParentId());
+        if(commentEntity!=null){
+            comment.setNickname(commentEntity.getUsername());
+        }
+        //应该获取当前登录人id set进user_id 字段 该条评论谁评论的：暂时是html写死的
         comment.setDelFlag(0);
         comment.setThumbUpNumber(0);
         comment.setOnNumberOf(0);

@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ttt.one.common.vo.UserEntity;
 import lombok.Data;
 
@@ -20,6 +21,8 @@ import lombok.Data;
  */
 @Data
 @TableName("waigua_comment")
+//在 json 序列化时忽略 bean 中的一些不需要转化的属性
+@JsonIgnoreProperties(value = { "handler" })
 public class CommentEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -91,10 +94,20 @@ public class CommentEntity implements Serializable {
 	@TableField(exist = false)
 	private String username;
 	/**
+	 * 父级用户名称  @
+	 */
+	@TableField(exist = false)
+	private String parentUsername;
+	/**
 	 * 用户头像
 	 */
 	@TableField(exist = false)
 	private String header;
 	@TableField(exist = false)
 	private List<CommentEntity> children;
+	/**
+	 * 是否点赞 0否 1是
+	 */
+	@TableField(exist = false)
+	private Integer isSupport;
 }

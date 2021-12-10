@@ -62,6 +62,11 @@
     .cs {
         color: #f00;
     }
+    .likeSon {
+        font-size: 16px;
+        cursor: pointer;
+        display:inline;
+    }
 
     /*底部样式*/
     .footer {
@@ -92,7 +97,90 @@
         user-select: none;
         outline: none;
     }
+         .comment-submitSon {
+             width: 70px;
+             height: 64px;
+             /*position: absolute;*/
+             right: -80px;
+             top: 0;
+             padding: 4px 15px;
+             font-size: 14px;
+             color: #fff;
+             border-radius: 4px;
+             text-align: center;
+             min-width: 60px;
+             vertical-align: top;
+             cursor: pointer;
+             background-color: #00a1d6;
+             border: 1px solid #00a1d6;
+             transition: 0.1s;
+             user-select: none;
+             outline: none;
+         }
 	/*评论列表*/
+    /*一级评论 头像*/
+    .one-headImg{
+        width: 70px;
+        height: 64px;
+        float: left;
+    }
+    .two-headImg{
+        width: 30px;
+        height: 30px;
+        margin-top: 30px;
+        border-radius:60px;
+        padding:0px;
+        vertical-align:middle;
+    }
+    .user{
+        margin-left: 90px;
+    }
+    .info{
+        margin-left: 90px;
+        color: #99a2aa;
+    }
+    .infoSon{
+        color: #99a2aa;
+    }
+    .text{
+        margin-left: 90px;
+    }
+    .B{
+        /*评论竖列排序 1层评论不乱样式 关键代码*/
+        display:inline;
+        margin-left: 5px;
+        float: bottom;
+    }
+    /*监听鼠标悬浮到标签  标签背景变色  字体变色*/
+    .gaoL:hover {
+        background: #99a2aa;
+        border-color: #a5e6ff;
+        color: #a5e6ff;
+
+    }
+    .baffle {
+        display: block;
+        position: absolute;
+        width: 100%;
+        top: 0;
+        line-height: 72px;
+        font-size: 12px;
+        border-radius: 4px;
+        text-align: center;
+        color: #777;
+        background-color: #e5e9ef;
+        overflow: hidden;
+    }
+    .textareaDiv{
+        position: relative;
+    }
+    .b-btn {
+        padding: 4px 9px;
+        margin: 0 3px;
+        color: #fff;
+        background-color: #00a1d6;
+        border-radius: 4px;
+    }
 
 </style>
 <header>
@@ -119,9 +207,8 @@
     </div>
     <!--点赞区-->
     <div>
-        <P class="" th:class="${infoVO.getIsSupport() == 0} ? 'like' : 'like cs'">&#10084;</P> <span id="countLike"
-                                                                                                     style="margin-left: 10px;"
-                                                                                                     th:text="${infoVO.getThumbUpNumber()}"></span>
+        <P class="" th:class="${infoVO.getIsSupport() == 0} ? 'like' : 'like cs'">&#10084;</P>
+        <span id="countLike" style="margin-left: 10px;" th:text="${infoVO.getThumbUpNumber()}"></span>
     </div>
     <hr/>
     <!--作者对该视频简介  没有暂时title顶-->
@@ -130,87 +217,68 @@
     </div>
     <hr/>
     <!--评论区-->
+    <div id="table_refresh" th:fragment="table_refresh">
     <div>
-        <span>700 评论</span>
+        <span th:text="${infoVO.getCommentConut()+'  评论'}">700 评论</span>
     </div>
     <div style="font-size: 15px;">
         <a>按热度排序</a> <a>按时间排序</a>
         <hr/>
     </div>
-    <div>
+    <div class="textareaDiv">
+        <div class="baffle" th:if="${session.loginUser==null}">
+            "请先"
+            <a class="b-btn">登录</a>
+            "后发表评论 (・ω・)"
+        </div>
         <textarea id="content" cols="60" rows="2" placeholder="发一条友善的评论"></textarea>
         <button id="sub" type="submit" class="comment-submit">发表评论</button>
     </div>
     <!--评论列表  灰线分割-->
+    <hr/>
     <!--最外层大集合:包住所有的一级评论-->
-    <div class="comment-list" id="table_refresh" th:fragment="table_refresh">
+    <div class="A" >
         <!--每个一级item 里面又包着二层小集合-->
-        <div th:each="comments : ${list}" class="list-item reply-wrap is-top" data-id="3774235214" data-index="0" scrollshow="true">
+        <div class="B" th:each="comments : ${list}"  >
             <!-- 一层左侧用户头像 + 关注按钮-->
-            <div class="user-face"><a href="//space.bilibili.com/14163840" target="_blank" data-usercard-mid="14163840">
-                <div class="bili-avatar">
-                    <img class="bili-avatar-img bili-avatar-face bili-avatar-img-radius"
-                         src="https://i0.hdslb.com/bfs/face/dcc9325c49974a385e9abb6c3cd039e08d3e8c56.jpg@96w_96h_1c_1s.webp"
+            <div class="C">
+                    <img class="one-headImg"
+                         src="static/waiguaindex/images/person1.jpg"
                          alt="">
-                    <span class="bili-avatar-icon"></span>
-                </div>
-            </a>
-                <!--<div class="hot-follow">
-                    <button class="follow-btn" data-mid="14163840" data-uname="黎曼的猜想" data-rpid="3774235214">关注</button>
-                </div>-->
             </div>
-            <!--二层集合 头部信息-->
-            <div class="con ">
+            <!--一层最外围-->
+            <div class="D">
                 <!--一层固定用户信息-->
-                <div class="user"><a data-usercard-mid="14163840" href="//space.bilibili.com/14163840" target="_black"
-                                     class="name" th:text="${comments.getUsername()}">黎曼的猜想</a><a class="level-link"
-                                                                             href="//www.bilibili.com/blackboard/help.html#%E4%BC%9A%E5%91%98%E7%AD%89%E7%BA%A7%E7%9B%B8%E5%85%B3"
+                <div class="user">
+                    <a  href="" th:text="${comments.getUsername()}">黎曼的猜想</a><a
+                                                                             href=""
                                                                              target="_blank"><i
-                        class="level l6"></i></a><span
-                        class="stick up" style="width:16px"></span></div>
+                        th:text="${comments.getUserLevelId()}"></i></a></div>
                 <!--一层用户评论信息-->
-                <p class="text" th:text="${comments.getContent()}"><span class="stick">置顶</span></p>
+                <p class="text" th:text="${comments.getContent()}"></p>
                 <!--一层用户评论 时间 点赞 回复按钮-->
-                <div class="info"><span class="time">2020-12-03 20:20</span><span
-                        class="like "><i></i><span>27</span></span><span class="hate "><i></i></span><span
-                        class="reply btn-hover btn-highlight">回复</span>
-                    <!--<div class="operation more-operation">
-                        <div class="spot"></div>
-                        <div class="opera-list">
-                            <ul>
-                                <li class="blacklist">加入黑名单</li>
-                                <li class="report">举报</li>
-                            </ul>
-                        </div>
-                    </div>-->
+                <div class="info">
+                    <span style="display:inline;margin-right: 10px;"  th:text="${#dates.format(comments.getCreateTime(),'yyyy-MM-dd HH:mm:ss')}"></span>
+                    <div th:class="${comments.getIsSupport() == 0} ? 'likeSon' : 'likeSon cs'"  th:attr="id=${comments.getId()},data-value=${comments.getIsSupport()}" >&#10084;</div>
+                    <span th:attr="id=${'countLike'+comments.getId()}"  th:text="${comments.getThumbUpNumber()}" style="display:inline;margin-right: 25px;">27</span><span class="huifuBtn gaoL" th:attr="id=${comments.getId()},data-value=${comments.getUsername()}" >回复</span>
                 </div>
                 <!--下面为2层循环集合开始-->
-                <div class="reply-box">
+                <div th:if="${comments.getChildren()!=null && comments.getChildren().size()>0}" class="E" style="margin-left: 120px;">
                     <!--每个2层信息-->
-                    <div th:each="comment : ${comments.getChildComments()}" class="reply-item reply-wrap" data-id="4134279655" data-index="0">
-                        <!--2层头像-->
-                        <a href="//space.bilibili.com/512916320" data-usercard-mid="512916320" target="_blank"
-                            class="reply-face" style="top: 0px;">
-                        <div class="bili-avatar">
-                            <img class="bili-avatar-img bili-avatar-face bili-avatar-img-radius"
-                                 src="https://i0.hdslb.com/bfs/face/member/noface.jpg@96w_96h_1c_1s.webp" alt="">
-                            <span class="bili-avatar-icon"></span>
-                        </div>
-                       </a>
+                    <div  th:each="comment : ${comments.getChildren()}" >
+                        <!--2层头像 -->
+                        <div style="position:relative" >
+                            <img class="two-headImg"
+                                 src="static/waiguaindex/images/person1.jpg"  alt="">
                         <!--2层 用户名称+等级 +评论信息-->
-                        <div class="reply-con">
-                            <div class="user"><a data-usercard-mid="512916320" href="//space.bilibili.com/512916320"
-                                                 target="_black" class="name" th:text="${comment.getUsername()}">bili_29350953960</a><a
-                                    class="level-link"
-                                    href="//www.bilibili.com/blackboard/help.html#%E4%BC%9A%E5%91%98%E7%AD%89%E7%BA%A7%E7%9B%B8%E5%85%B3"
-                                    target="_blank"><i class="level l3"></i></a><span class="text-con" th:text="${comment.getContent()}">已经看到了，大神想的很周到<img
-                                    src="//i0.hdslb.com/bfs/emote/c7aaeacb21e107292d3bb053e5abde4a4459ed30.png@100w_100h.webp"
-                                    class="small" alt="[加油]"></span></div>
+                        <p style="position:absolute;  margin-left: 50px; top:50%;width: 100%"  th:if=" ${comment.parentId != comments.getId()}" th:text="${comment.username+'@'+comment.nickname+':'+comment.content}"></p>
+                        <p style="position:absolute; margin-left: 50px; top:50%;width: 100%" th:if=" ${comment.parentId == comments.getId()}" th:text="${comment.username+':'+comment.content}"></p>
                         </div>
                         <!--2层 时间 点赞 或踩 回复按钮-->
-                        <div class="info"><span class="time">2021-02-17 00:14</span><span
-                                class="like "><i></i><span>1</span></span><span class="hate "><i></i></span><span
-                                class="reply btn-hover">回复</span>
+                        <div class="infoSon" style="display:inline;">
+                            <span style="margin-right: 10px;display:inline;" th:text="${#dates.format(comment.getCreateTime(),'yyyy-MM-dd HH:mm:ss')}">2021-02-17 00:14</span>
+                            <div th:class="${comment.getIsSupport() == 0} ? 'likeSon' : 'likeSon cs'" th:attr="id=${comment.getId()},data-value=${comment.getIsSupport()}" >&#10084;</div><span  th:attr="id=${'countLike'+comment.getId()}" th:text="${comment.getThumbUpNumber()}" style="margin-right: 25px;display:inline;">1</span></span><span
+                                class="huifuBtn gaoL"  th:attr="id=${comment.getId()},data-value=${comment.getUsername()}" >回复</span>
                             <!--右侧小点点-->
                             <!--<div class="operation btn-hover btn-hide-re">
                                 <div class="spot"></div>
@@ -227,13 +295,14 @@
                     <!--<div class="view-more" th:text="'共'+${comments.getCommentCount()}+'条回复'">共<b>34</b>条回复, <a class="btn-more" data-pid="3774235214" data-fold="false">点击查看</a>
                     </div>-->
                 </div>
-                <div class="paging-box"></div>
+                <!--这里点击回复 弹出回复框 写死在这个位置-->
+                <!--一层灰线隔开-->
+                <hr/>
             </div>
-            <!--con 结束-->
         </div>
     </div>
+    </div>
 </div>
-
 <!--底部-->
 <!--<div class="footer">
     <footer id="fh5co-footer" >
@@ -255,15 +324,22 @@
 <script th:inline="javascript" type="text/javascript">
 
     $(function () {
+        /*用户信息*/
+        let userId = [[${session.loginUser==null?-1:session.loginUser.id}]];
+        /*外挂信息点赞变量*/
         let isLiked = false;
         var isSupport = [[${infoVO.isSupport}]];
         var relationId = [[${infoVO.waiguaInfoId}]];
-        /*是否点赞*/
+        /*是否点过赞*/
         if (isSupport == 1) {
             isLiked = true;
         }
-        /*点赞逻辑*/
+
+        /*点击点赞逻辑*/
         $(".like").click(function () {
+            if(!noLogin()){
+                return;
+            }
             $(this).toggleClass('cs');
             let countLike = document.getElementById("countLike").innerText;
             isLiked = !isLiked;
@@ -277,57 +353,138 @@
                 url = "/waiguagg/info/unGiveLikeInfo";
             }
             document.getElementById('countLike').innerHTML = newCountLike;
-            var vo = {"relationId": relationId, "userId": 1};
-            $.ajax({
-                url: url,
-                dataType: "json",
-                type: "post",
-                data: JSON.stringify(vo),
-                contentType: 'application/json;charset=UTF-8',
-                success: function (result) {
-                    if (result.code == 0) {
-                        showTips(result.msg, 120, 200, 3);
-                    } else {
-                        showTips(result.message, 100, 200, 3);
-                    }
-                },
-                error: function (data) {
-                    alert("请求出错");
-                    alert(data);
-                }
-            });
+            giveLikePost(url,relationId,userId,1);
             /*解决连点选中bug*/
             document.onselectstart = new Function("return false");
         })
 
-        /*发表评论*/
-        var btn = document.getElementById("sub");
-        var content = document.getElementById("content");
-        btn.onclick =function(){
-            var vo = {"content": content.value, "userId": 1,"infoId":[[${infoVO.waiguaInfoId}]],"parentId":0};
-            $.ajax({
-                url: "/comment/comment/save",
-                dataType: "json",
-                type: "post",
-                data: JSON.stringify(vo),
-                contentType: 'application/json;charset=UTF-8',
-                success: function (result) {
-                    console.log(result);
-                    if (result.code == 0) {
-                        showTips('发布成功!', 120, 200, 3);
-                        $('#table_refresh').load("/local");
-                    } else {
-                        showTips(result.message, 100, 200, 3);
-                    }
-                },
-                error: function (data) {
-                    alert("请求出错");
-                    alert(data);
-                }
-            });
-        }
+        /*发表一级评论*/
+        $(document).on("click",".comment-submit",function(){
+            var content = document.getElementById("content");
+            subSon(content.value,userId,0,[[${infoVO.waiguaInfoId}]]);
+        })
+        /*二级往后的回复  根据class获取点击监听 并通过id来传参*/
+        $(document).on('click', '.huifuBtn', function(e){
+            if(!noLogin()){
+                return;
+            }
+            $(".reply_textarea").remove();
+            $(this).parent().append("<div class='reply_textarea'><textarea  id='contentSon'  cols='60' rows='2'placeholder='回复 @"+e.target.dataset.value
+                +":'></textarea> <button id='subSon'  parentId='"+e.target.id+"'   type='submit' class='comment-submitSon'>发表评论</button></div>");
+        });
+        /*二级往后的回复 的发表评论监听*/
+        $(document).on("click",".comment-submitSon",function(){
+            var parentId=$(this).attr("parentId");
+            var content  = document.getElementById('contentSon');
+            subSon(content.value,userId,parentId,relationId);
+        })
+        /*评论区的点赞功能监听*/
+        $(document).on('click', '.likeSon', function(e){
+            if(!noLogin()){
+                return;
+            }
+            let isLikedComment = false;
+            let className = document.getElementById(""+e.target.id+"").className;
+            if(className.indexOf("cs") != -1){
+                isLikedComment = true;
+            }else{
+                isLikedComment = false;
+            }
+            let isSupport = e.target.dataset.value;
+            let relationId = e.target.id;
+            /*是否点过赞*/
+            if (isSupport == 1) {
+                isLikedComment = true;
+            }
+            console.log("isSupport=",isSupport);
+            $(this).toggleClass('cs');
+            let countLike = document.getElementById("countLike"+relationId+"").innerText;
+            console.log("countLike=",countLike);
+            isLikedComment = !isLikedComment;
+            let newCountLike ;
+            let url;
+            if (isLikedComment) {
+                newCountLike = parseInt(countLike) + 1;
+                url = "/waiguagg/info/giveLikeInfo";
+            } else {
+                newCountLike = parseInt(countLike) - 1;
+                url = "/waiguagg/info/unGiveLikeInfo";
+            }
+            document.getElementById("countLike"+relationId+"").innerHTML = newCountLike;
+            giveLikePost(url,relationId,userId,2);
+            /*解决连点选中bug*/
+            document.onselectstart = new Function("return false");
+        });
+        /*登录页面跳转*/
+        $(document).on('click', '.b-btn', function(e){
+            window.location.href="http://auth.waiguattt.com/login.html"
+        });
     })
+    /*是否登录验证*/
+    function noLogin(){
+        let user = [[${session.loginUser}]];
+        if(user == null){
+            if(confirm('请登录！是否去登录?')) {
+                window.location.href="http://auth.waiguattt.com/login.html";
+                return false;
+            } else {
+                return false;
+            }
+        }
+        return true;
+    }
+    /*评论接口调用*/
+    function subSon(content,userId,parentId,infoId){
+        var vo = {"content": content, "userId": userId,"infoId":[[${infoVO.waiguaInfoId}]],"parentId":parentId};
+        $.ajax({
+            url: "/comment/comment/save",
+            dataType: "json",
+            type: "post",
+            data: JSON.stringify(vo),
+            contentType: 'application/json;charset=UTF-8',
+            success: function (result) {
+                if (result.code == 0) {
+                    showTips('发布成功!', 120, 200, 3);
+                    $('#table_refresh').load("/local?id="+infoId+"");
+                    console.log(parentId);
+                    if(parentId==0){
+                        document.getElementById("content").value ="";
+                    }else{
+                        document.getElementById("contentSon").value ="";
+                    }
+                } else {
+                    showTips(result.message, 100, 200, 3);
+                }
+            },
+            error: function (data) {
+                alert("请求出错");
+                console.log(data);
+            }
+        });
+    }
 
+    /*点赞接口调用*/
+    function giveLikePost(url,relationId,userId,type) {
+        var vo = {"relationId": relationId, "userId": userId, "type": type};
+        $.ajax({
+            url: url,
+            dataType: "json",
+            type: "post",
+            data: JSON.stringify(vo),
+            contentType: 'application/json;charset=UTF-8',
+            success: function (result) {
+                if (result.code == 0) {
+                    showTips(result.msg, 120, 200, 3);
+                } else {
+                    showTips(result.message, 100, 200, 3);
+                }
+            },
+            error: function (data) {
+                alert("请求出错");
+                console.log(data);
+            }
+        });
+    }
 
     /**
      * 借鉴

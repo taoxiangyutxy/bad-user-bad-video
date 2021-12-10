@@ -36,9 +36,10 @@ public interface InfoService extends IService<InfoEntity> {
     /**
      * 返回外挂账号 及 外挂信息
      * @param id
+     * @param currentUser 当前用户id
      * @return
      */
-    WaiGuaInfoVO getByIdAndUnmber(Long id);
+    WaiGuaInfoVO getByIdAndUnmber(Long id,Long currentUser);
 
     /**
      * 更新外挂账号  及  外挂信息表

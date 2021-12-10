@@ -19,14 +19,39 @@
         <result property="onNumberOf" column="on_number_of"/>
         <result property="commentNumber" column="comment_number"/>
         <result property="placedTheTop" column="placed_the_top"/>
+
+        <association property="children"
+                     select="com.ttt.one.waiguagg.dao.CommentDao.selectCommentById" column="{infoId=info_id,parentId=id,currentUser=currentUser}"
+                     fetchType="lazy">
+        </association>
     </resultMap>
     <select id="commentsList" resultType="com.ttt.one.waiguagg.entity.CommentEntity">
-        SELECT c.*,u.level_id AS userLevelId,u.header,u.username
+        SELECT c.*,u.level_id AS userLevelId,u.header,u.username,
+               IF
+                   ( g.id IS NULL, 0, 1 ) AS isSupport
         FROM waigua_comment c
                  LEFT JOIN waigua_user u ON u.id = c.user_id
+                 LEFT JOIN waigua_giveLike g ON g.relation_id = c.id AND g.user_id = #{currentUser} AND g.type = 2
         WHERE c.del_flag = 0
           AND info_id = #{infoId}
     </select>
+    <!--使用虚拟列  传动态参数 currentUser-->
+    <select id="selectCommentById" resultMap="commentMap">
+        SELECT c.* ,u.level_id AS userLevelId,u.header,u.username,
+               IF
+                   ( g.id IS NULL, 0, 1 ) AS isSupport ,IFNULL(#{currentUser},'') AS currentUser
+        FROM waigua_comment c
+        LEFT JOIN waigua_user u ON u.id = c.user_id
+        LEFT JOIN waigua_giveLike g ON g.relation_id = c.id AND g.user_id = #{currentUser} AND g.type = 2
+        WHERE c.info_id = #{infoId} AND c.parent_id = #{parentId}
+    </select>
 
+
+    <select id="selectCommentByCommentId" resultType="com.ttt.one.waiguagg.entity.CommentEntity">
+        SELECT c.* ,u.level_id AS userLevelId,u.header,u.username
+        FROM waigua_comment c
+                 LEFT JOIN waigua_user u ON u.id = c.user_id
+        WHERE  c.id = #{parentId}
+    </select>
 
 </mapper>

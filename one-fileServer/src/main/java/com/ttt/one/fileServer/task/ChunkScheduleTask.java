@@ -43,7 +43,7 @@ public class ChunkScheduleTask {
             e.printStackTrace();
         }
     }
-    @Scheduled(cron = "0 0 0 1/6 * ?") // 0 0 0 1/6 * ?  1号开始每6天出发一次任务
+    @Scheduled(cron = "0 0/10 * * * ?") // 0 0 0 1/6 * ?  1号开始每6天出发一次任务
     @SchedulerLock(name = "videoUrlDate-task",lockAtLeastFor = "2000") //2秒后开启其他任务
     public void task2(){ //CRON任务
         log.info("【CRON任务:每周刷新下视频访问链接】{}",new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date()));

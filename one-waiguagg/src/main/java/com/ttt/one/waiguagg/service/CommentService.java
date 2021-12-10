@@ -3,7 +3,6 @@ package com.ttt.one.waiguagg.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ttt.one.common.utils.PageUtils;
 import com.ttt.one.waiguagg.entity.CommentEntity;
-import com.ttt.one.waiguagg.vo.CommentsVO;
 
 import java.util.List;
 import java.util.Map;
@@ -19,6 +18,8 @@ public interface CommentService extends IService<CommentEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
 
-    List<CommentsVO> commentsList(Long infoId);
+    List<CommentEntity> commentsList(Long infoId,Integer type,Long currentUser);
+
+    CommentEntity selectCommentByCommentId(Long parentId);
 }
 

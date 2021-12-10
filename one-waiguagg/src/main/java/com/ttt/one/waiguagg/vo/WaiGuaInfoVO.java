@@ -84,6 +84,10 @@ public class WaiGuaInfoVO {
      * 是否点赞 0否 1是
      */
     private Integer isSupport;
+    /**
+     * 评论数
+     */
+    private Integer commentConut;
 
     /****************视频相关**********************/
     /**

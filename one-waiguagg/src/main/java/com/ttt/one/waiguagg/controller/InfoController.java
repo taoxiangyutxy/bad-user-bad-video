@@ -82,7 +82,7 @@ public class InfoController {
     @RequestMapping("/info/{id}")
    // @RequiresPermissions("waiguagg:info:info")
     public R info(@PathVariable("id") Long id){
-        WaiGuaInfoVO infoVO = infoService.getByIdAndUnmber(id);
+        WaiGuaInfoVO infoVO = infoService.getByIdAndUnmber(id,-1L);
         return R.ok().put("info", infoVO);
     }
 
@@ -128,7 +128,7 @@ public class InfoController {
      */
     @RequestMapping(value = "/giveLikeInfo",method = RequestMethod.POST)
     public R giveLikeInfo(@RequestBody GivelikeEntity givelikeEntity){
-        infoService.giveLikeInfo(givelikeEntity.getRelationId(),givelikeEntity.getUserId(),0);
+        infoService.giveLikeInfo(givelikeEntity.getRelationId(),givelikeEntity.getUserId(),givelikeEntity.getType());
         return R.ok("点赞成功");
     }
     /**
@@ -141,7 +141,7 @@ public class InfoController {
      */
     @RequestMapping(value = "/unGiveLikeInfo",method = RequestMethod.POST)
     public R unGiveLikeInfo(@RequestBody GivelikeEntity givelikeEntity){
-        infoService.unGiveLikeInfo(givelikeEntity.getRelationId(),givelikeEntity.getUserId(),0);
+        infoService.unGiveLikeInfo(givelikeEntity.getRelationId(),givelikeEntity.getUserId(),givelikeEntity.getType());
         return R.ok("取消点赞成功");
     }
 }

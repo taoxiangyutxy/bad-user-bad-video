@@ -22,7 +22,7 @@
         SELECT i.* , IF
             ( g.id IS NULL, 0, 1 ) AS isSupport
         FROM waigua_info i
-                 LEFT JOIN waigua_giveLike g ON g.relation_id = i.id AND g.user_id = #{currentUser}
+                 LEFT JOIN waigua_giveLike g ON g.relation_id = i.id AND g.user_id = #{currentUser} AND g.type = #{type}
         WHERE i.`status` = 0
         <if test="reviewStatus != null and reviewStatus != ''">
             AND i.review_status = #{reviewStatus}
@@ -36,7 +36,7 @@
         SELECT i.* , IF
             ( g.id IS NULL, 0, 1 ) AS isSupport
         FROM waigua_info i
-                 LEFT JOIN waigua_giveLike g ON g.relation_id = i.id AND g.user_id = #{currentUser}
+                 LEFT JOIN waigua_giveLike g ON g.relation_id = i.id AND g.user_id = #{currentUser} AND g.type = #{type}
         WHERE i.`status` = 0 AND i.id = #{id}
     </select>
 

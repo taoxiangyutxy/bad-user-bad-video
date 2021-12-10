@@ -10,12 +10,14 @@ import com.ttt.one.common.utils.PageUtils;
 import com.ttt.one.common.utils.Query;
 import com.ttt.one.common.utils.R;
 import com.ttt.one.common.utils.constant.InfoConstant;
+import com.ttt.one.waiguagg.entity.CommentEntity;
 import com.ttt.one.waiguagg.entity.GivelikeEntity;
 import com.ttt.one.waiguagg.entity.UnmberEntity;
 import com.ttt.one.waiguagg.fegin.EsSearchFeginServer;
 import com.ttt.one.waiguagg.fegin.FileServer;
 import com.ttt.one.waiguagg.fegin.ThirdPartyFeginServer;
 import com.ttt.one.waiguagg.fegin.UserFeginServer;
+import com.ttt.one.waiguagg.service.CommentService;
 import com.ttt.one.waiguagg.service.GivelikeService;
 import com.ttt.one.waiguagg.service.UnmberService;
 import com.ttt.one.waiguagg.vo.FileInfoVO;
@@ -72,6 +74,8 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
     private EsSearchFeginServer esSearchFeginServer;
     @Autowired
     private GivelikeService givelikeService;
+    @Autowired
+    private CommentService commentService;
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<InfoEntity> page = this.page(
@@ -103,7 +107,7 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
         /**
          * 查询集合 sql拼接是否点赞
          */
-        List<InfoEntity> records = this.baseMapper.findListAll(key,null,currentUser); //page.getRecords();
+        List<InfoEntity> records = this.baseMapper.findListAll(key,null,currentUser,Constant.LIKETYPE_INFO); //page.getRecords();
         /**
          * 数据汇总
          */
@@ -132,7 +136,7 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
             /**
              *汇总缓存点赞数
              */
-            Long countRelationLike = countRelationLike(infoEntity.getId());
+            Long countRelationLike = countRelationLike(infoEntity.getId(),Constant.LIKETYPE_INFO);
             Long countRelationLikeDb = 0L;
             if(infoEntity.getThumbUpNumber()!=null){
                 countRelationLikeDb =  Long.valueOf(infoEntity.getThumbUpNumber());
@@ -142,7 +146,7 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
             /**
              * 缓存是否点过赞了
              */
-            Integer isSupport = whetherThumbUp(infoEntity.getId(), currentUser, 1);
+            Integer isSupport = whetherThumbUp(infoEntity.getId(), currentUser, Constant.LIKETYPE_INFO);
             if(isSupport!=null){
                 waiGuaInfoVO.setIsSupport(isSupport);
             }
@@ -179,14 +183,11 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
     }
 
     @Override
-    public WaiGuaInfoVO getByIdAndUnmber(Long id) {
+    public WaiGuaInfoVO getByIdAndUnmber(Long id,Long currentUser) {
         WaiGuaInfoVO waiGuaInfoVO = new WaiGuaInfoVO();
-        /**
-         * 当前登录用户
-         */
-        Long currentUser = 1L;
-        //1 根据id查询info信息
-        InfoEntity infoEntity = this.baseMapper.getByIdAndCuser(id,currentUser);
+
+        //1 根据id查询info信息  type 1 是信息
+        InfoEntity infoEntity = this.baseMapper.getByIdAndCuser(id,currentUser,Constant.LIKETYPE_INFO);
         BeanUtils.copyProperties(infoEntity,waiGuaInfoVO);
         if(null!=infoEntity.getWaiguaType()){
             waiGuaInfoVO.setWaiguaType(infoEntity.getWaiguaType().split(","));
@@ -198,7 +199,7 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
         /**
          *汇总缓存点赞数
          */
-        Long countRelationLike = countRelationLike(infoEntity.getId());
+        Long countRelationLike = countRelationLike(infoEntity.getId(),Constant.LIKETYPE_INFO);
         Long countRelationLikeDb = 0L;
         if(infoEntity.getThumbUpNumber()!=null){
             countRelationLikeDb =  Long.valueOf(infoEntity.getThumbUpNumber());
@@ -208,7 +209,7 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
         /**
          * 缓存 是否点过赞了
          */
-        Integer isSupport = whetherThumbUp(infoEntity.getId(), currentUser, 1);
+        Integer isSupport = whetherThumbUp(infoEntity.getId(), currentUser, Constant.LIKETYPE_INFO);
         if(isSupport!=null){
             waiGuaInfoVO.setIsSupport(isSupport);
         }
@@ -225,6 +226,11 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
         } else {
             log.error("远程服务调用失败--- fileServer.videoInfo");
         }
+        /**
+         * 该info信息有多少条评论
+         */
+        int commentCount = commentService.count(new QueryWrapper<CommentEntity>().eq("info_id", id));
+        waiGuaInfoVO.setCommentConut(commentCount);
         //3 合并返回
         return waiGuaInfoVO;
     }
@@ -311,8 +317,8 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
             String code = "";
             if(waiGuaInfoVO.getReviewStatus()==2){
                 code="审核通过";
-                //获取info信息
-                WaiGuaInfoVO infoVO = this.getByIdAndUnmber(waiGuaInfoVO.getWaiguaInfoId());
+                //获取info信息  这里更新用不到当前登录用户id
+                WaiGuaInfoVO infoVO = this.getByIdAndUnmber(waiGuaInfoVO.getWaiguaInfoId(),-1L);
                 //调用远程服务 获取视频路径
                 R rFile = fileServer.videoInfo(infoEntity.getId());
                 if (rFile.getCode() == 0) { //远程服务调用成功
@@ -396,11 +402,11 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
         likeValidate(relationId,likedUserId,type);
         synchronized (this){
             //1.用户点赞评论记录
-            redisTemplate.opsForHash().put(InfoConstant.INFO_LIKED_USER_KEY,relationId+"::"+likedUserId, "1");
+            redisTemplate.opsForHash().put(InfoConstant.INFO_LIKED_USER_KEY,relationId+"::"+likedUserId+"::"+type, "1");
             //2.评论点赞数+1
-            String relationLikedResult = (String) redisTemplate.opsForHash().get(InfoConstant.TOTAL_LIKE_COUNT_KEY, String.valueOf(relationId));
+            String relationLikedResult = (String) redisTemplate.opsForHash().get(InfoConstant.TOTAL_LIKE_COUNT_KEY, relationId+"::"+type);
             Long likeCount = relationLikedResult == null ? 0L : Long.parseLong(relationLikedResult);
-            redisTemplate.opsForHash().put(InfoConstant.TOTAL_LIKE_COUNT_KEY, String.valueOf(relationId), (likeCount+1L)+"");
+            redisTemplate.opsForHash().put(InfoConstant.TOTAL_LIKE_COUNT_KEY, relationId+"::"+type, (likeCount+1L)+"");
             log.info("点赞数据存入redis结束，relationId:{}，likedUserId:{}", relationId, likedUserId);
         }
     }
@@ -412,13 +418,13 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
         unLikeValidate(relationId,likedUserId,type);
         synchronized (this){
             //1.评论点赞数-1
-            String relationLikedCountResult = (String) redisTemplate.opsForHash().get(InfoConstant.TOTAL_LIKE_COUNT_KEY, String.valueOf(relationId));
+            String relationLikedCountResult = (String) redisTemplate.opsForHash().get(InfoConstant.TOTAL_LIKE_COUNT_KEY, relationId+"::"+type);
             Long likeCount = relationLikedCountResult == null ? 0L :Long.parseLong(relationLikedCountResult);
             likeCount = likeCount - 1L;
-            redisTemplate.opsForHash().put(InfoConstant.TOTAL_LIKE_COUNT_KEY, String.valueOf(relationId),likeCount+"");
+            redisTemplate.opsForHash().put(InfoConstant.TOTAL_LIKE_COUNT_KEY, relationId+"::"+type,likeCount+"");
 
             //2.修改用户点赞评论记录
-            redisTemplate.opsForHash().put(InfoConstant.INFO_LIKED_USER_KEY,relationId+"::"+likedUserId,"0");
+            redisTemplate.opsForHash().put(InfoConstant.INFO_LIKED_USER_KEY,relationId+"::"+likedUserId+"::"+type,"0");
             log.info("取消点赞数据存入redis结束，relationId:{}，likedUserId:{}", relationId, likedUserId);
         }
     }
@@ -432,7 +438,7 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
             String value = (String)entry.getValue();
             String[] split = key.split("::");
             GivelikeEntity givelikeEntity = new GivelikeEntity();
-            givelikeEntity.setType(0);
+            givelikeEntity.setType(Integer.parseInt(split[2]));
             givelikeEntity.setRelationId(Long.parseLong(split[0]));
             givelikeEntity.setUserId(Long.parseLong(split[1]));
             QueryWrapper<GivelikeEntity> queryWrapper = new QueryWrapper<GivelikeEntity>()
@@ -451,16 +457,27 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
                 }
             }
         }
-        //2.更新评论点赞总数
+        //2.更新评论点赞总数 根据类型更新不同表
         Map<Object, Object> entriesTotal = redisTemplate.opsForHash().entries(InfoConstant.TOTAL_LIKE_COUNT_KEY);
         for (Map.Entry<Object, Object> entry : entriesTotal.entrySet()) {
             String key = (String) entry.getKey();
             String value =  (String) entry.getValue();
-            InfoEntity infoEntity = this.baseMapper.selectById(Long.parseLong(key));
-            if(infoEntity!=null){
-                infoEntity.setThumbUpNumber(infoEntity.getThumbUpNumber()+Integer.parseInt(value));
-                this.updateById(infoEntity);
+            // 0是关联id   1是类型
+            String[] split = key.split("::");
+            if(Integer.parseInt(split[1])==Constant.LIKETYPE_INFO){//更新info表
+                InfoEntity infoEntity = this.baseMapper.selectById(Long.parseLong(split[0]));
+                if(infoEntity!=null){
+                    infoEntity.setThumbUpNumber(infoEntity.getThumbUpNumber()+Integer.parseInt(value));
+                    this.updateById(infoEntity);
+                }
+            }else if(Integer.parseInt(split[1])==Constant.LIKETYPE_COMMENT){//更新评论表
+                CommentEntity commentEntity = commentService.getById(Long.parseLong(split[0]));
+                if(commentEntity!=null){
+                    commentEntity.setThumbUpNumber(commentEntity.getThumbUpNumber()+Integer.parseInt(value));
+                    commentService.updateById(commentEntity);
+                }
             }
+
         }
         /**
          * 结束后 清空记录数据
@@ -477,9 +494,9 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
      * @description
      * @date 2021/11/9 16:02
      */
-    public synchronized Long countRelationLike(Long relationId) {
+    public synchronized Long countRelationLike(Long relationId,Integer type) {
         validateParam(relationId);
-        String relationLikedResult = (String) redisTemplate.opsForHash().get(InfoConstant.TOTAL_LIKE_COUNT_KEY, String.valueOf(relationId));
+        String relationLikedResult = (String) redisTemplate.opsForHash().get(InfoConstant.TOTAL_LIKE_COUNT_KEY, relationId+"::"+type);
         Long likeCount = 0L;
         if(!org.apache.commons.lang3.StringUtils.isEmpty(relationLikedResult)){
             likeCount = Long.parseLong(relationLikedResult);
@@ -505,7 +522,7 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
          */
         //获取缓存值
         String value =(String) redisTemplate.opsForHash()
-                .get(InfoConstant.INFO_LIKED_USER_KEY, relationId + "::" + likedUserId);
+                .get(InfoConstant.INFO_LIKED_USER_KEY, relationId + "::" + likedUserId+"::"+type);
         if(!org.apache.commons.lang3.StringUtils.isEmpty(value)){
             return Integer.valueOf(value);
         }
@@ -537,7 +554,7 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
                 .eq("type",type).eq("del_flag",Constant.STATUS_0));
         //获取缓存值
         String value =(String) redisTemplate.opsForHash()
-                .get(InfoConstant.INFO_LIKED_USER_KEY, relationId + "::" + likedUserId);
+                .get(InfoConstant.INFO_LIKED_USER_KEY, relationId + "::" + likedUserId+"::"+type);
         if(count>0){//库里有
             if(!org.apache.commons.lang3.StringUtils.isEmpty(value)){
                 if(value.equals("1")){//点过了
@@ -579,14 +596,14 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
                 .eq("relation_id",relationId).eq("user_id",likedUserId)
                 .eq("type",type).eq("del_flag",Constant.STATUS_0));
         String value =(String) redisTemplate.opsForHash()
-                .get(InfoConstant.INFO_LIKED_USER_KEY, relationId + "::" + likedUserId);
+                .get(InfoConstant.INFO_LIKED_USER_KEY, relationId + "::" + likedUserId+"::"+type);
         if(count == 0 ){
             log.error("数据库没有，relationId:{}，likedUserId:{}", relationId, likedUserId);
             /**
              * 查缓存
              */
             boolean b = redisTemplate.opsForHash()
-                    .hasKey(InfoConstant.INFO_LIKED_USER_KEY, relationId + "::" + likedUserId);
+                    .hasKey(InfoConstant.INFO_LIKED_USER_KEY, relationId + "::" + likedUserId+"::"+type);
             if(!b){
                 log.error("缓存没有，commentId:{}，likedUserId:{}", relationId, likedUserId);
                 throw new RRException("该评论未被当前用户点赞，不可以进行取消点赞操作!");
@@ -639,7 +656,7 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
             /**
              * 查询集合 sql拼接是否点赞
              */
-            List<InfoEntity> infoEntities = this.baseMapper.findListAll(null,"2",currentUser);
+            List<InfoEntity> infoEntities = this.baseMapper.findListAll(null,"2",currentUser,Constant.LIKETYPE_INFO);
              collect = infoEntities.stream().map(infoEntity -> {
                 WaiGuaInfoVO waiGuaInfoVO = new WaiGuaInfoVO();
                 BeanUtils.copyProperties(infoEntity, waiGuaInfoVO);
@@ -651,7 +668,7 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
                  /**
                   *汇总缓存点赞数
                   */
-                 Long countRelationLike = countRelationLike(infoEntity.getId());
+                 Long countRelationLike = countRelationLike(infoEntity.getId(),Constant.LIKETYPE_INFO);
                  Long countRelationLikeDb = 0L;
                  if(infoEntity.getThumbUpNumber()!=null){
                      countRelationLikeDb =  Long.valueOf(infoEntity.getThumbUpNumber());
@@ -661,7 +678,7 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
                  /**
                   * 缓存是否点过赞了
                   */
-                 Integer isSupport = whetherThumbUp(infoEntity.getId(), currentUser, 1);
+                 Integer isSupport = whetherThumbUp(infoEntity.getId(), currentUser, Constant.LIKETYPE_INFO);
                  if(isSupport!=null){
                      waiGuaInfoVO.setIsSupport(isSupport);
                  }

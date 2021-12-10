@@ -1,10 +1,12 @@
 package com.ttt.one.waiguagg.web;
 
+import com.ttt.one.common.utils.Constant;
+import com.ttt.one.common.vo.UserEntity;
+import com.ttt.one.waiguagg.entity.CommentEntity;
 import com.ttt.one.waiguagg.service.CommentService;
 import com.ttt.one.waiguagg.service.InfoService;
-import com.ttt.one.waiguagg.vo.CommentsVO;
+import com.ttt.one.waiguagg.vo.UserEntityVO;
 import com.ttt.one.waiguagg.vo.WaiGuaInfoVO;
-import lombok.extern.log4j.Log4j;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 @Slf4j
@@ -22,6 +25,13 @@ public class IndexController {
     InfoService infoService;
     @Autowired
     private CommentService commentService;
+
+    /**
+     * 首页
+     * @param params
+     * @param model
+     * @return
+     */
     @GetMapping({"/","/index.html"})
     public String indexPage(@RequestParam Map<String, Object> params, Model model){
         List<WaiGuaInfoVO> lists = infoService.pageAllWaiGua(params);
@@ -39,9 +49,14 @@ public class IndexController {
      * @date 2021/11/24 10:04
      */
     @GetMapping("/single.html")
-    public String single(@RequestParam Long id, Model model){
-        WaiGuaInfoVO infoVO = infoService.getByIdAndUnmber(id);
-        List<CommentsVO>  list= commentService.commentsList(id);
+    public String single(@RequestParam Long id, Model model, HttpServletRequest request){
+        UserEntity userEntityVO = (UserEntity) request.getSession().getAttribute(Constant.LOGIN_USER);
+        Long currentUser = -1L;
+        if(userEntityVO!=null){
+            currentUser = userEntityVO.getId();
+        }
+        WaiGuaInfoVO infoVO = infoService.getByIdAndUnmber(id,currentUser);
+        List<CommentEntity>  list= commentService.commentsList(id,2,currentUser);
         model.addAttribute("infoVO",infoVO);
         model.addAttribute("list",list);
         log.info("单条详情id:{}",infoVO.getThumbUpNumber());
@@ -57,9 +72,14 @@ public class IndexController {
      * @date 2021/11/25 17:57
      */
     @RequestMapping("/local")
-    public String localRefresh(Model model) {
-        WaiGuaInfoVO infoVO = infoService.getByIdAndUnmber(23L);
-        List<CommentsVO>  list= commentService.commentsList(23L);
+    public String localRefresh(@RequestParam Long id,Model model, HttpServletRequest request) {
+        UserEntity userEntityVO = (UserEntity) request.getSession().getAttribute(Constant.LOGIN_USER);
+        Long currentUser = -1L;
+        if(userEntityVO!=null){
+            currentUser = userEntityVO.getId();
+        }
+        WaiGuaInfoVO infoVO = infoService.getByIdAndUnmber(id,currentUser);
+        List<CommentEntity>  list= commentService.commentsList(id,2,currentUser);
         model.addAttribute("infoVO",infoVO);
         model.addAttribute("list",list);
         // "single"single.html的名，
