@@ -66,6 +66,9 @@ public class ChunkEntity implements Serializable {
 	private String type;
 	//忽略该字段
 	@TableField(exist = false)
+	private Long fileInfoId;
+	//忽略该字段
+	@TableField(exist = false)
 	private MultipartFile file;
 
 	//忽略该字段

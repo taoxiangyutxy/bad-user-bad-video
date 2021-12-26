@@ -23,7 +23,7 @@ public interface FileInfoService extends IService<FileInfoEntity> {
      * @param identifier
      * @return
      */
-    boolean checkFileInfo(String identifier);
+    FileInfoEntity checkFileInfo(String identifier);
 
     /**
      * 上传视频表单提交
@@ -40,5 +40,14 @@ public interface FileInfoService extends IService<FileInfoEntity> {
      * @return
      */
     List<FileInfoEntity> videoList(Long id);
+    /**
+     *  描述: 返回 插入的id
+     * @param entity:
+     * @return FileInfoEntity
+     * @author txy
+     * @description
+     * @date 2021/12/24 14:14
+     */
+    FileInfoEntity saveFile(FileInfoEntity entity);
 }
 

@@ -94,6 +94,10 @@ public class WaiGuaInfoVO {
      * 下载链接
      */
     private String location;
+    /**
+     * 视频唯一标识
+     */
+    private String identifier;
 
 
 }

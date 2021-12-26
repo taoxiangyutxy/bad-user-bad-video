@@ -14,6 +14,11 @@
         <result property="waiguaInfoId" column="waigua_info_id"/>
         <result property="createTime" column="create_time"/>
     </resultMap>
+        <insert id="saveFile" parameterType="com.ttt.one.fileServer.entity.FileInfoEntity"
+                useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+            INSERT INTO waigua_file_info(filename, identifier, location,total_size,type,waigua_info_id,create_time)
+            VALUES(#{filename}, #{identifier}, #{location},#{totalSize},#{type},#{waiguaInfoId},#{createTime});
+        </insert>
     <update id="updateByIdentifiers">
         UPDATE  waigua_file_info  SET  waigua_info_id = #{waiguaInfoId}  , create_time= #{createTime}   WHERE  identifier  in
         <foreach collection="identifiers" index="index" item="item" open="(" separator="," close=")">

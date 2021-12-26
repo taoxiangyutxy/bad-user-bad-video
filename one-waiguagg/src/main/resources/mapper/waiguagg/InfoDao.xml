@@ -18,6 +18,13 @@
         <result property="thumbUpNumber" column="thumb_up_number"/>
         <result property="readNumber" column="read_number"/>
     </resultMap>
+    <insert id="saveInfoReturnId" parameterType="com.ttt.one.waiguagg.entity.InfoEntity"
+            useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO waigua_info(waigua_type, waigua_describe, waigua_id,reportuser_id,create_time,updata_time,status
+        ,review_status,waigua_username,thumb_up_number,read_number)
+        VALUES(#{waiguaType}, #{waiguaDescribe}, #{waiguaId},#{reportuserId},#{createTime},#{updataTime},#{status}
+        ,#{reviewStatus},#{waiguaUsername},#{thumbUpNumber},#{readNumber});
+    </insert>
     <select id="findListAll" resultType="com.ttt.one.waiguagg.entity.InfoEntity">
         SELECT i.* , IF
             ( g.id IS NULL, 0, 1 ) AS isSupport

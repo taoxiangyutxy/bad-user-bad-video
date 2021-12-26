@@ -36,13 +36,10 @@ public class FileInfoServiceImpl extends ServiceImpl<FileInfoDao, FileInfoEntity
     }
 
     @Override
-    public boolean checkFileInfo(String identifier) {
+    public FileInfoEntity checkFileInfo(String identifier) {
         FileInfoDao infoDao = this.getBaseMapper();
         FileInfoEntity infoEntity = infoDao.selectOne(new QueryWrapper<FileInfoEntity>().eq("identifier", identifier));
-        if(infoEntity!=null){
-            return true;
-        }
-        return false;
+        return infoEntity;
     }
 
     @Override
@@ -68,6 +65,12 @@ public class FileInfoServiceImpl extends ServiceImpl<FileInfoDao, FileInfoEntity
         FileInfoDao infoDao = this.getBaseMapper();
         List<FileInfoEntity> infoEntities = infoDao.selectList(new QueryWrapper<FileInfoEntity>().eq("waigua_info_id", id));
         return infoEntities;
+    }
+
+    @Override
+    public FileInfoEntity saveFile(FileInfoEntity entity) {
+        this.baseMapper.saveFile(entity);
+        return entity;
     }
 
 }

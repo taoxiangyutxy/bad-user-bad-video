@@ -94,8 +94,9 @@ public class UploadController {
     public R checkChunk(ChunkEntity chunk, HttpServletResponse response) {
         log.debug("f===: {}, chunkNumber: {}", "----", chunk.getChunkNumber());
         //秒传验证
-        if(fileInfoService.checkFileInfo(chunk.getIdentifier())){
-            // chunk.setStatus(true);
+        FileInfoEntity infoEntity = fileInfoService.checkFileInfo(chunk.getIdentifier());
+        if(infoEntity!=null){
+            chunk.setFileInfoId(infoEntity.getId());
             return R.ok().put("data",chunk).put("code", FileUploadConstant.UploadFileType.FILE_SUCCESS.getValue());
         }
         //是否有分片  进行断点续传
@@ -125,8 +126,9 @@ public class UploadController {
         boolean b = MinIoUtils.composeObjectAndRemoveChunk("uploadtest", chunkNames, fileInfo.getIdentifier()+"/"+filename);
         String url = MinIoUtils.getObjectUrl("uploadtest", fileInfo.getIdentifier()+"/"+filename, 60 * 24*7);
         fileInfo.setLocation(url);
-        fileInfoService.save(fileInfo);
-        return R.ok();
+        FileInfoEntity file = fileInfoService.saveFile(fileInfo);
+        log.info("最新插入文件的id:{}",file.getId());
+        return R.ok().put("data",file);
     }
 
 //********************Minio文件服务器******************************
@@ -160,5 +162,19 @@ public class UploadController {
         fileInfoService.updateFileInfo(infoVO.getId(),infoVO.getIdentifiers());
         return R.ok();
     }
-
+    /**
+     *  描述: 前端上传视频 用
+     * @param entity:
+     * @return R
+     * @author txy
+     * @description
+     * @date 2021/12/24 17:29
+     */
+    @PostMapping("/updateFileInfoByWeb")
+    public R updateFileInfoByWeb(@RequestBody FileInfoEntity entity) {
+        List<String> identifiers = new ArrayList<>();
+        identifiers.add(entity.getIdentifier());
+        fileInfoService.updateFileInfo(entity.getWaiguaInfoId(),identifiers);
+        return R.ok();
+    }
 }

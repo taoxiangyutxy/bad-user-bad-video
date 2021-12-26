@@ -485,6 +485,45 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
         redisTemplate.delete(InfoConstant.INFO_LIKED_USER_KEY);
         redisTemplate.delete(InfoConstant.TOTAL_LIKE_COUNT_KEY);
     }
+    @Transactional
+    @Override
+    public void saveAndUpdateFile(WaiGuaInfoVO waiGuaInfoVO) {
+        //1 外挂账号是否存在 根据名字  存在更新数据
+        UnmberEntity unmberEntity =  unmberService.getByName(waiGuaInfoVO.getWaiguaUsername());
+        if(unmberEntity!=null){ //更新
+            unmberService.updateById(unmberEntity);
+        }else{//新增
+            unmberEntity = new UnmberEntity();
+            BeanUtils.copyProperties(waiGuaInfoVO,unmberEntity);
+            unmberService.save(unmberEntity);
+        }
+        //2 新增info信息
+        InfoEntity infoEntity = new InfoEntity();
+        BeanUtils.copyProperties(waiGuaInfoVO,infoEntity);
+        infoEntity.setWaiguaId(unmberEntity.getId());
+        infoEntity.setWaiguaType(StringUtils.arrayToDelimitedString(waiGuaInfoVO.getWaiguaType(),","));
+        infoEntity.setStatus(Constant.STATUS_0);
+        infoEntity.setThumbUpNumber(0);
+        infoEntity.setReadNumber(0);
+        infoEntity.setCreateTime(new Date());
+        infoEntity.setUpdataTime(infoEntity.getCreateTime());
+        infoEntity.setReviewStatus(Constant.REVIEWSTATUS_0);
+        //上传用户id
+        this.baseMapper.saveInfoReturnId(infoEntity);
+        /**
+         * 关联视频文件表
+         */
+        FileInfoVO fileInfoVO = new FileInfoVO();
+        fileInfoVO.setWaiguaInfoId(infoEntity.getId());
+        fileInfoVO.setIdentifier(waiGuaInfoVO.getIdentifier());
+        R r = fileServer.updateFileInfoByWeb(fileInfoVO);
+        if(r.getCode() == 0){
+            log.info("调用远程服务成功：updateFileInfo");
+        }else{
+            log.error("调用远程服务失败：updateFileInfo");
+        }
+
+    }
 
     /**
      *  描述: 统计评论的总点赞数

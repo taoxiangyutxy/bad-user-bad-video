@@ -19,4 +19,6 @@ public interface InfoDao extends BaseMapper<InfoEntity> {
     List<InfoEntity> findListAll(String key,String reviewStatus, Long currentUser,Integer type);
 
     InfoEntity getByIdAndCuser(Long id, Long currentUser,Integer type);
+
+    void saveInfoReturnId(InfoEntity infoEntity);
 }

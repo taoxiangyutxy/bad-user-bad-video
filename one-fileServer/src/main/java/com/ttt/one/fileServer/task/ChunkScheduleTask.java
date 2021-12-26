@@ -31,7 +31,7 @@ public class ChunkScheduleTask {
     // @SchedulerLock注解里面对于任务独占锁的时间有两个配置项：
     //lockAtLeastFor : 成功执行定时任务时任务节点所能拥有独占锁的最短时间。
     //lockAtMostFor : 成功执行定时任务时任务节点所能拥有独占锁的最长时间。
-   // @Scheduled(cron = "0 0 1 * * ? *") // 每天凌晨1点出发一次任务
+    @Scheduled(cron = "0 0/20 * * * ?") // 每天凌晨1点出发一次任务
     @SchedulerLock(name = "chunk-task",lockAtLeastFor = "2000") //2秒后开启其他任务
     public void task(){ //CRON任务
         log.info("【CRON任务:清空无用的分片数据】{}",new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date()));

@@ -384,12 +384,6 @@
                 return;
             }
             let isLikedComment = false;
-            let className = document.getElementById(""+e.target.id+"").className;
-            if(className.indexOf("cs") != -1){
-                isLikedComment = true;
-            }else{
-                isLikedComment = false;
-            }
             let isSupport = e.target.dataset.value;
             let relationId = e.target.id;
             /*是否点过赞*/
@@ -397,6 +391,14 @@
                 isLikedComment = true;
             }
             console.log("isSupport=",isSupport);
+
+            let className = document.getElementById(""+e.target.id+"").className;
+            if(className.indexOf("cs") != -1){
+                isLikedComment = true;
+            }else{
+                isLikedComment = false;
+            }
+
             $(this).toggleClass('cs');
             let countLike = document.getElementById("countLike"+relationId+"").innerText;
             console.log("countLike=",countLike);

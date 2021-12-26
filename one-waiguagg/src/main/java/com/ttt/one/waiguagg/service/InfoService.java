@@ -112,5 +112,14 @@ public interface InfoService extends IService<InfoEntity> {
      * @date 2021/11/12 10:40
      */
     void redisDataToMysql();
+    /**
+     *  描述: 保存外挂账号 外挂信息 以及关联视频文件
+     * @param waiGuaInfoVO:
+     * @return void
+     * @author txy
+     * @description
+     * @date 2021/12/24 16:44
+     */
+    void saveAndUpdateFile(WaiGuaInfoVO waiGuaInfoVO);
 }
 

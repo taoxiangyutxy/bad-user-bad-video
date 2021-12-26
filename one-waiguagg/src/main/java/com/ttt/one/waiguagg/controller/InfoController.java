@@ -87,7 +87,7 @@ public class InfoController {
     }
 
     /**
-     * 保存
+     * 保存   管理员管理平台
      */
     @RequestMapping("/save")
   //  @RequiresPermissions("waiguagg:info:save")
@@ -96,7 +96,14 @@ public class InfoController {
 
         return R.ok();
     }
-
+    /**
+     * 保存   前台
+     */
+    @RequestMapping("/saveAndUpdateFile")
+    public R saveAndUpdateFile(@RequestBody WaiGuaInfoVO waiGuaInfoVO){
+        infoService.saveAndUpdateFile(waiGuaInfoVO);
+        return R.ok();
+    }
     /**
      * 修改
      */
