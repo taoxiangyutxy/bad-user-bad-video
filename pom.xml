@@ -10,7 +10,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>one-waiguagg</module>
-       <!-- <module>renren-fast</module>-->
+        <module>renren-fast</module>
         <module>one-common</module>
         <module>one-fileServer</module>
         <module>one-gateway</module>
