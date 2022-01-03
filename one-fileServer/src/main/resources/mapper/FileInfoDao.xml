@@ -13,11 +13,12 @@
         <result property="type" column="type"/>
         <result property="waiguaInfoId" column="waigua_info_id"/>
         <result property="createTime" column="create_time"/>
+        <result property="audioDuration" column="audio_duration"/>
     </resultMap>
         <insert id="saveFile" parameterType="com.ttt.one.fileServer.entity.FileInfoEntity"
                 useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-            INSERT INTO waigua_file_info(filename, identifier, location,total_size,type,waigua_info_id,create_time)
-            VALUES(#{filename}, #{identifier}, #{location},#{totalSize},#{type},#{waiguaInfoId},#{createTime});
+            INSERT INTO waigua_file_info(filename, identifier, location,total_size,type,waigua_info_id,create_time,audio_duration)
+            VALUES(#{filename}, #{identifier}, #{location},#{totalSize},#{type},#{waiguaInfoId},#{createTime},#{audioDuration});
         </insert>
     <update id="updateByIdentifiers">
         UPDATE  waigua_file_info  SET  waigua_info_id = #{waiguaInfoId}  , create_time= #{createTime}   WHERE  identifier  in
@@ -25,6 +26,11 @@
             #{item}
         </foreach>
     </update>
+    <select id="listByPass" resultType="com.ttt.one.fileServer.entity.FileInfoEntity">
+        SELECT f.* FROM `waigua_file_info` f
+        LEFT JOIN  waigua_info i ON i.id = f.waigua_info_id
+        WHERE i.review_status = 2
+    </select>
 
 
 </mapper>

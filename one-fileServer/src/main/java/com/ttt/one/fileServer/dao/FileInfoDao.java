@@ -26,4 +26,10 @@ public interface FileInfoDao extends BaseMapper<FileInfoEntity> {
     void updateByIdentifiers(@Param("waiguaInfoId") Long waiguaInfoId, @Param("createTime") Date createTime, @Param("identifiers") List<String> identifiers);
 
     void saveFile(FileInfoEntity entity);
+
+    /**
+     * 返回审核通过的视频列表
+     * @return
+     */
+    List<FileInfoEntity> listByPass();
 }

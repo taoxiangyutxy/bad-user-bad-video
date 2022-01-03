@@ -3,6 +3,7 @@ package com.ttt.one.waiguagg.controller;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 //import org.apache.shiro.authz.annotation.RequiresPermissions;
 import com.ttt.one.common.utils.PageUtils;
@@ -71,7 +72,6 @@ public class InfoController {
     //@RequiresPermissions("waiguagg:info:list")
     public R list(@RequestParam Map<String, Object> params){
         PageUtils page = infoService.queryPageAll(params);
-
         return R.ok().put("page", page);
     }
 
@@ -150,5 +150,21 @@ public class InfoController {
     public R unGiveLikeInfo(@RequestBody GivelikeEntity givelikeEntity){
         infoService.unGiveLikeInfo(givelikeEntity.getRelationId(),givelikeEntity.getUserId(),givelikeEntity.getType());
         return R.ok("取消点赞成功");
+    }
+
+    /**
+     * 返回用户的所有视频列表 带缩略图 视频时长 info信息
+     * @param params
+     * @return
+     */
+    @RequestMapping(value = "/findListByUser",method = RequestMethod.GET)
+    public R findListByUser(@RequestParam Map<String, Object> params){
+        boolean b = Optional.ofNullable(params).isPresent();
+        if(!b){
+            return R.error("参数不能为空!");
+        }
+        PageUtils page = infoService.findListByUser(params);
+
+        return R.ok("查询成功!").put("page",page);
     }
 }

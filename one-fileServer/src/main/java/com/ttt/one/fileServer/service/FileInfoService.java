@@ -49,5 +49,11 @@ public interface FileInfoService extends IService<FileInfoEntity> {
      * @date 2021/12/24 14:14
      */
     FileInfoEntity saveFile(FileInfoEntity entity);
+
+    /**
+     * 返回审核通过的视频列表
+     * @return
+     */
+    List<FileInfoEntity> listByPass();
 }
 

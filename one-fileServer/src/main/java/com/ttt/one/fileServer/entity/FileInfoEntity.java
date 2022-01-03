@@ -50,4 +50,6 @@ public class FileInfoEntity implements Serializable {
 	private Long waiguaInfoId;
 
 	private Date createTime;
+
+	private String audioDuration;
 }

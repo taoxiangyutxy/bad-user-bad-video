@@ -49,9 +49,9 @@ public class ChunkScheduleTask {
         log.info("【CRON任务:每周刷新下视频访问链接】{}",new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date()));
         try {
             /**
-             * 获取库里所有的视频数据
+             * 获取库里所有的视频数据  应该是审核通过前台可展示的所有视频
              */
-            List<FileInfoEntity> list = fileInfoService.list();
+            List<FileInfoEntity> list = fileInfoService.listByPass();
             list = list.stream().map(fileInfoEntity -> {
                 String url = MinIoUtils.getObjectUrl("uploadtest", fileInfoEntity.getIdentifier()+"/"+fileInfoEntity.getFilename(), 60 * 24*7);
                 fileInfoEntity.setCreateTime(new Date());

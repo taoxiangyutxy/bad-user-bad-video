@@ -121,5 +121,12 @@ public interface InfoService extends IService<InfoEntity> {
      * @date 2021/12/24 16:44
      */
     void saveAndUpdateFile(WaiGuaInfoVO waiGuaInfoVO);
+
+    /**
+     * 返回用户的所有视频列表 带缩略图 视频时长 info信息
+     * @param params
+     * @return
+     */
+    PageUtils findListByUser(Map<String, Object> params);
 }
 

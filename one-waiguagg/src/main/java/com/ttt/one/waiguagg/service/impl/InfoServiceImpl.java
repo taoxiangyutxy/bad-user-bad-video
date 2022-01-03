@@ -35,10 +35,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -509,6 +506,7 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
         infoEntity.setUpdataTime(infoEntity.getCreateTime());
         infoEntity.setReviewStatus(Constant.REVIEWSTATUS_0);
         //上传用户id
+        infoEntity.setReportuserId(4L);
         this.baseMapper.saveInfoReturnId(infoEntity);
         /**
          * 关联视频文件表
@@ -523,6 +521,30 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
             log.error("调用远程服务失败：updateFileInfo");
         }
 
+    }
+
+    @Override
+    public PageUtils findListByUser(Map<String, Object> params) {
+        QueryWrapper<InfoEntity> wrapper = new QueryWrapper<InfoEntity>().eq("status", Constant.STATUS_0);
+        String key = (String) params.get("key");
+        /**
+         * 查询字段 拼接
+         */
+        if(!StringUtils.isEmpty(key)){
+            wrapper.like("waigua_username",key);
+        }
+        String reviewStatus = (String) params.get("reviewStatus");
+        if(Optional.ofNullable(reviewStatus).isPresent()){
+            wrapper.eq("review_status",reviewStatus);
+        }
+        wrapper.eq("reportuser_id",(String) params.get("reportuserId"));
+        IPage<InfoEntity> page =
+                this.page(
+                        new Query<InfoEntity>().getPage(params),
+                        new QueryWrapper<>()
+                );
+        PageUtils pageUtils = new PageUtils(page);
+        return pageUtils;
     }
 
     /**
