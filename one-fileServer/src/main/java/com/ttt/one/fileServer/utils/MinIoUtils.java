@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.PostConstruct;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.InvalidKeyException;
@@ -123,6 +124,31 @@ public class MinIoUtils implements InitializingBean {
         //预览视频 关键  设置类型
         reqParams.put("response-content-type", "video/mp4");
        // reqParams.put("response-content-disposition", "video/mpeg4");
+        expiry = expiryHandle(expiry);
+        String objectUrl = minioClient.getPresignedObjectUrl(
+                GetPresignedObjectUrlArgs.builder()
+                        .method(Method.GET)
+                        .bucket(bucketName)
+                        .object(objectName)
+                        .extraQueryParams(reqParams)
+                        .expiry(expiry)
+                        .build()
+        );
+        return objectUrl;
+    }
+    /**
+     * 获取访问对象可预览的外链地址
+     * @param bucketName 存储桶名称
+     * @param objectName 对象名称
+     * @param expiry 过期时间(分钟) 最大为7天 超过7天则默认最大值
+     *        type : 文件类型
+     * @return viewUrl
+     */
+    @SneakyThrows
+    public static String getObjectPreviewUrl(String bucketName,String objectName,Integer expiry,String type){
+        Map<String, String> reqParams = new HashMap<String, String>();
+        //预览 关键  设置类型
+        reqParams.put("response-content-type", type);
         expiry = expiryHandle(expiry);
         String objectUrl = minioClient.getPresignedObjectUrl(
                 GetPresignedObjectUrlArgs.builder()
@@ -469,8 +495,41 @@ public class MinIoUtils implements InitializingBean {
                         .bucket(chunkBucKet)
                         .object(objectName)
                         .stream(imgInputStream,imgInputStream.available(),-1)
-                        .contentType(file.getContentType())
+                        .contentType("image/jpeg")
                         .build());
         imgInputStream.close();
     }
+
+    /**
+     * 获取文件流
+     * @param fileName
+     * @return
+     */
+    public static InputStream getFileStream(String fileName){
+        InputStream object = null;
+        try {
+            object = minioClient.getObject(GetObjectArgs.builder().bucket(chunkBucKet).object(fileName).build());
+            return object;
+        } catch (ErrorResponseException e) {
+            e.printStackTrace();
+        } catch (InsufficientDataException e) {
+            e.printStackTrace();
+        } catch (InternalException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        } catch (InvalidResponseException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (ServerException e) {
+            e.printStackTrace();
+        } catch (XmlParserException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
+

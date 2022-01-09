@@ -74,4 +74,19 @@ public class InfoEntity implements Serializable {
 	 */
 	@TableField(exist = false)
 	private Integer isSupport;
+	/**
+	 * 视频链接地址
+	 */
+	@TableField(exist = false)
+	private String location;
+	/**
+	 * 视频总时长
+	 */
+	@TableField(exist = false)
+	private String audioDuration;
+	/**
+	 * 视频封面
+	 */
+	@TableField(exist = false)
+	private String cover;
 }

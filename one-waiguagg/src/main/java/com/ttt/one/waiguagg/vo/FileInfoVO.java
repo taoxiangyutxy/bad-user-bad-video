@@ -41,4 +41,6 @@ public class FileInfoVO {
     private Long waiguaInfoId;
 
     private Date createTime;
+
+    private String cover;
 }

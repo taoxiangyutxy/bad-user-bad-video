@@ -1,10 +1,13 @@
 package com.ttt.one.fileServer.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
+
 import lombok.Data;
 
 /**
@@ -52,4 +55,12 @@ public class FileInfoEntity implements Serializable {
 	private Date createTime;
 
 	private String audioDuration;
+
+	private String cover;
+	/**
+	 *封面图片url集合
+	 */
+	//忽略该字段
+	@TableField(exist = false)
+	private List<String> covers;
 }

@@ -1,5 +1,6 @@
 package com.ttt.one.waiguagg.dao;
 
+import com.ttt.one.waiguagg.dto.InfoDTO;
 import com.ttt.one.waiguagg.entity.InfoEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
@@ -21,4 +22,10 @@ public interface InfoDao extends BaseMapper<InfoEntity> {
     InfoEntity getByIdAndCuser(Long id, Long currentUser,Integer type);
 
     void saveInfoReturnId(InfoEntity infoEntity);
+    /**
+     * 返回用户的所有视频列表 带缩略图 视频时长 info信息
+     * @param infoDTO
+     * @return
+     */
+    List<InfoEntity> findListByUser(InfoDTO infoDTO);
 }

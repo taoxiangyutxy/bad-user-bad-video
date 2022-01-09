@@ -23,7 +23,7 @@ public interface FileInfoDao extends BaseMapper<FileInfoEntity> {
      * @param createTime
      * @param identifiers
      */
-    void updateByIdentifiers(@Param("waiguaInfoId") Long waiguaInfoId, @Param("createTime") Date createTime, @Param("identifiers") List<String> identifiers);
+    void updateByIdentifiers(@Param("waiguaInfoId") Long waiguaInfoId, @Param("createTime") Date createTime,@Param("cover") String cover, @Param("identifiers") List<String> identifiers);
 
     void saveFile(FileInfoEntity entity);
 

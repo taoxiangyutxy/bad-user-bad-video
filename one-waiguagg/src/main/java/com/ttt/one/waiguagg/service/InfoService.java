@@ -128,5 +128,12 @@ public interface InfoService extends IService<InfoEntity> {
      * @return
      */
     PageUtils findListByUser(Map<String, Object> params);
+
+    /**
+     * 返回用户的所有视频列表 带缩略图 视频时长 info信息   不分页
+     * @param params
+     * @return
+     */
+    List<InfoEntity> findListByUserAll(Map<String, Object> params);
 }
 

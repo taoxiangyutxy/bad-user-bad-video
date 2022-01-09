@@ -46,6 +46,22 @@
                  LEFT JOIN waigua_giveLike g ON g.relation_id = i.id AND g.user_id = #{currentUser} AND g.type = #{type}
         WHERE i.`status` = 0 AND i.id = #{id}
     </select>
+    <select id="findListByUser" resultType="com.ttt.one.waiguagg.entity.InfoEntity">
+        SELECT i.*,
+               f.location,f.audio_duration AS audioDuration,f.cover
+        FROM `waigua_info` i
+                 LEFT JOIN waigua_file_info f ON f.waigua_info_id = i.id
+        where i.reportuser_id = #{reportuserId} and i.`status` = 0
+        <if test="reviewStatus != null and reviewStatus != ''">
+            AND i.review_status = #{reviewStatus}
+        </if>
+        <if test="key != null and key != ''">
+            AND i.waiguaUsername LIKE CONCAT( '%', #{key}, '%' )
+        </if>
+        <if test="pageSize != null and pageSize != ''">
+        LIMIT ${pageIndex},${pageSize}
+        </if>
+    </select>
 
 
 </mapper>

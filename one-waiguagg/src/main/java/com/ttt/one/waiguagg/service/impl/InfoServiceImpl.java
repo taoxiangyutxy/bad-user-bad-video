@@ -10,6 +10,7 @@ import com.ttt.one.common.utils.PageUtils;
 import com.ttt.one.common.utils.Query;
 import com.ttt.one.common.utils.R;
 import com.ttt.one.common.utils.constant.InfoConstant;
+import com.ttt.one.waiguagg.dto.InfoDTO;
 import com.ttt.one.waiguagg.entity.CommentEntity;
 import com.ttt.one.waiguagg.entity.GivelikeEntity;
 import com.ttt.one.waiguagg.entity.UnmberEntity;
@@ -514,6 +515,7 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
         FileInfoVO fileInfoVO = new FileInfoVO();
         fileInfoVO.setWaiguaInfoId(infoEntity.getId());
         fileInfoVO.setIdentifier(waiGuaInfoVO.getIdentifier());
+        fileInfoVO.setCover(waiGuaInfoVO.getCover());
         R r = fileServer.updateFileInfoByWeb(fileInfoVO);
         if(r.getCode() == 0){
             log.info("调用远程服务成功：updateFileInfo");
@@ -525,26 +527,57 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
 
     @Override
     public PageUtils findListByUser(Map<String, Object> params) {
-        QueryWrapper<InfoEntity> wrapper = new QueryWrapper<InfoEntity>().eq("status", Constant.STATUS_0);
-        String key = (String) params.get("key");
+
         /**
          * 查询字段 拼接
          */
+        QueryWrapper<InfoEntity> wrapper = new QueryWrapper<>();
+        String key = (String) params.get("key");
+        InfoDTO infoDTO = new InfoDTO();
+        String reportUserId = (String) params.get("reportuserId");
+        infoDTO.setReportuserId(Long.parseLong(reportUserId));
+        wrapper.eq("reportuser_id",Long.parseLong(reportUserId));
         if(!StringUtils.isEmpty(key)){
+            infoDTO.setWaiguaUsername(key);
             wrapper.like("waigua_username",key);
         }
         String reviewStatus = (String) params.get("reviewStatus");
-        if(Optional.ofNullable(reviewStatus).isPresent()){
-            wrapper.eq("review_status",reviewStatus);
+        if(Optional.ofNullable(reviewStatus).isPresent()&&!StringUtils.isEmpty(reviewStatus)){
+            infoDTO.setReviewStatus(Integer.parseInt(reviewStatus));
+            wrapper.eq("review_status",Integer.parseInt(reviewStatus));
         }
-        wrapper.eq("reportuser_id",(String) params.get("reportuserId"));
+
         IPage<InfoEntity> page =
                 this.page(
                         new Query<InfoEntity>().getPage(params),
-                        new QueryWrapper<>()
+                        wrapper
                 );
         PageUtils pageUtils = new PageUtils(page);
+        /**
+         * 设置分页
+         */
+        infoDTO.setPageSize(pageUtils.getPageSize());
+        infoDTO.setPageIndex(pageUtils.getPageSize()*(pageUtils.getCurrPage()-1));
+        List<InfoEntity> infoEntities =  this.baseMapper.findListByUser(infoDTO);
+        pageUtils.setList(infoEntities);
         return pageUtils;
+    }
+
+    @Override
+    public List<InfoEntity> findListByUserAll(Map<String, Object> params) {
+        String key = (String) params.get("key");
+        InfoDTO infoDTO = new InfoDTO();
+        String reportUserId = (String) params.get("reportuserId");
+        infoDTO.setReportuserId(Long.parseLong(reportUserId));
+        if(!StringUtils.isEmpty(key)){
+            infoDTO.setWaiguaUsername(key);
+        }
+        String reviewStatus = (String) params.get("reviewStatus");
+        if(Optional.ofNullable(reviewStatus).isPresent()&&!StringUtils.isEmpty(reviewStatus)){
+            infoDTO.setReviewStatus(Integer.parseInt(reviewStatus));
+        }
+        List<InfoEntity> infoEntities =  this.baseMapper.findListByUser(infoDTO);
+        return infoEntities;
     }
 
     /**

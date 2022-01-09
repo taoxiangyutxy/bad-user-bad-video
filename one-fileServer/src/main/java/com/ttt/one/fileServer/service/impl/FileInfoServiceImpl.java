@@ -43,9 +43,9 @@ public class FileInfoServiceImpl extends ServiceImpl<FileInfoDao, FileInfoEntity
     }
 
     @Override
-    public void updateFileInfo(Long waiguaInfoId, List<String> identifiers) {
+    public void updateFileInfo(Long waiguaInfoId,String cover, List<String> identifiers) {
         FileInfoDao infoDao = this.getBaseMapper();
-        infoDao.updateByIdentifiers(waiguaInfoId,new Date(), identifiers);
+        infoDao.updateByIdentifiers(waiguaInfoId,new Date(),cover, identifiers);
     }
 
     @Override

@@ -1,9 +1,6 @@
 package com.ttt.one.waiguagg.controller;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 //import org.apache.shiro.authz.annotation.RequiresPermissions;
 import com.ttt.one.common.utils.PageUtils;
@@ -164,7 +161,18 @@ public class InfoController {
             return R.error("参数不能为空!");
         }
         PageUtils page = infoService.findListByUser(params);
-
-        return R.ok("查询成功!").put("page",page);
+        /**
+         * 获取每个状态下的条数 返回
+         */
+        Map<String, Object> counts  = new HashMap<>();
+        List<InfoEntity> list = infoService.findListByUserAll(params);
+        long count1 = list.stream().filter(s -> s.getReviewStatus() == 1).count();
+        long count2 = list.stream().filter(s -> s.getReviewStatus() == 2).count();
+        long count3 = list.stream().filter(s -> s.getReviewStatus() == 3).count();
+        counts.put("allConut",page.getTotalCount());
+        counts.put("count1",count1);
+        counts.put("count2",count2);
+        counts.put("count3",count3);
+        return R.ok("查询成功!").put("page",page).put("counts",counts);
     }
 }

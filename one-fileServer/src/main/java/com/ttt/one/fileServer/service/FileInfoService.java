@@ -30,7 +30,7 @@ public interface FileInfoService extends IService<FileInfoEntity> {
      * @param waiguaInfoId
      * @param identifiers
      */
-    void updateFileInfo(Long waiguaInfoId,List<String> identifiers);
+    void updateFileInfo(Long waiguaInfoId,String cover,List<String> identifiers);
 
     void deleAllIn(Long infoId);
 

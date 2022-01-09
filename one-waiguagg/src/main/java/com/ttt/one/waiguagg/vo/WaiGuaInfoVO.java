@@ -99,5 +99,9 @@ public class WaiGuaInfoVO {
      */
     private String identifier;
 
+    /**
+     * 视频封面
+     */
+    private String cover;
 
 }
