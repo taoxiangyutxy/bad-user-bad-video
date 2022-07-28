@@ -38,8 +38,8 @@
             </activation>
             <properties>
                 <profile.name>local</profile.name>
-                <config.server-addr>127.0.0.1:8848</config.server-addr>
-                <discovery.server-addr>127.0.0.1:8848</discovery.server-addr>
+                <config.server-addr>47.104.177.6:8848</config.server-addr>
+                <discovery.server-addr>47.104.177.6:8848</discovery.server-addr>
                 <config.namespace>35ce12ef-0e40-4073-aadb-ec49fae66f55</config.namespace>
                 <config.group>tttOne</config.group>
             </properties>
