@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.util.Date;
 import lombok.Data;
+import lombok.ToString;
 
 /**
  * 一个外挂账号，会有多个举报信息,直到被永封该账号不会再接受新的举报信息。
@@ -17,6 +18,7 @@ import lombok.Data;
  */
 @Data
 @TableName("waigua_info")
+@ToString
 public class InfoEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 

@@ -1,69 +1,69 @@
-server:
-  port: 9555
-spring:
-  profiles:
-    active: env
-  servlet:
-    multipart:
-      max-file-size: 5120MB
-      max-request-size: 5120MB
-  datasource:
-    name: mysql-datasource
-    url: jdbc:mysql://192.168.56.10:3306/ttt_one_waigua?characterEncoding=UTF-8
-    username: root
-    password: root
-    driver-class-name: com.mysql.jdbc.Driver
-  jackson:
-    serialization:
-      write-dates-as-timestamps: true
-    default-property-inclusion: non_null
-  application:
-    name: one-fileServer
-  cloud:
-    nacos:
-      discovery:
-        server-addr: 127.0.0.1:8848
-  redis:
-    host: 192.168.56.10
-    port: 6379
-    database: 0 # 第0个数据库
-    timeout: 200
-    lettuce: # 使用lettuce连接池
-      pool:
-        max-active: 100 # 最大
-        max-idle: 20 # 维护
-        min-idle: 10
-        max-wait: 1000
-        time-between-eviction-runs: 2000 #每两秒回收一次空闲连接
-mybatis-plus:
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-  global-config:
-    db-config:
-      # 全局默认主键类型
-      id-type: auto
-      # 表名、是否使用下划线命名，默认数据库表使用下划线命名
-      table-underline: true
-      # 逻辑已删除值(默认为 1)
-      logic-delete-value: true
-      # 逻辑未删除值(默认为 0)
-      logic-not-delete-value: false
-  mapper-locations:
-  - /mapper/*.xml
-pagehelper:
-  helper-dialect: mysql
-  reasonable: true
-  support-methods-arguments: true
-  params: count=countsql
-
-file:
-  # 文件存储路径 http://192.168.56.10/static/  D:\temp\file-manager
-  save-path: D:\developData\test\renren-fast-vue\static\video
-  # 断点续传文件配置路径
-  conf-path: D:\temp\file-manager\conf
-
-minio:
-  endpoint: http://192.168.56.10:9000
-  accessKey: admin
-  secretKey: 12345678
-  chunkBucKet: uploadtest
+#server:
+#  port: 9555
+#spring:
+#  profiles:
+#    active: env
+#  servlet:
+#    multipart:
+#      max-file-size: 5120MB
+#      max-request-size: 5120MB
+#  datasource:
+#    name: mysql-datasource
+#    url: jdbc:mysql://47.104.177.6:3306/ttt_one_waigua?characterEncoding=UTF-8
+#    username: root
+#    password: root
+#    driver-class-name: com.mysql.jdbc.Driver
+#  jackson:
+#    serialization:
+#      write-dates-as-timestamps: true
+#    default-property-inclusion: non_null
+#  application:
+#    name: one-fileServer
+#  cloud:
+#    nacos:
+#      discovery:
+#        server-addr: 127.0.0.1:8848
+#  redis:
+#    host: 47.104.177.6
+#    port: 6379
+#    database: 0 # 第0个数据库
+#    timeout: 200
+#    lettuce: # 使用lettuce连接池
+#      pool:
+#        max-active: 100 # 最大
+#        max-idle: 20 # 维护
+#        min-idle: 10
+#        max-wait: 1000
+#        time-between-eviction-runs: 2000 #每两秒回收一次空闲连接
+#mybatis-plus:
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#  global-config:
+#    db-config:
+#      # 全局默认主键类型
+#      id-type: auto
+#      # 表名、是否使用下划线命名，默认数据库表使用下划线命名
+#      table-underline: true
+#      # 逻辑已删除值(默认为 1)
+#      logic-delete-value: true
+#      # 逻辑未删除值(默认为 0)
+#      logic-not-delete-value: false
+#  mapper-locations:
+#  - /mapper/*.xml
+#pagehelper:
+#  helper-dialect: mysql
+#  reasonable: true
+#  support-methods-arguments: true
+#  params: count=countsql
+#
+#file:
+#  # 文件存储路径 http://192.168.56.10/static/  D:\temp\file-manager
+#  save-path: D:\developData\test\renren-fast-vue\static\video
+#  # 断点续传文件配置路径
+#  conf-path: D:\temp\file-manager\conf
+#
+#minio:
+#  endpoint: http://47.104.177.6:9000
+#  accessKey: minioadmin
+#  secretKey: minioadmin
+#  chunkBucKet: uploadtest

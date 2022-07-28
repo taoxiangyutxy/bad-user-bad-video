@@ -1,11 +1,18 @@
 package com.ttt.one.waiguagg.service.impl;
 
+import com.rabbitmq.client.Channel;
 import com.ttt.one.common.utils.PageUtils;
 import com.ttt.one.common.utils.Query;
 import com.ttt.one.waiguagg.entity.InfoEntity;
 import com.ttt.one.waiguagg.service.InfoService;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.annotation.RabbitHandler;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -15,7 +22,7 @@ import com.ttt.one.waiguagg.dao.UnmberDao;
 import com.ttt.one.waiguagg.entity.UnmberEntity;
 import com.ttt.one.waiguagg.service.UnmberService;
 
-
+@RabbitListener(queues = {"hello-java-queue"})
 @Service("unmberService")
 public class UnmberServiceImpl extends ServiceImpl<UnmberDao, UnmberEntity> implements UnmberService {
     @Autowired
@@ -47,6 +54,27 @@ public class UnmberServiceImpl extends ServiceImpl<UnmberDao, UnmberEntity> impl
             return unmberEntity;
         }else{
             return null;
+        }
+    }
+
+    @RabbitHandler
+    public void recieveMessage(Message message, InfoEntity infoEntity, Channel channel){
+        System.out.println("接收到消息.："+message+"==>内容："+infoEntity);
+        long deliveryTag = message.getMessageProperties().getDeliveryTag();
+        try {
+            if(deliveryTag%2 == 0){
+                //签收货物
+                channel.basicAck(deliveryTag,false);
+                System.out.println("签收了货物..."+deliveryTag);
+            }else{
+                // 退货 long var1, boolean var3=true 丢弃 boolean var4=true 发回服务器重新入库
+                //拒签货物
+                channel.basicNack(deliveryTag,false,true);
+                System.out.println("没有签收货物》。。"+deliveryTag);
+            }
+        } catch (IOException e) {
+            //网络中断
+            e.printStackTrace();
         }
     }
 

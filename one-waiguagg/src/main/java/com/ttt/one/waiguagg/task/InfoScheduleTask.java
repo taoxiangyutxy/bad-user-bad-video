@@ -17,7 +17,7 @@ public class InfoScheduleTask {
     // @SchedulerLock注解里面对于任务独占锁的时间有两个配置项：
     //lockAtLeastFor : 成功执行定时任务时任务节点所能拥有独占锁的最短时间。
     //lockAtMostFor : 成功执行定时任务时任务节点所能拥有独占锁的最长时间。
-    @Scheduled(cron = "0 0/5 * * * ? ")//每2秒出发一次任务
+   // @Scheduled(cron = "0 0/5 * * * ? ")//每2秒出发一次任务
     @SchedulerLock(name = "redisToMysql-task",lockAtLeastFor = "2000") //2秒后开启其他任务
     public void task(){ //CRON任务
         log.info("【CRON任务】{}",new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date()));

@@ -16,6 +16,7 @@ import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.FrameGrabber;
 import org.bytedeco.javacv.Java2DFrameConverter;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
@@ -28,12 +29,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
 
 /**
@@ -45,10 +45,28 @@ import java.util.stream.Collectors;
 @RequestMapping("/fileServer/uploader")
 @Slf4j
 public class UploadController {
+    @Autowired
+    RabbitTemplate rabbitTemplate;
+
+    @ResponseBody
+    @RequestMapping("/test")
+    public String createUserTest(){
+        FileInfoEntity entity = new FileInfoEntity();
+        entity.setFilename("测试测试");
+        entity.setType("MQMQMQMQMQ");
+        entity.setCreateTime(new Date());
+        //消息发送给  create.ttt
+        rabbitTemplate.convertAndSend("topic-exchange","create.ttt",entity);
+        return "ok:"+new Date();
+    }
+
+
     /**
      * 线程池
      */
-    public static ExecutorService executor = Executors.newFixedThreadPool(10);
+  //  public static ExecutorService executor = Executors.newFixedThreadPool(10);
+    @Autowired
+    private ThreadPoolExecutor executor;
 
     @Value("${file.save-path}")
     private String uploadFolder;

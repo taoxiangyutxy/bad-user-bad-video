@@ -1,5 +1,10 @@
 package com.ttt.one.waiguagg.service.impl;
 
+//import com.alibaba.csp.sentinel.Entry;
+//import com.alibaba.csp.sentinel.SphU;
+//import com.alibaba.csp.sentinel.Tracer;
+//import com.alibaba.csp.sentinel.annotation.SentinelResource;
+//import com.alibaba.csp.sentinel.slots.block.BlockException;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -53,7 +58,7 @@ import org.springframework.util.StringUtils;
 @Service("infoService")
 @Slf4j
 public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements InfoService {
-
+    private Logger logger = LoggerFactory.getLogger(InfoServiceImpl.class);
     @Autowired
     private UnmberService unmberService;
 
@@ -179,56 +184,83 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
         infoEntity.setReviewStatus(Constant.REVIEWSTATUS_0);
         this.save(infoEntity);
     }
-
+//    public WaiGuaInfoVO blockHandlerttt(Long id,Long currentUser,BlockException e) {
+//        log.error("tttWaiGuaInfoResource被限流了..");
+//        return null;
+//    }
+  //  @SentinelResource(value = "tttWaiGuaInfoResource",blockHandler = "blockHandlerttt")
     @Override
     public WaiGuaInfoVO getByIdAndUnmber(Long id,Long currentUser) {
+       // Entry entry = null;
         WaiGuaInfoVO waiGuaInfoVO = new WaiGuaInfoVO();
-
-        //1 根据id查询info信息  type 1 是信息
-        InfoEntity infoEntity = this.baseMapper.getByIdAndCuser(id,currentUser,Constant.LIKETYPE_INFO);
-        BeanUtils.copyProperties(infoEntity,waiGuaInfoVO);
-        if(null!=infoEntity.getWaiguaType()){
-            waiGuaInfoVO.setWaiguaType(infoEntity.getWaiguaType().split(","));
-        }
-        waiGuaInfoVO.setWaiguaInfoId(id);
-        //2 根据id查出外挂账号
-        UnmberEntity unmberEntity = unmberService.getById(infoEntity.getWaiguaId());
-        BeanUtils.copyProperties(unmberEntity,waiGuaInfoVO);
-        /**
-         *汇总缓存点赞数
-         */
-        Long countRelationLike = countRelationLike(infoEntity.getId(),Constant.LIKETYPE_INFO);
-        Long countRelationLikeDb = 0L;
-        if(infoEntity.getThumbUpNumber()!=null){
-            countRelationLikeDb =  Long.valueOf(infoEntity.getThumbUpNumber());
-        }
-        Integer coutLike = Math.toIntExact(countRelationLike + countRelationLikeDb);
-        waiGuaInfoVO.setThumbUpNumber(coutLike);
-        /**
-         * 缓存 是否点过赞了
-         */
-        Integer isSupport = whetherThumbUp(infoEntity.getId(), currentUser, Constant.LIKETYPE_INFO);
-        if(isSupport!=null){
-            waiGuaInfoVO.setIsSupport(isSupport);
-        }
-        /**
-         * 获取视频链接
-         */
-        R r = fileServer.videoInfo(infoEntity.getId());
-        if (r.getCode() == 0) { //远程服务调用成功
-            List<FileInfoVO> fileList = r.getData("fileList", new TypeReference<List<FileInfoVO>>() {
-            });
-            if (fileList != null && fileList.size() > 0) {
-                waiGuaInfoVO.setLocation(fileList.get(0).getLocation());
+        // 务必保证 finally 会被执行
+        try {
+            // 资源名可使用任意有业务语义的字符串，注意数目不能太多（超过 1K），超出几千请作为参数传入而不要直接作为资源名
+            // EntryType 代表流量类型（inbound/outbound），其中系统规则只对 IN 类型的埋点生效
+        //    entry = SphU.entry("tttWaiGuaInfo");
+            // 被保护的业务逻辑
+            // do something...
+            //1 根据id查询info信息  type 1 是信息
+            InfoEntity infoEntity = this.baseMapper.getByIdAndCuser(id,currentUser,Constant.LIKETYPE_INFO);
+            BeanUtils.copyProperties(infoEntity,waiGuaInfoVO);
+            if(null!=infoEntity.getWaiguaType()){
+                waiGuaInfoVO.setWaiguaType(infoEntity.getWaiguaType().split(","));
             }
-        } else {
-            log.error("远程服务调用失败--- fileServer.videoInfo");
+            waiGuaInfoVO.setWaiguaInfoId(id);
+            //2 根据id查出外挂账号
+            UnmberEntity unmberEntity = unmberService.getById(infoEntity.getWaiguaId());
+            BeanUtils.copyProperties(unmberEntity,waiGuaInfoVO);
+            /**
+             *汇总缓存点赞数
+             */
+            Long countRelationLike = countRelationLike(infoEntity.getId(),Constant.LIKETYPE_INFO);
+            Long countRelationLikeDb = 0L;
+            if(infoEntity.getThumbUpNumber()!=null){
+                countRelationLikeDb =  Long.valueOf(infoEntity.getThumbUpNumber());
+            }
+            Integer coutLike = Math.toIntExact(countRelationLike + countRelationLikeDb);
+            waiGuaInfoVO.setThumbUpNumber(coutLike);
+            /**
+             * 缓存 是否点过赞了
+             */
+            Integer isSupport = whetherThumbUp(infoEntity.getId(), currentUser, Constant.LIKETYPE_INFO);
+            if(isSupport!=null){
+                waiGuaInfoVO.setIsSupport(isSupport);
+            }
+            /**
+             * 获取视频链接
+             */
+            R r = fileServer.videoInfo(infoEntity.getId());
+            if (r.getCode() == 0) { //远程服务调用成功
+                List<FileInfoVO> fileList = r.getData("fileList", new TypeReference<List<FileInfoVO>>() {
+                });
+                if (fileList != null && fileList.size() > 0) {
+                    waiGuaInfoVO.setLocation(fileList.get(0).getLocation());
+                }
+            } else {
+                log.error("远程服务调用失败--- fileServer.videoInfo");
+            }
+            /**
+             * 该info信息有多少条评论
+             */
+            int commentCount = commentService.count(new QueryWrapper<CommentEntity>().eq("info_id", id));
+            waiGuaInfoVO.setCommentConut(commentCount);
         }
-        /**
-         * 该info信息有多少条评论
-         */
-        int commentCount = commentService.count(new QueryWrapper<CommentEntity>().eq("info_id", id));
-        waiGuaInfoVO.setCommentConut(commentCount);
+//        catch (BlockException ex) {
+//            // 资源访问阻止，被限流或被降级
+//            // 进行相应的处理操作
+//            log.error("资源访问被阻止原因:{}",ex.getMessage());
+//        }
+        catch (Exception ex) {
+            // 若需要配置降级规则，需要通过这种方式记录业务异常
+        //    Tracer.traceEntry(ex, entry);
+        }
+//        finally {
+//            // 务必保证 exit，务必保证每个 entry 与 exit 配对
+//            if (entry != null) {
+//                entry.exit();
+//            }
+//        }
         //3 合并返回
         return waiGuaInfoVO;
     }
@@ -793,7 +825,8 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
             }).collect(Collectors.toList());
              //加入缓存
              String s = JSON.toJSONString(collect);
-             redisTemplate.opsForValue().set("allWaiGuaData",s,1,TimeUnit.DAYS);
+             redisTemplate.opsForValue().set("allWaiGuaData",s,1,TimeUnit.MINUTES);
+            logger.error("新建缓存key-allWaiGuaData的生成时间:{}",new Date());
         }finally {
             lock.unlock();
         }

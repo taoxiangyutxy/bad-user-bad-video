@@ -15,9 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,11 +24,13 @@ import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
+@RequestMapping("/login")
 public class LoginController {
     @Autowired
     private AuthService authService;
@@ -58,6 +58,12 @@ public class LoginController {
     public R sendCode(String phone){
         authService.sendCode(phone);
         return R.ok();
+    }
+
+    @ResponseBody
+    @RequestMapping("/test")
+    public String createUserTest(){
+        return "ok:"+new Date();
     }
 
     /**

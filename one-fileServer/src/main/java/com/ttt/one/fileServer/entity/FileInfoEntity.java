@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.List;
 
 import lombok.Data;
+import lombok.ToString;
 
 /**
  * 
@@ -18,6 +19,7 @@ import lombok.Data;
  * @date 2021-08-13 17:41:45
  */
 @Data
+@ToString
 @TableName("waigua_file_info")
 public class FileInfoEntity implements Serializable {
 	private static final long serialVersionUID = 1L;

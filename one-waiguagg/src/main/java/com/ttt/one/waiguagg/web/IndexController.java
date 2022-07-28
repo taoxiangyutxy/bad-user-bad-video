@@ -3,19 +3,23 @@ package com.ttt.one.waiguagg.web;
 import com.ttt.one.common.utils.Constant;
 import com.ttt.one.common.vo.UserEntity;
 import com.ttt.one.waiguagg.entity.CommentEntity;
+import com.ttt.one.waiguagg.entity.InfoEntity;
 import com.ttt.one.waiguagg.service.CommentService;
 import com.ttt.one.waiguagg.service.InfoService;
 import com.ttt.one.waiguagg.vo.UserEntityVO;
 import com.ttt.one.waiguagg.vo.WaiGuaInfoVO;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 @Slf4j
@@ -25,6 +29,22 @@ public class IndexController {
     InfoService infoService;
     @Autowired
     private CommentService commentService;
+
+    @Autowired
+    RabbitTemplate rabbitTemplate;
+
+    @ResponseBody
+    @RequestMapping("/test")
+    public String createUserTest(){
+        InfoEntity entity = new InfoEntity();
+        entity.setWaiguaUsername("测试测试");
+        entity.setWaiguaDescribe("MQMQMQMQMQ");
+        entity.setCreateTime(new Date());
+        //消息发送给  create.ttt
+        rabbitTemplate.convertAndSend("topic-exchange","create.ttt",entity);
+        return "ok:"+new Date();
+    }
+
 
     /**
      * 首页

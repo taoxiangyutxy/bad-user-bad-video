@@ -2,6 +2,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.3.5.RELEASE</version>
+        <relativePath/>
+    </parent>
     <groupId>com.ttt.one</groupId>
     <artifactId>ttt-one</artifactId>
     <version>0.0.1-SNAPSHOT</version>
@@ -17,6 +23,83 @@
         <module>one-auth-server</module>
         <module>one-search</module>
         <module>one-user</module>
+        <module>renren-generator</module>
     </modules>
+    <properties>
+     <spring.boot.version>2.3.5.RELEASE</spring.boot.version>
+     <spring.cloud.version>Hoxton.SR9</spring.cloud.version>
+    </properties>
 
+    <profiles>
+        <profile>
+            <id>local</id><!--本地环境 -->
+            <activation>
+                <activeByDefault>true</activeByDefault><!--默认激活配置-->
+            </activation>
+            <properties>
+                <profile.name>local</profile.name>
+                <config.server-addr>127.0.0.1:8848</config.server-addr>
+                <discovery.server-addr>127.0.0.1:8848</discovery.server-addr>
+                <config.namespace>35ce12ef-0e40-4073-aadb-ec49fae66f55</config.namespace>
+                <config.group>tttOne</config.group>
+            </properties>
+        </profile>
+        <profile>
+            <id>dev</id><!--开发环境 -->
+            <properties>
+                <profile.name>dev</profile.name>
+                <config.server-addr>121.36.41.30:8848</config.server-addr>
+                <discovery.server-addr>121.36.41.30:8848</discovery.server-addr>
+                <config.namespace>155e2dc2-a85c-4fd0-a205-2cff1cb02f44</config.namespace>
+                <config.group>tttOne</config.group>
+            </properties>
+        </profile>
+        <profile>
+            <id>test</id><!-- 测试环境 -->
+            <properties>
+                <profile.name>test</profile.name>
+                <config.server-addr>121.36.41.30:8848</config.server-addr>
+                <discovery.server-addr>121.36.41.30:8848</discovery.server-addr>
+                <config.namespace>c0a55f9e-1cda-4dd1-8096-b34adfbbb0c8</config.namespace>
+                <config.group>tttOne</config.group>
+            </properties>
+        </profile>
+        <profile>
+            <id>prod</id><!--生产环境 -->
+            <properties>
+                <profile.name>prod</profile.name>
+                <config.server-addr>47.105.117.4:8848</config.server-addr>
+                <discovery.server-addr>47.105.117.4:8848</discovery.server-addr>
+                <config.namespace>2eafd844-40e0-4cc3-b3d3-0ade9e39ee57</config.namespace>
+                <config.group>tttOne</config.group>
+            </properties>
+        </profile>
+    </profiles>
+
+
+    <build>
+        <finalName>${project.name}</finalName>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <version>${spring.boot.version}</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>repackage</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 </project>
