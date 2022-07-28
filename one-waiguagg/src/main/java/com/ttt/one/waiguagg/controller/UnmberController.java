@@ -31,9 +31,9 @@ public class UnmberController {
     @Autowired
     private UnmberService unmberService;
 
-    @Value("${ttt.user.name}")
+    @Value("${spring.ttt.user.name}")
     private String name;
-    @Value("${ttt.user.age}")
+    @Value("${spring.ttt.user.age}")
     private Integer age;
 
     @GetMapping("/test")
