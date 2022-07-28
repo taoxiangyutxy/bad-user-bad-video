@@ -14,7 +14,7 @@ node {
         }
     }
     stage('停止当前模块，释放内存') {
-        sh "sudo supervisorctl stop ${CURRENT_JOB}"
+        sh "supervisorctl stop ${CURRENT_JOB}"
     }
     stage('编译公共模块') {
         dir("/var/lib/jenkins/workspace/ttt-one-admin") {
