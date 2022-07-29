@@ -86,9 +86,9 @@
 				<a href="#" class="js-fh5co-nav-toggle fh5co-nav-toggle"><i></i></a>
 				<ul class="fh5co-social">
 					<li th:if="${session.loginUser!=null}" style="color: blue;font-size: 15px" >欢迎你:[[${session.loginUser==null?" ":session.loginUser.username}]]</li>
-					<li><a href="http://auth.waiguattt.com/loguot.html" style="color: red;font-size: 15px" th:if="${session.loginUser!=null}">退出</a></li>
-					<li><a href="http://auth.waiguattt.com/login.html" style="color: blue;font-size: 15px" th:if="${session.loginUser==null}">你好，请登录</a></li>
-					<li th:if="${session.loginUser==null}"><a href="http://auth.waiguattt.com/reg.html" style="color: red;font-size: 15px">免费注册</i></a></li>
+					<li><a href="http://47.104.177.6:88/one-auth-server/login/loguot.html" style="color: red;font-size: 15px" th:if="${session.loginUser!=null}">退出</a></li>
+					<li><a href="http://47.104.177.6:88/one-auth-server/login/login.html" style="color: blue;font-size: 15px" th:if="${session.loginUser==null}">你好，请登录</a></li>
+					<li th:if="${session.loginUser==null}"><a href="http://47.104.177.6:88/one-auth-server/login/reg.html" style="color: red;font-size: 15px">免费注册</i></a></li>
 					<!--<li><a href="#"><i class="icon-instagram"></i></a></li>-->
 				</ul>
 				<div >

@@ -92,7 +92,7 @@ public class LoginController {
             //校验出错，转发到出错页
             //  return "forward:/reg.html";
            // return "reg";
-            return "redirect:http://auth.waiguattt.com/reg.html";
+            return "redirect:http://47.104.177.6:88/one-auth-server/login/reg.html";
         }
         //注册
           //1.校验验证码
@@ -108,25 +108,25 @@ public class LoginController {
                 R r = userFeginServer.regist(vo);
                 if(r.getCode()==0){
                     //成功
-                    return "redirect:http://auth.waiguattt.com/login.html";
+                    return "redirect:http://47.104.177.6:88/one-auth-server/login/login.html";
                 }else{
                     // TODO 待解决： 手机号重复 这里报错了  msg信息没有展示到前台
                     Map<String, String> errors = new HashMap<>();
                     errors.put("msg",r.getData("msg",new TypeReference<String>(){}));
                     redirectAttributes.addFlashAttribute("errors",errors);
-                    return "redirect:http://auth.waiguattt.com/reg.html";
+                    return "redirect:http://47.104.177.6:88/one-auth-server/login/reg.html";
                 }
             }else{
                 Map<String, String> errors = new HashMap<>();
                 errors.put("code","验证码错误!");
                 redirectAttributes.addFlashAttribute("errors",errors);
-                return "redirect:http://auth.waiguattt.com/reg.html";
+                return "redirect:http://47.104.177.6:88/one-auth-server/login/reg.html";
             }
         }else{
             Map<String, String> errors = new HashMap<>();
             errors.put("code","验证码错误!");
             redirectAttributes.addFlashAttribute("errors",errors);
-            return "redirect:http://auth.waiguattt.com/reg.html";
+            return "redirect:http://47.104.177.6:88/one-auth-server/login/reg.html";
         }
 
         //注册成功回到登录页
@@ -155,7 +155,7 @@ public class LoginController {
             errors.put("msg", r.getData("msg", new TypeReference<String>() {
             }));
             redirectAttributes.addFlashAttribute("errors",errors);
-            return "redirect:http://auth.waiguattt.com/login.html";
+            return "redirect:http://47.104.177.6:88/one-auth-server/login/login.html";
         }
 
     }

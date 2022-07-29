@@ -419,7 +419,7 @@
         });
         /*登录页面跳转*/
         $(document).on('click', '.b-btn', function(e){
-            window.location.href="http://auth.waiguattt.com/login.html"
+            window.location.href="http://47.104.177.6:88/one-auth-server/login/login.html"
         });
     })
     /*是否登录验证*/
@@ -427,7 +427,7 @@
         let user = [[${session.loginUser}]];
         if(user == null){
             if(confirm('请登录！是否去登录?')) {
-                window.location.href="http://auth.waiguattt.com/login.html";
+                window.location.href="http://47.104.177.6:88/one-auth-server/login/login.html";
                 return false;
             } else {
                 return false;

@@ -24,7 +24,7 @@ public class LoginUserInterceptor implements HandlerInterceptor {
         }else{
             //没登录  重定向去登录
             request.getSession().setAttribute("msg","请先进行登录!");
-            response.sendRedirect("http://auth.waiguattt.com/login.html");
+            response.sendRedirect("http://47.104.177.6:88/one-auth-server/login/login.html");
             return false;
         }
 
