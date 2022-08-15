@@ -52,8 +52,11 @@ class OneWaiguaggApplicationTests {
         infoEntity.setCreateTime(new Date());
         infoEntity.setWaiguaDescribe("测试消息接收对象444");
         String msg ="你好！世界.";
-        rabbitTemplate.convertAndSend("hello-java-exchange","hello.java",infoEntity);
+      //  rabbitTemplate.convertAndSend("hello-java-exchange","hello.java",infoEntity);
         log.info("消息发送完成{}",infoEntity);
+
+        rabbitTemplate.convertAndSend("topic-exchange","create.ttt",infoEntity);
+
     }
     /**
      * 1、如何创建 Exchange 、Queue、Binging
