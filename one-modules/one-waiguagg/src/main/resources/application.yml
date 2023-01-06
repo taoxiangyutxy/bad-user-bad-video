@@ -1,0 +1,37 @@
+###配置数据源
+#spring:
+#  datasource:
+#    username: root
+#    password: root
+#    url: jdbc:mysql://47.104.177.6:3306/ttt_one_waigua
+#    driver-class-name: com.mysql.jdbc.Driver
+#  cloud:
+#    nacos:
+#      discovery:
+#        server-addr: 127.0.0.1:8848
+#  application:
+#    name: one-waiguagg
+#  thymeleaf:
+#    cache: false
+#  redis:
+#    host: 47.104.177.6
+#    port: 6379
+##告诉mybatis-plus，sql映射文件位置
+mybatis-plus:
+  mapper-locations: classpath:/mapper/**/*.xml
+#  #配置自增长id
+#  global-config:
+#    db-config:
+#      id-type: auto
+#      logic-delete-value: 1
+#      logic-not-delete-value: 0
+##配置端口号
+#server:
+#  port: 20000
+#  logging:
+#    level:
+#      com.ttt.one.waiguagg: debug
+#  swagger:
+#    title: TTT Swagger API
+#    description: 本地文件管理服务ttt
+#    version: 1.0.0

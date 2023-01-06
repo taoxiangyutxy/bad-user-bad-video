@@ -10,6 +10,8 @@ import com.ttt.one.common.utils.R;
 import com.ttt.one.common.vo.UserEntity;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -31,6 +33,7 @@ import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/login")
+@RefreshScope
 public class LoginController {
     @Autowired
     private AuthService authService;
@@ -53,6 +56,10 @@ public class LoginController {
     public String regPage(){
         return "reg";
     }*/
+
+    @Value("${spring.ttt.theHost}")
+    private String theHost;
+    
     @ResponseBody
     @GetMapping("/sms/sendcode")
     public R sendCode(String phone){
@@ -92,7 +99,7 @@ public class LoginController {
             //校验出错，转发到出错页
             //  return "forward:/reg.html";
            // return "reg";
-            return "redirect:http://47.104.177.6:88/one-auth-server/login/reg.html";
+            return "redirect:http://"+theHost+":88/one-auth-server/login/reg.html";
         }
         //注册
           //1.校验验证码
@@ -108,25 +115,25 @@ public class LoginController {
                 R r = userFeginServer.regist(vo);
                 if(r.getCode()==0){
                     //成功
-                    return "redirect:http://47.104.177.6:88/one-auth-server/login/login.html";
+                    return "redirect:http://"+theHost+":88/one-auth-server/login/login.html";
                 }else{
                     // TODO 待解决： 手机号重复 这里报错了  msg信息没有展示到前台
                     Map<String, String> errors = new HashMap<>();
                     errors.put("msg",r.getData("msg",new TypeReference<String>(){}));
                     redirectAttributes.addFlashAttribute("errors",errors);
-                    return "redirect:http://47.104.177.6:88/one-auth-server/login/reg.html";
+                    return "redirect:http://"+theHost+":88/one-auth-server/login/reg.html";
                 }
             }else{
                 Map<String, String> errors = new HashMap<>();
                 errors.put("code","验证码错误!");
                 redirectAttributes.addFlashAttribute("errors",errors);
-                return "redirect:http://47.104.177.6:88/one-auth-server/login/reg.html";
+                return "redirect:http://"+theHost+":88/one-auth-server/login/reg.html";
             }
         }else{
             Map<String, String> errors = new HashMap<>();
             errors.put("code","验证码错误!");
             redirectAttributes.addFlashAttribute("errors",errors);
-            return "redirect:http://47.104.177.6:88/one-auth-server/login/reg.html";
+            return "redirect:http://"+theHost+":88/one-auth-server/login/reg.html";
         }
 
         //注册成功回到登录页
@@ -149,13 +156,13 @@ public class LoginController {
             response.addHeader("token",map.get("token"));
             System.out.println("---------------"+map.get("token"));
             //登录成功
-            return "redirect:http://waiguattt.com";
+            return "redirect:http://"+theHost+":20000/";
         }else{
             Map<String,String> errors = new HashMap<>();
             errors.put("msg", r.getData("msg", new TypeReference<String>() {
             }));
             redirectAttributes.addFlashAttribute("errors",errors);
-            return "redirect:http://47.104.177.6:88/one-auth-server/login/login.html";
+            return "redirect:http://"+theHost+":88/one-auth-server/login/login.html";
         }
 
     }

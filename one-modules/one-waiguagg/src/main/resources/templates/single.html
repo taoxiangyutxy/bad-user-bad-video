@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>
+<html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>
+<html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>
+<html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" xmlns:th="http://www.thymeleaf.org"> <!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>waiguaGG &mdash; item</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Free HTML5 Template by FREEHTML5"/>
+    <meta name="keywords" content="free html5, free template, free bootstrap, html5, css3, mobile first, responsive"/>
+
+
+    <!-- Facebook and Twitter integration -->
+    <meta property="og:title" content=""/>
+    <meta property="og:image" content=""/>
+    <meta property="og:url" content=""/>
+    <meta property="og:site_name" content=""/>
+    <meta property="og:description" content=""/>
+    <meta name="twitter:title" content=""/>
+    <meta name="twitter:image" content=""/>
+    <meta name="twitter:url" content=""/>
+    <meta name="twitter:card" content=""/>
+
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+    <link rel="shortcut icon" href="favicon.ico">
+    <!-- Google Fonts -->
+    <link href='http://fonts.googleapis.com/css?family=Playfair+Display:400,700,400italic|Roboto:400,300,700'
+          rel='stylesheet' type='text/css'>
+    <!-- Animate -->
+    <link rel="stylesheet" href="static/waiguaindex/css/animate.css">
+    <!-- Icomoon -->
+    <link rel="stylesheet" href="static/waiguaindex/css/icomoon.css">
+    <!-- Bootstrap  -->
+    <link rel="stylesheet" href="static/waiguaindex/css/bootstrap.css">
+
+    <link rel="stylesheet" href="static/waiguaindex/css/style.css">
+    <!-- Modernizr JS -->
+    <script src="static/waiguaindex/js/modernizr-2.6.2.min.js"></script>
+    <!-- FOR IE9 below -->
+    <!--[if lt IE 9]>
+    <script src="static/waiguaindex/js/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+<body>
+<style>
+    /*点赞样式*/
+    .like {
+        font-size: 16px;
+        color: #ccc;
+        cursor: pointer;
+        float: left;
+        margin-left: 8px;
+    }
+
+    .cs {
+        color: #f00;
+    }
+    .likeSon {
+        font-size: 16px;
+        cursor: pointer;
+        display:inline;
+    }
+
+    /*底部样式*/
+    .footer {
+        width: 100%;
+        /*background-color: #cccccc;*/
+        position: fixed;
+        bottom: 0;
+    }
+
+    /*发布评论 按钮*/
+    .comment-submit {
+        width: 70px;
+        height: 64px;
+        /*position: absolute;*/
+        right: -80px;
+        top: 0;
+        padding: 4px 15px;
+        font-size: 14px;
+        color: #fff;
+        border-radius: 4px;
+        text-align: center;
+        min-width: 60px;
+        vertical-align: top;
+        cursor: pointer;
+        background-color: #00a1d6;
+        border: 1px solid #00a1d6;
+        transition: 0.1s;
+        user-select: none;
+        outline: none;
+    }
+         .comment-submitSon {
+             width: 70px;
+             height: 64px;
+             /*position: absolute;*/
+             right: -80px;
+             top: 0;
+             padding: 4px 15px;
+             font-size: 14px;
+             color: #fff;
+             border-radius: 4px;
+             text-align: center;
+             min-width: 60px;
+             vertical-align: top;
+             cursor: pointer;
+             background-color: #00a1d6;
+             border: 1px solid #00a1d6;
+             transition: 0.1s;
+             user-select: none;
+             outline: none;
+         }
+	/*评论列表*/
+    /*一级评论 头像*/
+    .one-headImg{
+        width: 70px;
+        height: 64px;
+        float: left;
+    }
+    .two-headImg{
+        width: 30px;
+        height: 30px;
+        margin-top: 30px;
+        border-radius:60px;
+        padding:0px;
+        vertical-align:middle;
+    }
+    .user{
+        margin-left: 90px;
+    }
+    .info{
+        margin-left: 90px;
+        color: #99a2aa;
+    }
+    .infoSon{
+        color: #99a2aa;
+    }
+    .text{
+        margin-left: 90px;
+    }
+    .B{
+        /*评论竖列排序 1层评论不乱样式 关键代码*/
+        display:inline;
+        margin-left: 5px;
+        float: bottom;
+    }
+    /*监听鼠标悬浮到标签  标签背景变色  字体变色*/
+    .gaoL:hover {
+        background: #99a2aa;
+        border-color: #a5e6ff;
+        color: #a5e6ff;
+
+    }
+    .baffle {
+        display: block;
+        position: absolute;
+        width: 100%;
+        top: 0;
+        line-height: 72px;
+        font-size: 12px;
+        border-radius: 4px;
+        text-align: center;
+        color: #777;
+        background-color: #e5e9ef;
+        overflow: hidden;
+    }
+    .textareaDiv{
+        position: relative;
+    }
+    .b-btn {
+        padding: 4px 9px;
+        margin: 0 3px;
+        color: #fff;
+        background-color: #00a1d6;
+        border-radius: 4px;
+    }
+
+</style>
+<header>
+
+</header>
+<div style="float: left;margin-left: 70px;">
+    <!--title -->
+    <div>
+        <h3 th:text="${infoVO.getWaiguaDescribe()}"><sup>TM</sup></a></h3>
+    </div>
+    <div style="font-size: 10px;opacity: 0.5;">
+        <span th:text="${infoVO.getReadNumber()}+'播放'">March 6th, 2016</span>
+        <span th:text="${#dates.format(infoVO.getCreateTime(),'yyyy-MM-dd HH:mm:ss')}">March 6th, 2016</span>
+    </div>
+    <!--video-->
+    <div>
+        <article>
+            <figure style="float: left">
+                <video width="620" height="360" controls>
+                    <source th:src="${infoVO.getLocation()}" type="video/mp4">
+                </video>
+            </figure>
+        </article>
+    </div>
+    <!--点赞区-->
+    <div>
+        <P class="" th:class="${infoVO.getIsSupport() == 0} ? 'like' : 'like cs'">&#10084;</P>
+        <span id="countLike" style="margin-left: 10px;" th:text="${infoVO.getThumbUpNumber()}"></span>
+    </div>
+    <hr/>
+    <!--作者对该视频简介  没有暂时title顶-->
+    <div style="font-size: 10px;">
+        <span th:text="${infoVO.getWaiguaDescribe()}"></span>
+    </div>
+    <hr/>
+    <!--评论区-->
+    <div id="table_refresh" th:fragment="table_refresh">
+    <div>
+        <span th:text="${infoVO.getCommentConut()+'  评论'}">700 评论</span>
+    </div>
+    <div style="font-size: 15px;">
+        <a>按热度排序</a> <a>按时间排序</a>
+        <hr/>
+    </div>
+    <div class="textareaDiv">
+        <div class="baffle" th:if="${session.loginUser==null}">
+            "请先"
+            <a class="b-btn">登录</a>
+            "后发表评论 (・ω・)"
+        </div>
+        <textarea id="content" cols="60" rows="2" placeholder="发一条友善的评论"></textarea>
+        <button id="sub" type="submit" class="comment-submit">发表评论</button>
+    </div>
+    <!--评论列表  灰线分割-->
+    <hr/>
+    <!--最外层大集合:包住所有的一级评论-->
+    <div class="A" >
+        <!--每个一级item 里面又包着二层小集合-->
+        <div class="B" th:each="comments : ${list}"  >
+            <!-- 一层左侧用户头像 + 关注按钮-->
+            <div class="C">
+                    <img class="one-headImg"
+                         src="static/waiguaindex/images/person1.jpg"
+                         alt="">
+            </div>
+            <!--一层最外围-->
+            <div class="D">
+                <!--一层固定用户信息-->
+                <div class="user">
+                    <a  href="" th:text="${comments.getUsername()}">黎曼的猜想</a><a
+                                                                             href=""
+                                                                             target="_blank"><i
+                        th:text="${comments.getUserLevelId()}"></i></a></div>
+                <!--一层用户评论信息-->
+                <p class="text" th:text="${comments.getContent()}"></p>
+                <!--一层用户评论 时间 点赞 回复按钮-->
+                <div class="info">
+                    <span style="display:inline;margin-right: 10px;"  th:text="${#dates.format(comments.getCreateTime(),'yyyy-MM-dd HH:mm:ss')}"></span>
+                    <div th:class="${comments.getIsSupport() == 0} ? 'likeSon' : 'likeSon cs'"  th:attr="id=${comments.getId()},data-value=${comments.getIsSupport()}" >&#10084;</div>
+                    <span th:attr="id=${'countLike'+comments.getId()}"  th:text="${comments.getThumbUpNumber()}" style="display:inline;margin-right: 25px;">27</span><span class="huifuBtn gaoL" th:attr="id=${comments.getId()},data-value=${comments.getUsername()}" >回复</span>
+                </div>
+                <!--下面为2层循环集合开始-->
+                <div th:if="${comments.getChildren()!=null && comments.getChildren().size()>0}" class="E" style="margin-left: 120px;">
+                    <!--每个2层信息-->
+                    <div  th:each="comment : ${comments.getChildren()}" >
+                        <!--2层头像 -->
+                        <div style="position:relative" >
+                            <img class="two-headImg"
+                                 src="static/waiguaindex/images/person1.jpg"  alt="">
+                        <!--2层 用户名称+等级 +评论信息-->
+                        <p style="position:absolute;  margin-left: 50px; top:50%;width: 100%"  th:if=" ${comment.parentId != comments.getId()}" th:text="${comment.username+'@'+comment.nickname+':'+comment.content}"></p>
+                        <p style="position:absolute; margin-left: 50px; top:50%;width: 100%" th:if=" ${comment.parentId == comments.getId()}" th:text="${comment.username+':'+comment.content}"></p>
+                        </div>
+                        <!--2层 时间 点赞 或踩 回复按钮-->
+                        <div class="infoSon" style="display:inline;">
+                            <span style="margin-right: 10px;display:inline;" th:text="${#dates.format(comment.getCreateTime(),'yyyy-MM-dd HH:mm:ss')}">2021-02-17 00:14</span>
+                            <div th:class="${comment.getIsSupport() == 0} ? 'likeSon' : 'likeSon cs'" th:attr="id=${comment.getId()},data-value=${comment.getIsSupport()}" >&#10084;</div><span  th:attr="id=${'countLike'+comment.getId()}" th:text="${comment.getThumbUpNumber()}" style="margin-right: 25px;display:inline;">1</span></span><span
+                                class="huifuBtn gaoL"  th:attr="id=${comment.getId()},data-value=${comment.getUsername()}" >回复</span>
+                            <!--右侧小点点-->
+                            <!--<div class="operation btn-hover btn-hide-re">
+                                <div class="spot"></div>
+                                <div class="opera-list">
+                                    <ul>
+                                        <li class="blacklist">加入黑名单</li>
+                                        <li class="report">举报</li>
+                                    </ul>
+                                </div>
+                            </div>-->
+                        </div>
+                    </div>
+                    <!--2层的底层分页 -->
+                    <!--<div class="view-more" th:text="'共'+${comments.getCommentCount()}+'条回复'">共<b>34</b>条回复, <a class="btn-more" data-pid="3774235214" data-fold="false">点击查看</a>
+                    </div>-->
+                </div>
+                <!--这里点击回复 弹出回复框 写死在这个位置-->
+                <!--一层灰线隔开-->
+                <hr/>
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+<!--底部-->
+<!--<div class="footer">
+    <footer id="fh5co-footer" >
+        <p><small>&copy; 2021. Magazine Free HTML5. All Rights ttt. </small></p>
+    </footer>
+</div>-->
+<!-- jQuery -->
+<script src="static/waiguaindex/js/jquery.min.js"></script>
+<!-- jQuery Easing -->
+<script src="static/waiguaindex/js/jquery.easing.1.3.js"></script>
+<!-- Bootstrap -->
+<script src="static/waiguaindex/js/bootstrap.min.js"></script>
+<!-- Waypoints -->
+<script src="static/waiguaindex/js/jquery.waypoints.min.js"></script>
+<!-- Main JS -->
+<script src="static/waiguaindex/js/main.js"></script>
+
+</body>
+<script th:inline="javascript" type="text/javascript">
+
+    $(function () {
+        /*用户信息*/
+        let userId = [[${session.loginUser==null?-1:session.loginUser.id}]];
+        /*外挂信息点赞变量*/
+        let isLiked = false;
+        var isSupport = [[${infoVO.isSupport}]];
+        var relationId = [[${infoVO.waiguaInfoId}]];
+        /*是否点过赞*/
+        if (isSupport == 1) {
+            isLiked = true;
+        }
+
+        /*点击点赞逻辑*/
+        $(".like").click(function () {
+            if(!noLogin()){
+                return;
+            }
+            $(this).toggleClass('cs');
+            let countLike = document.getElementById("countLike").innerText;
+            isLiked = !isLiked;
+            let newCountLike;
+            let url;
+            if (isLiked) {
+                newCountLike = parseInt(countLike) + 1;
+                url = "/waiguagg/info/giveLikeInfo";
+            } else {
+                newCountLike = parseInt(countLike) - 1;
+                url = "/waiguagg/info/unGiveLikeInfo";
+            }
+            document.getElementById('countLike').innerHTML = newCountLike;
+            giveLikePost(url,relationId,userId,1);
+            /*解决连点选中bug*/
+            document.onselectstart = new Function("return false");
+        })
+
+        /*发表一级评论*/
+        $(document).on("click",".comment-submit",function(){
+            var content = document.getElementById("content");
+            subSon(content.value,userId,0,[[${infoVO.waiguaInfoId}]]);
+        })
+        /*二级往后的回复  根据class获取点击监听 并通过id来传参*/
+        $(document).on('click', '.huifuBtn', function(e){
+            if(!noLogin()){
+                return;
+            }
+            $(".reply_textarea").remove();
+            $(this).parent().append("<div class='reply_textarea'><textarea  id='contentSon'  cols='60' rows='2'placeholder='回复 @"+e.target.dataset.value
+                +":'></textarea> <button id='subSon'  parentId='"+e.target.id+"'   type='submit' class='comment-submitSon'>发表评论</button></div>");
+        });
+        /*二级往后的回复 的发表评论监听*/
+        $(document).on("click",".comment-submitSon",function(){
+            var parentId=$(this).attr("parentId");
+            var content  = document.getElementById('contentSon');
+            subSon(content.value,userId,parentId,relationId);
+        })
+        /*评论区的点赞功能监听*/
+        $(document).on('click', '.likeSon', function(e){
+            if(!noLogin()){
+                return;
+            }
+            let isLikedComment = false;
+            let isSupport = e.target.dataset.value;
+            let relationId = e.target.id;
+            /*是否点过赞*/
+            if (isSupport == 1) {
+                isLikedComment = true;
+            }
+            console.log("isSupport=",isSupport);
+
+            let className = document.getElementById(""+e.target.id+"").className;
+            if(className.indexOf("cs") != -1){
+                isLikedComment = true;
+            }else{
+                isLikedComment = false;
+            }
+
+            $(this).toggleClass('cs');
+            let countLike = document.getElementById("countLike"+relationId+"").innerText;
+            console.log("countLike=",countLike);
+            isLikedComment = !isLikedComment;
+            let newCountLike ;
+            let url;
+            if (isLikedComment) {
+                newCountLike = parseInt(countLike) + 1;
+                url = "/waiguagg/info/giveLikeInfo";
+            } else {
+                newCountLike = parseInt(countLike) - 1;
+                url = "/waiguagg/info/unGiveLikeInfo";
+            }
+            document.getElementById("countLike"+relationId+"").innerHTML = newCountLike;
+            giveLikePost(url,relationId,userId,2);
+            /*解决连点选中bug*/
+            document.onselectstart = new Function("return false");
+        });
+        /*登录页面跳转*/
+        $(document).on('click', '.b-btn', function(e){
+            window.location.href="http://127.0.0.1:88/one-auth-server/login/login.html"
+        });
+    })
+    /*是否登录验证*/
+    function noLogin(){
+        let user = [[${session.loginUser}]];
+        if(user == null){
+            if(confirm('请登录！是否去登录?')) {
+                window.location.href="http://127.0.0.1:88/one-auth-server/login/login.html";
+                return false;
+            } else {
+                return false;
+            }
+        }
+        return true;
+    }
+    /*评论接口调用*/
+    function subSon(content,userId,parentId,infoId){
+        var vo = {"content": content, "userId": userId,"infoId":[[${infoVO.waiguaInfoId}]],"parentId":parentId};
+        $.ajax({
+            url: "/comment/comment/save",
+            dataType: "json",
+            type: "post",
+            data: JSON.stringify(vo),
+            contentType: 'application/json;charset=UTF-8',
+            success: function (result) {
+                if (result.code == 0) {
+                    showTips('发布成功!', 120, 200, 3);
+                    $('#table_refresh').load("/local?id="+infoId+"");
+                    console.log(parentId);
+                    if(parentId==0){
+                        document.getElementById("content").value ="";
+                    }else{
+                        document.getElementById("contentSon").value ="";
+                    }
+                } else {
+                    showTips(result.message, 100, 200, 3);
+                }
+            },
+            error: function (data) {
+                alert("请求出错");
+                console.log(data);
+            }
+        });
+    }
+
+    /*点赞接口调用*/
+    function giveLikePost(url,relationId,userId,type) {
+        var vo = {"relationId": relationId, "userId": userId, "type": type};
+        $.ajax({
+            url: url,
+            dataType: "json",
+            type: "post",
+            data: JSON.stringify(vo),
+            contentType: 'application/json;charset=UTF-8',
+            success: function (result) {
+                if (result.code == 0) {
+                    showTips(result.msg, 120, 200, 3);
+                } else {
+                    showTips(result.message, 100, 200, 3);
+                }
+            },
+            error: function (data) {
+                alert("请求出错");
+                console.log(data);
+            }
+        });
+    }
+
+    /**
+     * 借鉴
+     * 浮动DIV定时显示提示信息,如操作成功, 失败等
+     * @param string tips (提示的内容)
+     * @param int height 显示的信息距离浏览器顶部的高度
+     * @param int time 显示的时间(按秒算), time > 0
+     * @sample <a href="javascript:void(0);" οnclick="showTips( '操作成功', 100, 3 );">点击</a>
+     * @sample 上面代码表示点击后显示操作成功3秒钟, 距离顶部100px
+     */
+    function showTips(tips, height, sizeWidth, time) {
+        var windowWidth = document.documentElement.clientWidth;
+        var tipsDiv = '<div class="tipsClass">' + tips + '</div>';
+
+        $('body').append(tipsDiv);
+        $('div.tipsClass').css({
+            'top': '200px',
+            'right': 650 + 'px',
+            'position': 'absolute',
+            'padding': '3px 5px',
+            'background': '#8FBC8F',
+            'font-size': 12 + 'px',
+            'margin': '0 auto',
+            'text-align': 'center',
+            'width': sizeWidth + 'px',
+            'color': '#fff',
+            'opacity': '0.8'
+        }).show();
+        setTimeout(function () {
+            $('div.tipsClass').fadeOut();
+        }, (time * 1000));
+    }
+
+</script>
+</html>
+

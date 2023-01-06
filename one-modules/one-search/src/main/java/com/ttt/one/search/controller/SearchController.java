@@ -1,0 +1,23 @@
+package com.ttt.one.search.controller;
+
+import com.ttt.one.search.service.WaiGuaSearchService;
+import com.ttt.one.search.vo.SearchParam;
+import com.ttt.one.search.vo.SearchResult;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+
+@Controller
+public class SearchController {
+    @Autowired
+    private WaiGuaSearchService waiGuaSearchService;
+
+    @GetMapping("/list.html")
+    public String list(SearchParam searchParam, Model model){
+        SearchResult result = waiGuaSearchService.search(searchParam);
+        model.addAttribute("lists",result);
+        model.addAttribute("keyword",searchParam.getKeyword());
+        return "list";
+    }
+}

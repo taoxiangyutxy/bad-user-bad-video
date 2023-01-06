@@ -19,6 +19,23 @@ spring:
           #lb 代表负载均衡
           uri: lb://one-waiguagg
           predicates:
+            #按照日期之后转发
+            #- After=2023-02-23T14:20:00.000+08:00[Asia/Shanghai]
+            #按照cookie
+            #- Cookie=loginname, ruoyi
+            #按照header正则规则
+            #- Header=token,^(?!\d+$)[\da-zA-Z]+$
+            #host转发
+            #- Host=**.baidu.com
+            #请求方式
+            #- Method=POST
+            #请求路径转发
+            #- Path=/system/config/{segment}
+            #参数转发  参数必须是token值必须是整数
+            #- Query=token, \d+
+            #请求ip地址转发   请求是ip
+            #- RemoteAddr=192.168.1.1/0
+
             #按照路径断言 http
             - Path=/api/waiguagg/**
           filters:

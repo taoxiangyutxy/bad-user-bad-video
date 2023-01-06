@@ -1,0 +1,43 @@
+server:
+    port: 20000
+
+
+
+spring:
+    application:
+        name: one-waiguagg
+    cloud:
+        nacos:
+            discovery:
+                server-addr: '@discovery.server-addr@'
+            config:
+                file-extension: yml
+                server-addr: '@discovery.server-addr@'
+                namespace: '@config.namespace@'
+                group: '@config.group@'
+                ext-config:
+                  -  data-id: mysql_waigua.yml
+                     group: '@config.group@'
+                     refresh: true
+
+                  -  data-id: redis.yml
+                     group: '@config.group@'
+                     refresh: true
+
+                  -  data-id: mybatis-plus.yml
+                     group: '@config.group@'
+                     refresh: true
+
+                  -  data-id: other.yml
+                     group: '@config.group@'
+                     refresh: true
+
+                  -  data-id: rabbitmq.yml
+                     group: '@config.group@'
+                     refresh: true
+
+                  -  data-id: plumelog.yml
+                     group: '@config.group@'
+                     refresh: true
+    profiles:
+        active: '@profile.name@'

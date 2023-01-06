@@ -1,0 +1,70 @@
+package com.ttt.one.fileServer.entity;
+
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+
+import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
+
+import lombok.Data;
+import lombok.ToString;
+import org.springframework.web.multipart.MultipartFile;
+
+/**
+ * 
+ * 文件信息表
+ * @author ttt
+ * @email 496427196@qq.com
+ * @date 2021-08-13 17:41:45
+ */
+@Data
+@ToString
+@TableName("waigua_file_info")
+public class FileInfoEntity implements Serializable {
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * 
+	 */
+	@TableId
+	private Long id;
+	/**
+	 * 
+	 */
+	private String filename;
+	/**
+	 * 
+	 */
+	private String identifier;
+	/**
+	 * 
+	 */
+	private String location;
+	/**
+	 * 
+	 */
+	private Long totalSize;
+	/**
+	 * 
+	 */
+	private String type;
+	/**
+	 *
+	 */
+	private Long waiguaInfoId;
+
+	private Date createTime;
+
+	private String audioDuration;
+
+	private String cover;
+	/**
+	 *封面图片url集合
+	 */
+	//忽略该字段
+	@TableField(exist = false)
+	private List<String> covers;
+
+}

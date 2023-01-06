@@ -13,8 +13,6 @@
     <description>网关服务</description>
     <properties>
         <java.version>1.8</java.version>
-        <!--解决版本过高 调用远程服务报错问题-->
-        <spring-cloud.version>Hoxton.SR9</spring-cloud.version>
     </properties>
     <dependencies>
         <!--sentinel-gateway-->
@@ -45,8 +43,8 @@
 
 
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>one-common</artifactId>
+            <groupId>com.ttt.one</groupId>
+            <artifactId>one-common-core</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
@@ -65,18 +63,20 @@
             </exclusions>
             <scope>test</scope>
         </dependency>
+
+        <!-- SpringCloud Alibaba Nacos -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+        </dependency>
+
+        <!-- SpringCloud Alibaba Nacos Config -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+        </dependency>
     </dependencies>
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-dependencies</artifactId>
-                <version>${spring-cloud.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
+
 
     <build>
         <finalName>one-gateway</finalName>

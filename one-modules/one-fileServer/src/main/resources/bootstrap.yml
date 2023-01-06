@@ -1,0 +1,49 @@
+server:
+  port: 9555
+  tomcat:
+    max-threads: 10
+
+
+spring:
+    application:
+        name: one-fileServer
+    cloud:
+        nacos:
+            discovery:
+                server-addr: '@discovery.server-addr@'
+            config:
+                file-extension: yaml
+                server-addr: '@discovery.server-addr@'
+                namespace: '@config.namespace@'
+                group: '@config.group@'
+                ext-config:
+                  -  data-id: mysql_waigua.yml
+                     group: '@config.group@'
+                     refresh: true
+
+                  -  data-id: redis.yml
+                     group: '@config.group@'
+                     refresh: true
+
+                  -  data-id: mybatis-plus.yml
+                     group: '@config.group@'
+                     refresh: true
+
+                  -  data-id: other.yml
+                     group: '@config.group@'
+                     refresh: true
+
+                  -  data-id: rabbitmq.yml
+                     group: '@config.group@'
+                     refresh: true
+
+                  -  data-id: plumelog.yml
+                     group: '@config.group@'
+                     refresh: true
+
+                  -  data-id: file.yml
+                     group: '@config.group@'
+                     refresh: true
+
+    profiles:
+        active: '@profile.name@'

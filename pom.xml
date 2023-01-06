@@ -15,20 +15,43 @@
     <description>ttt-one的聚合服务1</description>
     <packaging>pom</packaging>
     <modules>
-        <module>one-waiguagg</module>
-        <module>renren-fast</module>
         <module>one-common</module>
-        <module>one-fileServer</module>
         <module>one-gateway</module>
         <module>one-auth-server</module>
-        <module>one-search</module>
-        <module>one-user</module>
-        <module>renren-generator</module>
+        <module>one-modules</module>
     </modules>
     <properties>
      <spring.boot.version>2.3.5.RELEASE</spring.boot.version>
      <spring.cloud.version>Hoxton.SR9</spring.cloud.version>
     </properties>
+    <!-- 依赖声明 -->
+    <dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+            <!--解决nacos  longPolling error报错-->
+            <version>2.2.5.RELEASE</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-dependencies</artifactId>
+            <version>Hoxton.SR9</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+
+        <dependency>
+        <groupId>com.ttt.one</groupId>
+        <artifactId>one-common-core</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </dependency>
+
+    </dependencies>
+    </dependencyManagement>
+
 
     <profiles>
         <profile>
@@ -38,9 +61,9 @@
             </activation>
             <properties>
                 <profile.name>local</profile.name>
-                <config.server-addr>139.129.14.106:8848</config.server-addr>
-                <discovery.server-addr>139.129.14.106:8848</discovery.server-addr>
-                <config.namespace>35ce12ef-0e40-4073-aadb-ec49fae66f55</config.namespace>
+                <config.server-addr>82.157.63.155:8848</config.server-addr>
+                <discovery.server-addr>82.157.63.155:8848</discovery.server-addr>
+                <config.namespace>c2fcd194-161e-4d1b-b116-4e1e5927d226</config.namespace>
                 <config.group>tttOne</config.group>
             </properties>
         </profile>
