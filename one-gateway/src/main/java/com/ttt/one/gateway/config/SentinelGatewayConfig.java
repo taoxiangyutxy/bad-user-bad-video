@@ -1,3 +1,4 @@
+/*
 package com.ttt.one.gateway.config;
 
 //import com.alibaba.csp.sentinel.adapter.gateway.sc.callback.BlockRequestHandler;
@@ -10,11 +11,13 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+*/
 /**
  * @author   SentinelGateway配置类
  * @date 2021/3/30 14:40
  * @description
- */
+ *//*
+
 //@Configuration
 public class SentinelGatewayConfig {
 
@@ -32,3 +35,4 @@ public class SentinelGatewayConfig {
 //        });
 //    }
 }
+*/

@@ -12,14 +12,27 @@
     <artifactId>one-common-core</artifactId>
     <description>每一个微服务公共的依赖，bean，工具类等</description>
     <properties>
-        <java.version>1.8</java.version>
+        <hibernate-validator.version>6.2.0.Final</hibernate-validator.version>
+        <mybatis-plus-boot-starter.version>3.3.1.tmp</mybatis-plus-boot-starter.version>
+        <lombok.version>1.18.12</lombok.version>
+        <logback-classic.version>1.2.3</logback-classic.version>
+        <httpcore.version>4.4.13</httpcore.version>
+        <commons-lang.version>2.6</commons-lang.version>
+        <mysql-connector-java.version>8.0.17</mysql-connector-java.version>
+        <servlet-api.version>2.5</servlet-api.version>
     </properties>
     <dependencies>
+        <!-- Collection 增强Java集合框架 -->
+        <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>${commons-collections.version}</version>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-bootstrap -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-bootstrap</artifactId>
-            <version>3.0.3</version>
+            <version>${spring-cloud-starter-bootstrap.version}</version>
         </dependency>
 
         <!--sleuth 链路追踪-->
@@ -64,13 +77,13 @@
         <dependency>
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
-            <version>6.2.0.Final</version>
+            <version>${hibernate-validator.version}</version>
         </dependency>
         <!-- JSON转换依赖 -->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
-            <version>1.2.47</version>
+            <version>${fastjson.version}</version>
         </dependency>
         <!--mybatis-plus-->
         <dependency>
@@ -82,44 +95,44 @@
                     <artifactId>spring-boot-starter-logging</artifactId>
                 </exclusion>
             </exclusions>
-            <version>3.3.1.tmp</version>
+            <version>${mybatis-plus-boot-starter.version}</version>
         </dependency>
         <!--lombok-->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.12</version>
+            <version>${lombok.version}</version>
         </dependency>
 
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.2.3</version>
+            <version>${logback-classic.version}</version>
         </dependency>
 
         <!--httpcomponents-->
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpcore</artifactId>
-            <version>4.4.13</version>
+            <version>${httpcore.version}</version>
         </dependency>
         <!--commons-lang-->
         <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
-            <version>2.6</version>
+            <version>${commons-lang.version}</version>
         </dependency>
         <!--mysql驱动-->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.17</version>
+            <version>${mysql-connector-java.version}</version>
         </dependency>
         <!--servlet-->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
-            <version>2.5</version>
+            <version>${servlet-api.version}</version>
             <!--servlet一般tomcat都会带，所以调成目标环境已存在，这样打包的时候就不会再带上servlet-api-->
             <scope>provided</scope>
         </dependency>

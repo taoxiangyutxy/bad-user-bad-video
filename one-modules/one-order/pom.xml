@@ -13,8 +13,7 @@
     <description>订单服务</description>
     <properties>
         <java.version>1.8</java.version>
-        <!--解决版本过高 调用远程服务报错问题-->
-        <spring-cloud.version>Hoxton.SR9</spring-cloud.version>
+        <alipay-sdk-java.version>4.9.28.ALL</alipay-sdk-java.version>
     </properties>
     <dependencies>
         <!-- https://mvnrepository.com/artifact/com.alipay.sdk/alipay-sdk-java -->
@@ -22,14 +21,13 @@
         <dependency>
             <groupId>com.alipay.sdk</groupId>
             <artifactId>alipay-sdk-java</artifactId>
-            <version>4.9.28.ALL</version>
+            <version>${alipay-sdk-java.version}</version>
         </dependency>
         <!--thymeleaf模板-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
-
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -56,10 +54,7 @@
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
         </dependency>
-
     </dependencies>
-
-
 
     <build>
         <plugins>

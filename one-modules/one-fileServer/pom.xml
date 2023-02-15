@@ -13,6 +13,17 @@
     <description>文件上传下载服务</description>
     <properties>
         <java.version>1.8</java.version>
+        <spring-mock.version>2.0.8</spring-mock.version>
+        <javacv.version>1.5.7</javacv.version>
+        <ffmpeg-platform.version>5.0-1.5.7</ffmpeg-platform.version>
+        <shedlock-spring.version>4.25.0</shedlock-spring.version>
+        <shedlock-provider-redis-spring.version>4.25.0</shedlock-provider-redis-spring.version>
+        <commons-pool2.version>2.11.1</commons-pool2.version>
+        <minio.version>8.3.0</minio.version>
+        <progressbar.version>0.5.3</progressbar.version>
+        <okhttp.version>4.8.1</okhttp.version>
+        <snakeyaml.version>1.26</snakeyaml.version>
+        <pagehelper-spring-boot-starter.version>1.4.1</pagehelper-spring-boot-starter.version>
     </properties>
     <dependencies>
         <!--common-core-->
@@ -30,7 +41,7 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-mock</artifactId>
-            <version>2.0.8</version>
+            <version>${spring-mock.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>javax.servlet</groupId>
@@ -43,13 +54,13 @@
         <dependency>
             <groupId>org.bytedeco</groupId>
             <artifactId>javacv</artifactId>
-            <version>1.5.7</version>
+            <version>${javacv.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.bytedeco</groupId>
             <artifactId>ffmpeg-platform</artifactId>
-            <version>5.0-1.5.7</version>
+            <version>${ffmpeg-platform.version}</version>
             <classifier>windows-x86_64</classifier>
             <exclusions>
                 <exclusion>
@@ -73,13 +84,13 @@
         <dependency>
             <groupId>net.javacrumbs.shedlock</groupId>
             <artifactId>shedlock-spring</artifactId>
-            <version>4.25.0</version>
+            <version>${shedlock-spring.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/net.javacrumbs.shedlock/shedlock-provider-redis-spring -->
         <dependency>
             <groupId>net.javacrumbs.shedlock</groupId>
             <artifactId>shedlock-provider-redis-spring</artifactId>
-            <version>4.25.0</version>
+            <version>${shedlock-provider-redis-spring.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-redis -->
         <dependency>
@@ -90,9 +101,9 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-pool2</artifactId>
-            <version>2.11.1</version>
+            <version>${commons-pool2.version}</version>
         </dependency>
-        <!--定时任务需要-->
+        <!--定时任务需要end-->
 
         <!--配置文件-->
         <dependency>
@@ -104,17 +115,17 @@
         <dependency>
             <groupId>io.minio</groupId>
             <artifactId>minio</artifactId>
-            <version>8.3.0</version>
+            <version>${minio.version}</version>
         </dependency>
         <dependency>
             <groupId>me.tongfei</groupId>
             <artifactId>progressbar</artifactId>
-            <version>0.5.3</version>
+            <version>${progressbar.version}</version>
         </dependency>
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp</artifactId>
-            <version>4.8.1</version>
+            <version>${okhttp.version}</version>
         </dependency>
         <!--Minio结束-->
 
@@ -132,14 +143,14 @@
         <dependency>
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
-            <version>1.26</version>
+            <version>${snakeyaml.version}</version>
         </dependency>
 
         <!-- 分页插件 -->
         <dependency>
             <groupId>com.github.pagehelper</groupId>
             <artifactId>pagehelper-spring-boot-starter</artifactId>
-            <version>1.4.1</version>
+            <version>${pagehelper-spring-boot-starter.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.mybatis</groupId>

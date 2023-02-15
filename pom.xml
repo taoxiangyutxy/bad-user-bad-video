@@ -27,6 +27,8 @@
         <spring-cloud-alibaba.version>2021.0.4.0</spring-cloud-alibaba.version>
         <velocity.version>2.3</velocity.version>
         <commons-collections.version>3.2.2</commons-collections.version>
+        <spring-cloud-starter-bootstrap.version>3.0.3</spring-cloud-starter-bootstrap.version>
+        <fastjson.version>1.2.47</fastjson.version>
     </properties>
     <!-- 依赖声明 -->
     <dependencyManagement>
@@ -42,7 +44,6 @@
                     <artifactId>elasticsearch-rest-client</artifactId>
                 </exclusion>
             </exclusions>
-
             <version>${spring-boot.version}</version>
             <type>pom</type>
             <scope>import</scope>
@@ -62,7 +63,7 @@
             <type>pom</type>
             <scope>import</scope>
         </dependency>
-
+        <!--one - common -->
         <dependency>
         <groupId>com.ttt.one</groupId>
         <artifactId>one-common-core</artifactId>
@@ -75,14 +76,6 @@
             <artifactId>velocity-engine-core</artifactId>
             <version>${velocity.version}</version>
         </dependency>
-
-        <!-- Collection 增强Java集合框架 -->
-        <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-            <version>${commons-collections.version}</version>
-        </dependency>
-
     </dependencies>
     </dependencyManagement>
 
