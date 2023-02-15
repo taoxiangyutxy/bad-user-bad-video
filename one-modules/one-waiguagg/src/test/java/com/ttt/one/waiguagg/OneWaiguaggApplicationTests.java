@@ -13,7 +13,7 @@ import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.common.xcontent.XContentType;
+//import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
@@ -138,7 +138,7 @@ class OneWaiguaggApplicationTests {
 
         User user = new User(18,"nan","zhangsan");
         String s = JSON.toJSONString(user);
-        indexRequest.source(s, XContentType.JSON);//要保存的内容
+   //     indexRequest.source(s, XContentType.JSON);//要保存的内容
         IndexResponse index = null;
         try {
             index = client.index(indexRequest, MyElasticsearchConfig.COMMON_OPTIONS);

@@ -4,10 +4,8 @@ import com.rabbitmq.client.Channel;
 import com.ttt.one.common.utils.PageUtils;
 import com.ttt.one.common.utils.Query;
 import com.ttt.one.waiguagg.entity.InfoEntity;
-import com.ttt.one.waiguagg.service.InfoService;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -23,8 +21,6 @@ import com.ttt.one.waiguagg.service.UnmberService;
 //@RabbitListener(queues = {"hello-java-queue"})
 @Service("unmberService")
 public class UnmberServiceImpl extends ServiceImpl<UnmberDao, UnmberEntity> implements UnmberService {
-    @Autowired
-    private InfoService infoService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {

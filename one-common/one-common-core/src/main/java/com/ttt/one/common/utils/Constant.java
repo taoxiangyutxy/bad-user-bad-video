@@ -152,5 +152,16 @@ public class Constant {
             return value;
         }
     }
+    /** 主子表（增删改查） */
+    public static final String TPL_SUB = "sub";
 
+    /** 树编码字段 */
+    public static final String TREE_CODE = "treeCode";
+    /** 单表（增删改查） */
+    public static final String TPL_CRUD = "crud";
+    /** Entity基类字段 */
+    public static final String[] BASE_ENTITY = { "createBy", "createTime", "updateBy", "updateTime", "remark" };
+
+    /** Tree基类字段 */
+    public static final String[] TREE_ENTITY = { "parentName", "parentId", "orderNum", "ancestors" };
 }

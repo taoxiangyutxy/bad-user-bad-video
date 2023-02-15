@@ -16,7 +16,11 @@
     </properties>
     <dependencies>
 
-
+        <!-- SpringCloud Loadbalancer -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-loadbalancer</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.cloud</groupId>
@@ -79,7 +83,6 @@
                     <artifactId>spring-boot-starter-logging</artifactId>
                 </exclusion>
             </exclusions>
-            <version>7.4.2</version>
         </dependency>
 
         <!--spring cache缓存 使用注解 [未使用]-->
@@ -127,12 +130,6 @@
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
 
-        <!--swagger-->
-        <dependency>
-            <groupId>com.github.wgbvirtuals</groupId>
-            <artifactId>vip-swagger</artifactId>
-            <version>1.0.0</version>
-        </dependency>
         <!--common-->
         <dependency>
             <groupId>com.ttt.one</groupId>

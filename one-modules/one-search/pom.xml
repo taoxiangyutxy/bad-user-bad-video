@@ -62,7 +62,6 @@
                     <artifactId>spring-boot-starter-logging</artifactId>
                 </exclusion>
             </exclusions>
-            <version>7.4.2</version>
         </dependency>
         <dependency>
             <groupId>com.ttt.one</groupId>

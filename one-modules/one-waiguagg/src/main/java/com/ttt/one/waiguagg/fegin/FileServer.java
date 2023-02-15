@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 public interface FileServer {
 
     @PostMapping("/fileServer/uploader/deleAllIn")
-     R deleAllIn(@RequestParam Long infoId);
+     R deleAllIn(@RequestParam("infoId") Long infoId);
 
     @RequestMapping("/fileServer/uploader/info/{id}")
      R videoInfo(@PathVariable("id") Long id);
