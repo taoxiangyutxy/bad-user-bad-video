@@ -21,8 +21,8 @@
         <commons-pool2.version>2.11.1</commons-pool2.version>
         <minio.version>8.3.0</minio.version>
         <progressbar.version>0.5.3</progressbar.version>
-        <okhttp.version>4.8.1</okhttp.version>
-        <snakeyaml.version>1.26</snakeyaml.version>
+        <okhttp.version>4.9.3</okhttp.version>
+        <snakeyaml.version>1.30</snakeyaml.version>
         <pagehelper-spring-boot-starter.version>1.4.1</pagehelper-spring-boot-starter.version>
     </properties>
     <dependencies>

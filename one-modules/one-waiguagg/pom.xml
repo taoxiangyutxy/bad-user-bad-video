@@ -140,6 +140,12 @@
             <groupId>com.ttt.one</groupId>
             <artifactId>one-common-core</artifactId>
             <version>0.0.1-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>spring-cloud-starter-bootstrap</artifactId>
+                    <groupId>org.springframework.cloud</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!--web-->
         <dependency>
