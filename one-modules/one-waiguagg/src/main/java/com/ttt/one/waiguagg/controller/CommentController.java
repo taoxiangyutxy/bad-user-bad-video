@@ -36,6 +36,13 @@ public class CommentController {
     private CommentService commentService;
     @Autowired
     private UserFeginServer userFeginServer;
+
+    /**
+     *
+     * @param infoId
+     * @param request
+     * @return
+     */
     @RequestMapping("/commentsList")
     public R commentsList(@RequestParam Long infoId, HttpServletRequest request){
         UserEntityVO userEntityVO = (UserEntityVO) request.getSession().getAttribute(Constant.LOGIN_USER);
