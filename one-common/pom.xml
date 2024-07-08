@@ -18,4 +18,12 @@
         one-common 公共模块
     </description>
 
+    <dependencies>
+    <!-- aop切面 -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-aop</artifactId>
+    </dependency>
+    </dependencies>
+
 </project>

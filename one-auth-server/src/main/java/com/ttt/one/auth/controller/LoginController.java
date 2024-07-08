@@ -1,13 +1,18 @@
 package com.ttt.one.auth.controller;
 import com.alibaba.fastjson.TypeReference;
+import com.qdport.core.oplog.annotation.OperationLog;
+import com.qdport.core.oplog.annotation.OperationLogType;
 import com.ttt.one.auth.fegin.UserFeginServer;
 import com.ttt.one.auth.service.AuthService;
 import com.ttt.one.auth.utils.TokenUtil;
+import com.ttt.one.auth.vo.OperationLogInfo;
 import com.ttt.one.auth.vo.UserLoginVo;
 import com.ttt.one.auth.vo.UserRegistVo;
+import com.ttt.one.auth.aop.LogAnnotation;
 import com.ttt.one.common.utils.Constant;
 import com.ttt.one.common.utils.R;
 import com.ttt.one.common.vo.UserEntity;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,6 +39,7 @@ import java.util.stream.Collectors;
 @Controller
 @RequestMapping("/login")
 @RefreshScope
+@Slf4j
 public class LoginController {
     @Autowired
     private AuthService authService;
@@ -59,7 +65,10 @@ public class LoginController {
 
     @Value("${spring.ttt.theHost}")
     private String theHost;
-    
+
+    @Value("${spring.ttt.log.url}")
+    private String url;
+
     @ResponseBody
     @GetMapping("/sms/sendcode")
     public R sendCode(String phone){
@@ -69,8 +78,10 @@ public class LoginController {
 
     @ResponseBody
     @RequestMapping("/test")
-    public String createUserTest(){
-        return "ok:"+new Date();
+    public String createUserTest(@RequestBody OperationLogInfo info){
+        log.info("到這裡了-2222222");
+        log.info(info.toString());
+        return "ok:"+new Date()+ " ---"+url;
     }
 
     /**
@@ -141,7 +152,9 @@ public class LoginController {
     }
 
     @PostMapping("/login")
+    @OperationLog(type =OperationLogType.QUERY ,desc = "登录接口")
     public  String login(UserLoginVo vo, RedirectAttributes redirectAttributes, HttpSession session, HttpServletResponse response){
+        log.info("ttturl:{}",url);
         R r = userFeginServer.login(vo);
         if(r.getCode()==0){
             UserEntity data = r.getData("data", new TypeReference<UserEntity>() {
@@ -155,6 +168,7 @@ public class LoginController {
             //token放至请求头给前端
             response.addHeader("token",map.get("token"));
             System.out.println("---------------"+map.get("token"));
+            log.info("测试info");
             //登录成功
             return "redirect:http://"+theHost+":20000/";
         }else{
@@ -176,14 +190,16 @@ public class LoginController {
         if (attribute == null) {
             return "login";
         } else {
-            return "redirect:http://waiguattt.com";
+            return "redirect:http://127.0.0.1:20000";
         }
     }
 
     @GetMapping(value = "/loguot.html")
-     public String logout(HttpServletRequest request) {
+    //   @LogAnnotation(module = "logout",operator = "退出登录接口")
+    @OperationLog(type =OperationLogType.QUERY ,desc = "退出登录接口")
+    public String logout(HttpServletRequest request) {
          request.getSession().removeAttribute(Constant.LOGIN_USER);
          request.getSession().invalidate();
-        return "redirect:http://waiguattt.com";
+        return "redirect:http://127.0.0.1:20000";
      }
 }

@@ -17,6 +17,18 @@
         <hutool-crypto.version>5.0.0</hutool-crypto.version>
     </properties>
     <dependencies>
+
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-http</artifactId>
+            <version>5.8.13</version> <!-- 使用最新版本或适合你项目的版本 -->
+        </dependency>
+
+        <dependency>
+            <groupId>com.qdport.core.oplog</groupId>
+            <artifactId>one-oplog</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
         <!--加密解密-->
         <dependency>
             <groupId>cn.hutool</groupId>

@@ -4,6 +4,7 @@ import com.ttt.one.waiguagg.dto.InfoDTO;
 import com.ttt.one.waiguagg.entity.InfoEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -17,7 +18,7 @@ import java.util.List;
 @Mapper
 public interface InfoDao extends BaseMapper<InfoEntity> {
 
-    List<InfoEntity> findListAll(String key,String reviewStatus, Long currentUser,Integer type);
+    List<InfoEntity> findListAll(@Param("key") String key, @Param("reviewStatus") String reviewStatus,@Param("currentUser") Long currentUser,@Param("type") Integer type);
 
     InfoEntity getByIdAndCuser(Long id, Long currentUser,Integer type);
 

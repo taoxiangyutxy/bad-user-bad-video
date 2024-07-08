@@ -17,6 +17,13 @@
         <hutool-core.version>4.5.2</hutool-core.version>
     </properties>
     <dependencies>
+
+        <!--客户端负载均衡loadbalancer-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-loadbalancer</artifactId>
+        </dependency>
+
         <!--sentinel-gateway-->
       <!--  <dependency>
             <groupId>com.alibaba.cloud</groupId>

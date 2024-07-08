@@ -32,7 +32,7 @@ public class MyRedissonConfig {
                 .addNodeAddress("redis://127.0.0.1:7000", "redis://127.0.0.1:7001")
                 .addNodeAddress("redis://127.0.0.1:7002");*/
         //单节点方式
-        config.useSingleServer().setAddress(""+hostIp+"");
+        config.useSingleServer().setAddress(""+hostIp+":6379");
         RedissonClient redissonClient = Redisson.create(config);
         return  redissonClient;
     }

@@ -20,7 +20,7 @@ public class WaiGuatttSessionConfig {
     public CookieSerializer cookieSerializer(){
         DefaultCookieSerializer cookieSerializer = new DefaultCookieSerializer();
         //设置cookie作用父域
-        cookieSerializer.setDomainName("waiguattt.com");
+        cookieSerializer.setDomainName("127.0.0.1");
         cookieSerializer.setCookieName("WAIGUATTTSESSION");
         return cookieSerializer;
     }

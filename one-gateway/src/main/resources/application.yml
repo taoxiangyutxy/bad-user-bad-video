@@ -39,7 +39,7 @@ spring:
             #按照路径断言 http
             - Path=/api/waiguagg/**
           filters:
-            #过滤掉api前缀
+            #过滤掉api前缀 使得后端服务只需要处理剩下的路径部分(剩下的需要跟接口路径匹配)
             - RewritePath=/api/(?<segment>.*),/$\{segment}
 
         - id: third_party_route
@@ -81,27 +81,27 @@ spring:
             - RewritePath=/one-auth-server/(?<path>.*),/$\{path}
 
 
-        - id:  waigua_order_route
-          #lb 代表负载均衡
-          uri: lb://one-order
-          predicates:
-            #按照路径断言 http
-            - Path=/one-order/**
-          filters:
-            - AddRequestHeader=handle-server, one-order
-            #过滤掉api前缀
-            - RewritePath=/one-order/(?<path>.*),/$\{path}
+#        - id:  waigua_order_route
+#          #lb 代表负载均衡
+#          uri: lb://one-order
+#          predicates:
+#            #按照路径断言 http
+#            - Path=/one-order/**
+#          filters:
+#            - AddRequestHeader=handle-server, one-order
+#            #过滤掉api前缀
+#            - RewritePath=/one-order/(?<path>.*),/$\{path}
 
 
-        - id: admin_route
-          #lb 代表负载均衡
-          uri: lb://renren-fast
-          predicates:
-            #按照路径断言 http
-            - Path=/api/**
-          filters:
-            #过滤掉api前缀
-            - RewritePath=/api/(?<segment>.*),/renren-fast/$\{segment}
+#        - id: admin_route
+#          #lb 代表负载均衡
+#          uri: lb://renren-fast
+#          predicates:
+#            #按照路径断言 http
+#            - Path=/api/**
+#          filters:
+#            #过滤掉api前缀
+#            - RewritePath=/api/(?<segment>.*),/renren-fast/$\{segment}
 
 
 #        - id: waigua_host_route

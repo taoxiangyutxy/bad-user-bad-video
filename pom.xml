@@ -33,7 +33,6 @@
     <!-- 依赖声明 -->
     <dependencyManagement>
     <dependencies>
-
         <!-- SpringBoot 依赖配置 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -88,9 +87,9 @@
             </activation>
             <properties>
                 <profile.name>local</profile.name>
-                <config.server-addr>82.157.63.155:8848</config.server-addr>
-                <discovery.server-addr>82.157.63.155:8848</discovery.server-addr>
-                <config.namespace>c2fcd194-161e-4d1b-b116-4e1e5927d226</config.namespace>
+                <config.server-addr>192.168.133.101:8848</config.server-addr>
+                <discovery.server-addr>192.168.133.101:8848</discovery.server-addr>
+                <config.namespace></config.namespace>
                 <config.group>tttOne</config.group>
             </properties>
         </profile>
