@@ -61,7 +61,7 @@
             <groupId>org.bytedeco</groupId>
             <artifactId>ffmpeg-platform</artifactId>
             <version>${ffmpeg-platform.version}</version>
-            <classifier>windows-x86_64</classifier>
+<!--            <classifier>windows-x86_64</classifier>-->
             <exclusions>
                 <exclusion>
                     <groupId>org.bytedeco</groupId>

@@ -17,7 +17,6 @@
     <modules>
         <module>one-common</module>
         <module>one-gateway</module>
-        <module>one-auth-server</module>
         <module>one-modules</module>
     </modules>
     <properties>

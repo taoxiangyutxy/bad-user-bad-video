@@ -9,6 +9,28 @@ import java.util.Date;
  */
 @Data
 public class WaiguaEsModel {
+       /*
+    *
+    * InfoId" : {
+          "type" : "long"
+        },
+        "waiguaType" : {
+          "type" : "text"
+        },
+        "waiguaDescribe" : {
+          "type" : "keyword"
+        },
+        "createTime" : {
+          "type" : "keyword"
+        },
+        "location" : {
+          "type" : "text",
+          "index" : false,
+          "doc_values" : false
+        }
+    *
+    * */
+
 
     private Long  InfoId;
 

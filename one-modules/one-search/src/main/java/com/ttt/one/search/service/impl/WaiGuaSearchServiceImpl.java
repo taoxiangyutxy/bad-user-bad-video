@@ -1,10 +1,13 @@
 package com.ttt.one.search.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.ttt.one.common.to.es.OperationLogInfo;
 import com.ttt.one.common.to.es.WaiguaEsModel;
 import com.ttt.one.search.config.MyElasticsearchConfig;
 import com.ttt.one.search.constant.EsConstant;
 import com.ttt.one.search.service.WaiGuaSearchService;
+import com.ttt.one.search.vo.LogSearchParam;
+import com.ttt.one.search.vo.LogSearchResult;
 import com.ttt.one.search.vo.SearchParam;
 import com.ttt.one.search.vo.SearchResult;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +20,7 @@ import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.index.reindex.BulkByScrollResponse;
 import org.elasticsearch.index.reindex.UpdateByQueryRequest;
 import org.elasticsearch.script.Script;
@@ -33,13 +37,13 @@ import org.elasticsearch.search.sort.SortOrder;
 import org.elasticsearch.xcontent.XContentType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -108,6 +112,53 @@ public class WaiGuaSearchServiceImpl implements WaiGuaSearchService {
         });
         //updateRequests.forEach(bulkProcessor::add);
     }
+
+    @Override
+    public boolean operationLogSaveES(OperationLogInfo logInfo) {
+        //1.ES中建立索引，建立好映射关系 waiguas_mapping.txt
+        //2.往ES中保存数据
+        String index = logInfo.getApplicationName();
+        if("auth".equals(index)){
+            index = EsConstant.ONE_AUTH_SERVER_INDEX;
+        }
+        logInfo.setExtend1(UUID.randomUUID().toString());
+        BulkRequest bulkRequest = new BulkRequest();
+        IndexRequest indexRequest = new IndexRequest(index);
+        //唯一值
+        indexRequest.id(logInfo.getExtend1());
+        String s = JSON.toJSONString(logInfo);
+        indexRequest.source(s, XContentType.JSON);
+        bulkRequest.add(indexRequest);
+        //批量存入
+        BulkResponse bulk = null;
+        try {
+            bulk = restHighLevelClient.bulk(bulkRequest, MyElasticsearchConfig.COMMON_OPTIONS);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        //是否有错误  如果没错误返回false  ，有错误返回true
+        boolean b = bulk.hasFailures();
+        BulkItemResponse[] items = bulk.getItems();
+        log.info("存入ES完成infoID：{}",items[0].getId());
+        return b;
+    }
+
+    @Override
+    public LogSearchResult searchLog(LogSearchParam logSearchParam) {
+        LogSearchResult result = null;
+        //1 准备检索请求
+        SearchRequest searchRequest = buildLogSearchRequest(logSearchParam);
+        try {
+            //2 执行检索请求
+            SearchResponse response = restHighLevelClient.search(searchRequest, MyElasticsearchConfig.COMMON_OPTIONS);
+            //3 分析响应数据封装成需要的格式
+            result = buildLogSearchResult(response,logSearchParam);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
     /**
      *  描述:  根据条件修改  成功的
      * @param :
@@ -239,6 +290,101 @@ public class WaiGuaSearchServiceImpl implements WaiGuaSearchService {
         int totalPages = (int)total%EsConstant.WAIGUA_PAGESIZE == 0?(int)total/EsConstant.WAIGUA_PAGESIZE:((int)total/EsConstant.WAIGUA_PAGESIZE)+1;
         result.setTotalPages(totalPages);
 
+        return result;
+    }
+
+
+
+    private SearchRequest buildLogSearchRequest(LogSearchParam param) {
+        //构建DSL语句
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+
+     /*   // 添加 term 查询
+        TermQueryBuilder termQuery = QueryBuilders.termQuery("field_name", "value_to_search");
+        sourceBuilder.query(termQuery);*/
+        /**
+         * bool -  must模糊查询  描述（当标题）模糊查询和类型查询
+         */
+        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
+        // 添加 term 精确查询到 bool 查询中
+        if(!StringUtils.isEmpty(param.getTableName())) {
+            boolQuery.must(QueryBuilders.termQuery("tableName", param.getTableName()));
+        }
+        if(!StringUtils.isEmpty(param.getMethodName())) {
+            boolQuery.must(QueryBuilders.termQuery("methodName", param.getMethodName()));
+        }
+        // 添加match 模糊查询
+        if(!StringUtils.isEmpty(param.getParam())){
+            boolQuery.must(QueryBuilders.matchQuery("param",param.getParam()));
+        }
+        if(!StringUtils.isEmpty(param.getError())){
+            boolQuery.must(QueryBuilders.matchQuery("error",param.getError()));
+        }
+        if(!StringUtils.isEmpty(param.getResult())){
+            boolQuery.must(QueryBuilders.matchQuery("result",param.getResult()));
+        }
+        if(!StringUtils.isEmpty(param.getUserName())){
+            boolQuery.must(QueryBuilders.matchQuery("userName",param.getUserName()));
+        }
+        if(!StringUtils.isEmpty(param.getRealName())){
+            boolQuery.must(QueryBuilders.matchQuery("realName",param.getRealName()));
+        }
+        if(!StringUtils.isEmpty(param.getMemberName())){
+            boolQuery.must(QueryBuilders.matchQuery("memberName",param.getMemberName()));
+        }
+        //bool - filter查询
+        if(!ObjectUtils.isEmpty(param.getStartTime()) && !ObjectUtils.isEmpty(param.getEndTime())){
+            Instant startDate = Instant.ofEpochSecond(param.getStartTime().getTime()); // 例如：2021-07-11T00:00:00Z
+            Instant endDate = Instant.ofEpochSecond(param.getEndTime().getTime());   // 例如：2021-07-12T00:00:00Z - 1 second
+            boolQuery.filter(QueryBuilders.rangeQuery("opTime").gte(startDate).lte(endDate));
+        }
+        sourceBuilder.query(boolQuery);
+        /**
+         * 排序 分页 高亮
+         */
+        //排序  sort  time_asc/desc
+        param.setSort("opTime_desc");
+        if(!StringUtils.isEmpty(param.getSort())){
+            String [] s = param.getSort().split("_");
+            SortOrder sortOrder = s[1].equalsIgnoreCase("asc") ? SortOrder.ASC : SortOrder.DESC;
+            sourceBuilder.sort(s[0],sortOrder);
+        }
+        //分页  form 从哪开始  size 每页显示几个
+        sourceBuilder.from((param.getPageNum()-1)*EsConstant.WAIGUA_PAGESIZE);
+        sourceBuilder.size(EsConstant.WAIGUA_PAGESIZE);
+        System.out.println("构建的DSL语句="+sourceBuilder.toString());
+
+        SearchRequest searchRequest = new SearchRequest(new String[]{EsConstant.ONE_AUTH_SERVER_INDEX},sourceBuilder);
+        return searchRequest;
+    }
+
+    /**
+     * 构造结果返回
+     * @param response
+     * @return
+     */
+    private LogSearchResult buildLogSearchResult(SearchResponse response,LogSearchParam param) {
+        // 创建一个SimpleDateFormat对象，设置日期格式
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        LogSearchResult result = new LogSearchResult();
+        //返回所有查到的数据
+        SearchHits hits = response.getHits();
+        List<OperationLogInfo> logInfos = new ArrayList<>();
+        for (SearchHit hit : hits.getHits()) {
+            String sourceAsString = hit.getSourceAsString();
+            OperationLogInfo logInfo = JSON.parseObject(sourceAsString,OperationLogInfo.class);
+            logInfo.setDateStr(sdf.format(logInfo.getOpTime()));
+            logInfos.add(logInfo);
+        }
+        result.setLogInfos(logInfos);
+        //分页信息-页码
+        result.setPageNum(param.getPageNum());
+        //分页信息-总记录数
+        long total =hits.getTotalHits().value;
+        result.setTotal(total);
+        //分页信息-总页码
+        int totalPages = (int)total%EsConstant.WAIGUA_PAGESIZE == 0?(int)total/EsConstant.WAIGUA_PAGESIZE:((int)total/EsConstant.WAIGUA_PAGESIZE)+1;
+        result.setTotalPages(totalPages);
         return result;
     }
 }

@@ -37,6 +37,10 @@ spring:
           -  data-id: plumelog.yml
              group: '@config.group@'
              refresh: true
+
+          -  data-id: auth.yml
+             group: '@config.group@'
+             refresh: true
   profiles:
     active: '@profile.name@'
   thymeleaf:

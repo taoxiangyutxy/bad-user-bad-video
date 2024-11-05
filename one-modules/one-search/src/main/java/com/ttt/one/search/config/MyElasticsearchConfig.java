@@ -24,7 +24,7 @@ public class MyElasticsearchConfig {
     public RestHighLevelClient esRestClient(){
         RestHighLevelClient client = new RestHighLevelClient(
                 RestClient.builder(
-                        new HttpHost("47.104.177.6", 9200, "http")));
+                        new HttpHost("192.168.133.101", 9200, "http")));
                     //    new HttpHost("localhost", 9201, "http")));
         return client;
     }

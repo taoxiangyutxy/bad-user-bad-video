@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script>
+		$(document).ready(function() {
+			$('#searchButton').click(function(event) {
+				event.preventDefault();
+
+				var tableName = $('#tableName').val();
+				var methodName = $('#methodName').val();
+
+				$.ajax({
+					url: "/logSearch",
+					type: "GET",
+					data: {
+						tableName: tableName,
+						methodName: methodName
+					},
+					success: function(data) {
+						// 清空结果区
+						$('#searchResults').empty();
+
+						if (data && data.logInfos && data.logInfos.length > 0) {
+							var tableHtml = '<table>';
+							tableHtml += '<thead><tr>';
+							tableHtml += '<th>表名</th>';
+							tableHtml += '<th>方法名</th>';
+							tableHtml += '<th>应用名称</th>';
+							tableHtml += '<th>应用描述</th>';
+							tableHtml += '<th>类名</th>';
+							tableHtml += '<th>调用方式</th>';
+							tableHtml += '<th>传参</th>';
+							tableHtml += '<th>操作类型名称</th>';
+							tableHtml += '<th>接口描述</th>';
+							tableHtml += '<th>接口调用时间</th>';
+							tableHtml += '<th>接口响应时间</th>';
+							tableHtml += '<th>响应状态</th>';
+							tableHtml += '<th>错误原因</th>';
+							tableHtml += '<th>返回结果</th>';
+							tableHtml += '<th>用户登录名</th>';
+							tableHtml += '<th>用户姓名</th>';
+							tableHtml += '</tr></thead>';
+							tableHtml += '<tbody>';
+
+							data.logInfos.forEach(function(logInfo) {
+								tableHtml += '<tr>';
+								tableHtml += '<td>' + logInfo.tableName + '</td>';
+								tableHtml += '<td>' + logInfo.methodName + '</td>';
+								tableHtml += '<td>' + logInfo.applicationName + '</td>';
+								tableHtml += '<td>' + logInfo.applicationDesc + '</td>';
+								tableHtml += '<td>' + logInfo.className + '</td>';
+								tableHtml += '<td>' + logInfo.method + '</td>';
+								tableHtml += '<td>' + logInfo.param + '</td>';
+								tableHtml += '<td>' + logInfo.opTypeName + '</td>';
+								tableHtml += '<td>' + logInfo.opDesc + '</td>';
+								tableHtml += '<td>' + logInfo.dateStr + '</td>';
+								tableHtml += '<td>' + logInfo.consumeTime + '</td>';
+								tableHtml += '<td>' + logInfo.success + '</td>';
+								tableHtml += '<td>' + logInfo.error + '</td>';
+								tableHtml += '<td>' + logInfo.result + '</td>';
+								tableHtml += '<td>' + logInfo.userName + '</td>';
+								tableHtml += '<td>' + logInfo.realName + '</td>';
+								tableHtml += '</tr>';
+							});
+
+							tableHtml += '</tbody>';
+							tableHtml += '</table>';
+
+							$('#searchResults').html(tableHtml);
+
+							$('.total-count').text('总共有 ' + data.total + ' 条记录');
+						} else {
+							$('#searchResults').html('<p>No results found.</p>');
+						}
+					},
+					error: function(xhr, status, error) {
+						console.log('Error occurred: ' + error);
+					}
+				});
+			});
+
+			$('#resetButton').click(function() {
+				location.reload();
+			});
+		});
+	</script>
+</head>
+<body>
+<style>
+	table {
+		width: 100%;
+		border-collapse: collapse;
+	}
+	th, td {
+		padding: 8px;
+		text-align: left;
+		border-bottom: 1px solid #ddd;
+		border-right: 1px solid #ddd;
+	}
+	th:last-child, td:last-child {
+		border-right: none;
+	}
+	th {
+		background-color: #f2f2f2;
+		font-weight: bold;
+	}
+	tr:hover {
+		background-color: #f5f5f5;
+	}
+
+	.pagination {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		list-style: none;
+		margin-top: 20px;
+	}
+
+	.pagination .total-count {
+		font-size: 1rem;
+		color: #555;
+	}
+
+	.pagination ul {
+		display: inline-flex;
+		padding: 0;
+	}
+
+	.pagination li {
+		border: 1px solid #ccc;
+		display: list-item;
+		padding: 5px 10px;
+		text-align: center;
+		transition: background-color .3s, border .3s;
+	}
+
+	.pagination li a {
+		color: black;
+		display: block;
+		padding: 8px 16px;
+		text-decoration: none;
+	}
+
+	.pagination li.active {
+		background-color: #4CAF50;
+		border-color: #4CAF50;
+	}
+
+	.pagination li.active a {
+		color: white;
+	}
+
+	.pagination li:hover:not(.active) {
+		background-color: #ddd;
+		border-color: #ddd;
+	}
+</style>
+<div>
+	<label for="tableName">表名:</label>
+	<input type="text" id="tableName" name="tableName" placeholder="Enter 表名">
+
+	<label for="methodName">方法名:</label>
+	<input type="text" id="methodName" name="methodName" placeholder="Enter 方法名">
+
+	<button id="searchButton">搜索</button>
+	<button id="resetButton">重置</button>
+</div>
+<div id="searchResults">
+	<!-- 结果将在这里动态生成 -->
+</div>
+
+<div class="pagination">
+	<div class="total-count">总共有 0 条记录</div>
+	<ul>
+		<li><a href="#">&laquo; 上一页</a></li>
+		<li class="active"><a href="#">1</a></li>
+		<li><a href="#">2</a></li>
+		<li><a href="#">3</a></li>
+		<li><a href="#">4</a></li>
+		<li><a href="#">5</a></li>
+		<li><a href="#">下一页 &raquo;</a></li>
+	</ul>
+</div>
+
+</body>
+</html>

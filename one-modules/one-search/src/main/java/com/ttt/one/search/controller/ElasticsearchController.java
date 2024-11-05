@@ -1,5 +1,6 @@
 package com.ttt.one.search.controller;
 
+import com.ttt.one.common.to.es.OperationLogInfo;
 import com.ttt.one.common.to.es.WaiguaEsModel;
 import com.ttt.one.common.utils.R;
 import com.ttt.one.search.service.WaiGuaSearchService;
@@ -51,5 +52,19 @@ public class ElasticsearchController {
     public R waiguaInfoBatchUpdate(@RequestBody(required = false) List<WaiguaEsModel> esModelList){
         waiGuaSearchService.waiguaInfoBatchUpdate(esModelList);
         return R.ok();
+    }
+
+
+    @RequestMapping("/operationLogSaveES")
+    public R operationLogSaveES(@RequestBody OperationLogInfo logInfo)  {
+        boolean b = false;
+        try {
+            b = waiGuaSearchService.operationLogSaveES(logInfo);
+        } catch (Exception e) {
+            log.error("数据存入ES异常:{}",e);
+            return R.error("数据存入ES异常");
+        }
+        if(!b){ return R.ok();}
+        else {return  R.error("数据存入ES异常");}
     }
 }

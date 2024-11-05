@@ -1,0 +1,92 @@
+全文检索 日志信息字段映射
+
+PUT xxx (服务名)
+{
+  "mappings" : {
+      "properties" : {
+        "tableName" : {
+          "type" : "keyword"
+        },
+        "applicationName" : {
+          "type" : "text"
+        },
+         "applicationDesc" : {
+          "type" : "text",
+          "index": false
+        },
+        "className" : {
+          "type" : "text",
+          "index": false
+        },
+        "methodName" : {
+          "type" : "keyword"
+        },
+        "url" : {
+          "type" : "text"
+        },
+        "uri" : {
+                  "type" : "text"
+                },
+        "ip" : {
+                  "type" : "text"
+                },
+        "method" : {
+                 "type" : "text"
+                        },
+        "param" : {
+                  "type" : "text"
+                },
+                "opTypeCode" : {
+                  "type" : "text",
+                  "index": false
+                },
+                "opTypeName" : {
+                  "type" : "text",
+                  "index": false
+                },
+                 "opDesc" : {
+                  "type" : "text",
+                  "index": false
+                },
+                "opTime" : {
+                  "type" : "keyword"
+                },
+                "consumeTime" : {
+                  "type" : "text"
+                },
+                "success" : {
+                  "type" : "text",
+                  "index": false
+                },
+        "error" : {
+                  "type" : "text"
+                },
+                "result" : {
+                  "type" : "text"
+                },
+                "dtype" : {
+                  "type" : "text",
+                  "index": false
+                },
+                 "userName" : {
+                  "type" : "text"
+                },
+                "realName" : {
+                  "type" : "text"
+                },
+                "memberName" : {
+                  "type" : "text"
+                },
+                "extend1" : {
+                  "type" : "text"
+                },
+                "extend2" : {
+                          "type" : "text"
+                        },
+                "extend3" : {
+                          "type" : "text"
+                        }
+
+      }
+    }
+}

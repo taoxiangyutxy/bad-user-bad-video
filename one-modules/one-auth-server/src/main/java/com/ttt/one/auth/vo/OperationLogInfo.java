@@ -1,6 +1,6 @@
 package com.ttt.one.auth.vo;
 
-import com.qdport.core.oplog.bean.OperationLogBase;
+import com.ttt.one.oplog.bean.OperationLogBase;
 
 import java.io.Serializable;
 import java.util.Date;

@@ -1,6 +1,9 @@
 package com.ttt.one.search.service;
 
+import com.ttt.one.common.to.es.OperationLogInfo;
 import com.ttt.one.common.to.es.WaiguaEsModel;
+import com.ttt.one.search.vo.LogSearchParam;
+import com.ttt.one.search.vo.LogSearchResult;
 import com.ttt.one.search.vo.SearchParam;
 import com.ttt.one.search.vo.SearchResult;
 
@@ -29,4 +32,18 @@ public interface WaiGuaSearchService {
      * @date 2021/11/19 16:58
      */
     void waiguaInfoBatchUpdate(List<WaiguaEsModel> esModelList);
+
+    /**
+     * 操作日志存入ES
+     * @param logInfo
+     * @return
+     */
+    boolean operationLogSaveES(OperationLogInfo logInfo);
+
+    /**
+     * 日志检索
+     * @param logSearchParam
+     * @return
+     */
+    LogSearchResult searchLog(LogSearchParam logSearchParam);
 }

@@ -1,7 +1,7 @@
 package com.ttt.one.auth.controller;
 import com.alibaba.fastjson.TypeReference;
-import com.qdport.core.oplog.annotation.OperationLog;
-import com.qdport.core.oplog.annotation.OperationLogType;
+import com.ttt.one.oplog.annotation.OperationLog;
+import com.ttt.one.oplog.annotation.OperationLogType;
 import com.ttt.one.auth.fegin.UserFeginServer;
 import com.ttt.one.auth.service.AuthService;
 import com.ttt.one.auth.utils.TokenUtil;
