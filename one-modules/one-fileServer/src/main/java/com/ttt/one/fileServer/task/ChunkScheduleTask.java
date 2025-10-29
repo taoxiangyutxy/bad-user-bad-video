@@ -7,6 +7,7 @@ import com.ttt.one.fileServer.fegin.EsSearchFeginServer;
 import com.ttt.one.fileServer.service.ChunkService;
 import com.ttt.one.fileServer.service.FileInfoService;
 import com.ttt.one.fileServer.utils.MinIoUtils;
+import com.ttt.one.fileServer.utils.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +55,11 @@ public class ChunkScheduleTask {
                 String url = MinIoUtils.getObjectUrl("uploadtest", fileInfoEntity.getIdentifier()+"/"+fileInfoEntity.getFilename(), 60 * 24*7);
                 fileInfoEntity.setCreateTime(new Date());
                 fileInfoEntity.setLocation(url);
+
+                //同时更新封面图片链接
+                String previewUrl = MinIoUtils.getObjectPreviewUrl("uploadtest",
+                        "images/" + StrUtil.extractFileName(fileInfoEntity.getCover()), 60 * 24 * 7, "image/jpeg");
+                fileInfoEntity.setCover(previewUrl);
                 return fileInfoEntity;
             }).collect(Collectors.toList());
             //循环更新sql 不要一条一条的更新
