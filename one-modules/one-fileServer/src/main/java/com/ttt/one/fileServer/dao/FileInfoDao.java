@@ -32,4 +32,10 @@ public interface FileInfoDao extends BaseMapper<FileInfoEntity> {
      * @return
      */
     List<FileInfoEntity> listByPass();
+
+    /**
+     *  返回审核通过的视频列表并且过期的
+     * @return
+     */
+    List<FileInfoEntity> listByPassAndExpired();
 }

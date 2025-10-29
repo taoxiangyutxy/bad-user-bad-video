@@ -32,6 +32,12 @@
         LEFT JOIN  waigua_info i ON i.id = f.waigua_info_id
         WHERE i.review_status = 2
     </select>
+    <select id="listByPassAndExpired" resultType="com.ttt.one.fileServer.entity.FileInfoEntity">
+        SELECT f.* FROM `waigua_file_info` f
+        LEFT JOIN  waigua_info i ON i.id = f.waigua_info_id
+        WHERE i.review_status = 2
+        and f.create_time  &lt;  DATE_SUB(NOW(), INTERVAL 7 DAY)
+    </select>
 
 
 </mapper>
