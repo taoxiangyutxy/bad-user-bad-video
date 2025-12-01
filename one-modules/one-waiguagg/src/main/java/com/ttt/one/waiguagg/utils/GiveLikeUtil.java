@@ -1,6 +1,6 @@
 package com.ttt.one.waiguagg.utils;
 
-import com.ttt.one.common.exception.RRException;
+import com.ttt.one.common.exception.BizException;
 import com.ttt.one.common.utils.constant.InfoConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,7 +73,7 @@ public class GiveLikeUtil {
         for (Long param : params) {
             if (null == param) {
                 log.error("入参存在null值");
-                throw new RRException("参数不能为null!");
+                throw new BizException("参数不能为null!");
             }
         }
     }

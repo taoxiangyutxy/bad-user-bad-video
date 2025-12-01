@@ -15,7 +15,7 @@ package com.ttt.one.common.exception;
  *
  * @author ZSY
  */
-public enum BizCodeEnum {
+public enum BizExceptionEnum {
     /**
      * 系统未知异常
      */
@@ -37,7 +37,7 @@ public enum BizCodeEnum {
     private final int code;
     private final String msg;
 
-    BizCodeEnum(int code, String msg) {
+    BizExceptionEnum(int code, String msg) {
         this.code = code;
         this.msg = msg;
     }

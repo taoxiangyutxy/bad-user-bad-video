@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 //import org.apache.shiro.authz.annotation.RequiresPermissions;
-import com.ttt.one.common.exception.BizCodeEnum;
+import com.ttt.one.common.exception.BizExceptionEnum;
 import com.ttt.one.common.utils.PageUtils;
 import com.ttt.one.common.utils.R;
 import com.ttt.one.user.exception.PhoneExistException;
@@ -40,7 +40,7 @@ public class UserController {
        if(userEntity!=null){
            return R.ok().setData(userEntity);
        }else {
-           return R.error(BizCodeEnum.LOGIN_ACCOUNT_PASSWORD_EXCEPTION.getCode(),BizCodeEnum.LOGIN_ACCOUNT_PASSWORD_EXCEPTION.getMsg());
+           return R.error(BizExceptionEnum.LOGIN_ACCOUNT_PASSWORD_EXCEPTION.getCode(), BizExceptionEnum.LOGIN_ACCOUNT_PASSWORD_EXCEPTION.getMsg());
        }
     }
 

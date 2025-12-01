@@ -29,8 +29,8 @@ public class RedisKeyExpirationListener extends KeyExpirationEventMessageListene
         logger.error("监听redis失效时间");
         // 获取到失效的 key，进行取消订单业务处理
         String expiredKey = message.toString();
-        String s = redisTemplate.opsForValue().get("allWaiGuaData");
-        logger.error("redis过期key:{};过期key的值:{}",expiredKey,s);
+       // String s = redisTemplate.opsForValue().get("allWaiGuaData");
+        logger.error("redis过期key:{};过期key的值:{}",expiredKey);
 
     }
 }

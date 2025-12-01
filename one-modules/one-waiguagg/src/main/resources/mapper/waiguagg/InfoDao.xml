@@ -51,7 +51,10 @@
                f.location,f.audio_duration AS audioDuration,f.cover
         FROM `waigua_info` i
                  LEFT JOIN waigua_file_info f ON f.waigua_info_id = i.id
-        where i.reportuser_id = #{reportuserId} and i.`status` = 0
+        where  i.`status` = 0
+        <if test="reportuserId != null ">
+            AND i.reportuser_id = #{reportuserId}
+        </if>
         <if test="reviewStatus != null and reviewStatus != ''">
             AND i.review_status = #{reviewStatus}
         </if>

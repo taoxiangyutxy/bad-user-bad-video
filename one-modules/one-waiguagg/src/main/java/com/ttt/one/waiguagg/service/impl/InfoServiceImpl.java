@@ -7,7 +7,7 @@ package com.ttt.one.waiguagg.service.impl;
 //import com.alibaba.csp.sentinel.slots.block.BlockException;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
-import com.ttt.one.common.exception.RRException;
+import com.ttt.one.common.exception.BizException;
 import com.ttt.one.common.to.es.WaiguaEsModel;
 import com.ttt.one.common.utils.Constant;
 import com.ttt.one.common.utils.PageUtils;
@@ -25,6 +25,7 @@ import com.ttt.one.waiguagg.fegin.UserFeginServer;
 import com.ttt.one.waiguagg.service.CommentService;
 import com.ttt.one.waiguagg.service.GivelikeService;
 import com.ttt.one.waiguagg.service.UnmberService;
+import com.ttt.one.waiguagg.utils.GGFileUtil;
 import com.ttt.one.waiguagg.vo.FileInfoVO;
 import com.ttt.one.waiguagg.vo.VideoPreviewVO;
 import com.ttt.one.waiguagg.vo.WaiGuaInfoVO;
@@ -50,6 +51,7 @@ import com.ttt.one.waiguagg.dao.InfoDao;
 import com.ttt.one.waiguagg.entity.InfoEntity;
 import com.ttt.one.waiguagg.service.InfoService;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 @Service("infoService")
@@ -85,7 +87,6 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
 
         return new PageUtils(page);
     }
-
     @Override
     public PageUtils queryPageAll(Map<String, Object> params) {
         QueryWrapper<InfoEntity> wrapper = new QueryWrapper<InfoEntity>().eq("status", Constant.STATUS_0);
@@ -251,6 +252,7 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
         catch (Exception ex) {
             // 若需要配置降级规则，需要通过这种方式记录业务异常
         //    Tracer.traceEntry(ex, entry);
+            ex.printStackTrace();
         }
 //        finally {
 //            // 务必保证 exit，务必保证每个 entry 与 exit 配对
@@ -515,28 +517,26 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
     @Transactional
     @Override
     public void saveAndUpdateFile(WaiGuaInfoVO waiGuaInfoVO) {
-        //1 外挂账号是否存在 根据名字  存在更新数据
-        UnmberEntity unmberEntity =  unmberService.getByName(waiGuaInfoVO.getWaiguaUsername());
-        if(unmberEntity!=null){ //更新
+        // 参数校验
+        if(waiGuaInfoVO == null || StringUtils.isEmpty(waiGuaInfoVO.getWaiguaUsername())){
+            throw new BizException("参数不能为空");
+        }
+        
+        // 1. 保存或更新外挂账号信息
+        UnmberEntity unmberEntity = unmberService.getByName(waiGuaInfoVO.getWaiguaUsername());
+        if(unmberEntity != null){ 
+            // 更新：将VO的数据复制到已存在的entity中
+            BeanUtils.copyProperties(waiGuaInfoVO, unmberEntity);
             unmberService.updateById(unmberEntity);
-        }else{//新增
+        } else {
+            // 新增
             unmberEntity = new UnmberEntity();
-            BeanUtils.copyProperties(waiGuaInfoVO,unmberEntity);
+            BeanUtils.copyProperties(waiGuaInfoVO, unmberEntity);
             unmberService.save(unmberEntity);
         }
-        //2 新增info信息
-        InfoEntity infoEntity = new InfoEntity();
-        BeanUtils.copyProperties(waiGuaInfoVO,infoEntity);
-        infoEntity.setWaiguaId(unmberEntity.getId());
-        infoEntity.setWaiguaType(StringUtils.arrayToDelimitedString(waiGuaInfoVO.getWaiguaType(),","));
-        infoEntity.setStatus(Constant.STATUS_0);
-        infoEntity.setThumbUpNumber(0);
-        infoEntity.setReadNumber(0);
-        infoEntity.setCreateTime(new Date());
-        infoEntity.setUpdataTime(infoEntity.getCreateTime());
-        infoEntity.setReviewStatus(Constant.REVIEWSTATUS_0);
-        //上传用户id
-        infoEntity.setReportuserId(4L);
+        
+        // 2. 新增info信息
+        InfoEntity infoEntity = buildInfoEntity(waiGuaInfoVO, unmberEntity.getId());
         this.baseMapper.saveInfoReturnId(infoEntity);
         /**
          * 关联视频文件表
@@ -546,10 +546,18 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
         fileInfoVO.setIdentifier(waiGuaInfoVO.getIdentifier());
         fileInfoVO.setCover(waiGuaInfoVO.getCover());
         R r = fileServer.updateFileInfoByWeb(fileInfoVO);
-        if(r.getCode() == 0){
-            log.info("调用远程服务成功：updateFileInfo");
-        }else{
-            log.error("调用远程服务失败：updateFileInfo");
+        if(r == null || r.getCode() != 0){
+            String errorMsg = r != null ? (String) r.get("msg") : "远程服务返回null";
+            log.error("调用远程服务失败：updateFileInfo, 错误信息: {}", errorMsg);
+            throw new BizException("文件信息更新失败: " + errorMsg);
+        }
+        
+        log.info("调用远程服务成功：updateFileInfo");
+        //清除截屏图片文件
+        try {
+            GGFileUtil.deleteFilesByName("test2.jpg");
+        } catch (Exception e) {
+            log.warn("清除截屏图片文件失败: {}", e.getMessage());
         }
 
     }
@@ -596,8 +604,11 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
     public List<InfoEntity> findListByUserAll(Map<String, Object> params) {
         String key = (String) params.get("key");
         InfoDTO infoDTO = new InfoDTO();
-        String reportUserId = (String) params.get("reportuserId");
-        infoDTO.setReportuserId(Long.parseLong(reportUserId));
+        String reportUserId = "";
+        if(!ObjectUtils.isEmpty(params.get("reportuserId"))){
+            reportUserId = (String) params.get("reportuserId");
+            infoDTO.setReportuserId(Long.parseLong(reportUserId));
+        }
         if(!StringUtils.isEmpty(key)){
             infoDTO.setWaiguaUsername(key);
         }
@@ -607,6 +618,41 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
         }
         List<InfoEntity> infoEntities =  this.baseMapper.findListByUser(infoDTO);
         return infoEntities;
+    }
+
+    @Override
+    public PageUtils findListAll(Map<String, Object> params) {
+
+        /**
+         * 查询字段 拼接
+         */
+        QueryWrapper<InfoEntity> wrapper = new QueryWrapper<>();
+        String key = (String) params.get("key");
+        InfoDTO infoDTO = new InfoDTO();
+        if(!StringUtils.isEmpty(key)){
+            infoDTO.setWaiguaUsername(key);
+            wrapper.like("waigua_username",key);
+        }
+        String reviewStatus = (String) params.get("reviewStatus");
+        if(Optional.ofNullable(reviewStatus).isPresent()&&!StringUtils.isEmpty(reviewStatus)){
+            infoDTO.setReviewStatus(Integer.parseInt(reviewStatus));
+            wrapper.eq("review_status",Integer.parseInt(reviewStatus));
+        }
+
+        IPage<InfoEntity> page =
+                this.page(
+                        new Query<InfoEntity>().getPage(params),
+                        wrapper
+                );
+        PageUtils pageUtils = new PageUtils(page);
+        /**
+         * 设置分页
+         */
+        infoDTO.setPageSize(pageUtils.getPageSize());
+        infoDTO.setPageIndex(pageUtils.getPageSize()*(pageUtils.getCurrPage()-1));
+        List<InfoEntity> infoEntities =  this.baseMapper.findListByUser(infoDTO);
+        pageUtils.setList(infoEntities);
+        return pageUtils;
     }
 
     /**
@@ -682,11 +728,11 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
             if(!org.apache.commons.lang.StringUtils.isEmpty(value)){
                 if(value.equals("1")){//点过了
                     log.error("数据库有但是缓存取消了又点过攒了，relationId:{}，likedUserId:{}", relationId, likedUserId);
-                    throw new RRException("该评论已被当前用户点赞，重复点赞!");
+                    throw new BizException("该评论已被当前用户点赞，重复点赞!");
                 }
             }else{
                 log.error("数据库有，relationId:{}，likedUserId:{}", relationId, likedUserId);
-                throw new RRException("该评论已被当前用户点赞，重复点赞!");
+                throw new BizException("该评论已被当前用户点赞，重复点赞!");
             }
         }else{
             /**
@@ -695,7 +741,7 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
             if(!org.apache.commons.lang.StringUtils.isEmpty(value)){
                 if(value.equals("1")){// 点过赞了
                     log.error("缓存有并点过了，relationId:{}，likedUserId:{}", relationId, likedUserId);
-                    throw new RRException("该评论已被当前用户点赞，重复点赞!");
+                    throw new BizException("该评论已被当前用户点赞，重复点赞!");
                 }
             }
         }
@@ -729,17 +775,17 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
                     .hasKey(InfoConstant.INFO_LIKED_USER_KEY, relationId + "::" + likedUserId+"::"+type);
             if(!b){
                 log.error("缓存没有，commentId:{}，likedUserId:{}", relationId, likedUserId);
-                throw new RRException("该评论未被当前用户点赞，不可以进行取消点赞操作!");
+                throw new BizException("该评论未被当前用户点赞，不可以进行取消点赞操作!");
             }else {
                 if(value.equals("0")){
                     log.error("缓存有但是取消了已经，commentId:{}，likedUserId:{}", relationId, likedUserId);
-                    throw new RRException("该评论未被当前用户点赞，不可以进行取消点赞操作!");
+                    throw new BizException("该评论未被当前用户点赞，不可以进行取消点赞操作!");
                 }
             }
         }else{//库里有
             if(!org.apache.commons.lang.StringUtils.isBlank(value)){
                 if(value.equals("0")){//但是缓存已经取消过了
-                    throw new RRException("该评论已经取消点赞，不可以进行取消点赞操作!");
+                    throw new BizException("该评论已经取消点赞，不可以进行取消点赞操作!");
                 }
             }
         }
@@ -757,7 +803,7 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
         for (Long param : params) {
             if (null == param) {
                 log.error("入参存在null值");
-                throw new RRException("参数不能为null!");
+                throw new BizException("参数不能为null!");
             }
         }
     }
@@ -828,5 +874,33 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
             lock.unlock();
         }
         return collect;
+    }
+
+    /**
+     * 构建InfoEntity对象
+     * @param waiGuaInfoVO VO对象
+     * @param waiguaId 外挂账号ID
+     * @return InfoEntity
+     */
+    private InfoEntity buildInfoEntity(WaiGuaInfoVO waiGuaInfoVO, Long waiguaId) {
+        InfoEntity infoEntity = new InfoEntity();
+        BeanUtils.copyProperties(waiGuaInfoVO, infoEntity);
+        
+        Date now = new Date();
+        infoEntity.setWaiguaId(waiguaId);
+        infoEntity.setWaiguaType(StringUtils.arrayToDelimitedString(waiGuaInfoVO.getWaiguaType(), ","));
+        infoEntity.setStatus(Constant.STATUS_0);
+        infoEntity.setThumbUpNumber(0);
+        infoEntity.setReadNumber(0);
+        infoEntity.setCreateTime(now);
+        infoEntity.setUpdataTime(now);
+        infoEntity.setReviewStatus(Constant.REVIEWSTATUS_0);
+        
+        // 设置上传用户ID（如果VO中没有提供则使用默认值）
+        if(waiGuaInfoVO.getReportuserId() == null) {
+            infoEntity.setReportuserId(4L);
+        }
+        
+        return infoEntity;
     }
 }

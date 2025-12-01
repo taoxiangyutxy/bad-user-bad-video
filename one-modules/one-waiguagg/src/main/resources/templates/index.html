@@ -116,7 +116,7 @@
 
 				</figure>
 				<span class="fh5co-meta"><a th:href="@{/single.html(id=${waigua.getWaiguaInfoId()})}"  th:text="${waigua.getWaiguaUsername()}">Food &amp; Drink</a></span>
-				<h2 class="fh5co-article-title"><a href="http://localhost:20000/single.html" th:text="${waigua.getWaiguaDescribe()}">We Eat and Drink All Night</a></h2>
+				<h2 class="fh5co-article-title"><a th:href="@{/single.html(id=${waigua.getWaiguaInfoId()})}" th:text="${waigua.getWaiguaDescribe()}">We Eat and Drink All Night</a></h2>
 				<span class="fh5co-meta fh5co-date" th:text="${#dates.format(waigua.getCreateTime(),'yyyy-MM-dd HH:mm:ss')}">March 6th, 2016</span>
 			</article>
 			<div class="clearfix visible-xs-block"></div>

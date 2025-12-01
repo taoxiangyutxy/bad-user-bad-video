@@ -166,7 +166,34 @@ public class InfoController {
          */
         Map<String, Object> counts  = new HashMap<>();
         List<InfoEntity> list = infoService.findListByUserAll(params);
-        long count1 = list.stream().filter(s -> s.getReviewStatus() == 1).count();
+        long count1 = list.stream().filter(s -> s.getReviewStatus() == 0).count();
+        long count2 = list.stream().filter(s -> s.getReviewStatus() == 2).count();
+        long count3 = list.stream().filter(s -> s.getReviewStatus() == 3).count();
+        counts.put("allConut",page.getTotalCount());
+        counts.put("count1",count1);
+        counts.put("count2",count2);
+        counts.put("count3",count3);
+        return R.ok("查询成功!").put("page",page).put("counts",counts);
+    }
+
+    /**
+     * 返回所有视频列表 带缩略图 视频时长 info信息
+     * @param params
+     * @return
+     */
+    @RequestMapping(value = "/findListAll",method = RequestMethod.GET)
+    public R findListAll (@RequestParam Map<String, Object> params){
+        boolean b = Optional.ofNullable(params).isPresent();
+        if(!b){
+            return R.error("参数不能为空!");
+        }
+        PageUtils page = infoService.findListAll(params);
+        /**
+         * 获取每个状态下的条数 返回
+         */
+        Map<String, Object> counts  = new HashMap<>();
+        List<InfoEntity> list = infoService.findListByUserAll(params);
+        long count1 = list.stream().filter(s -> s.getReviewStatus() == 0).count();
         long count2 = list.stream().filter(s -> s.getReviewStatus() == 2).count();
         long count3 = list.stream().filter(s -> s.getReviewStatus() == 3).count();
         counts.put("allConut",page.getTotalCount());

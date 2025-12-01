@@ -135,5 +135,7 @@ public interface InfoService extends IService<InfoEntity> {
      * @return
      */
     List<InfoEntity> findListByUserAll(Map<String, Object> params);
+
+    PageUtils findListAll(Map<String, Object> params);
 }
 

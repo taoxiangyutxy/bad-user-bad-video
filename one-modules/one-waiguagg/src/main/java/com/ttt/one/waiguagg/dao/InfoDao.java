@@ -20,7 +20,7 @@ public interface InfoDao extends BaseMapper<InfoEntity> {
 
     List<InfoEntity> findListAll(@Param("key") String key, @Param("reviewStatus") String reviewStatus,@Param("currentUser") Long currentUser,@Param("type") Integer type);
 
-    InfoEntity getByIdAndCuser(Long id, Long currentUser,Integer type);
+    InfoEntity getByIdAndCuser(@Param("id") Long id,@Param("currentUser") Long currentUser,@Param("type") Integer type);
 
     void saveInfoReturnId(InfoEntity infoEntity);
     /**
