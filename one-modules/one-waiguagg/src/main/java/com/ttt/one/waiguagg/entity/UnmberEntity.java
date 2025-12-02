@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.io.Serializable;
 import java.util.Date;
+
+import com.ttt.one.waiguagg.annotation.WaiGuaName;
 import lombok.Data;
 
 /**
@@ -27,6 +29,7 @@ public class UnmberEntity implements Serializable {
 	/**
 	 * 外挂账号名
 	 */
+	@WaiGuaName(message = "名称只能包含英文和数字")
 	private String waiguaUsername;
 	/**
 	 * 账号等级

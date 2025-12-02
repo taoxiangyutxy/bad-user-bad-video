@@ -2,6 +2,7 @@ package com.ttt.one.common.exception;
 
 import com.ttt.one.common.utils.R;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -61,6 +62,26 @@ public class GlobalExceptionHandler {
         
         log.warn("参数校验失败：{}", errorMap);
         return R.error(400, "参数校验失败", errorMap);
+    }
+
+    /**
+     * 处理数据绑定失败
+     * @param e
+     * @return
+     */
+    @ExceptionHandler(BindException.class)
+    public R handleBindException(BindException e) {
+        BindingResult result = e.getBindingResult();
+
+        Map<String, String> errorMap = result.getFieldErrors().stream()
+                .collect(Collectors.toMap(
+                        FieldError::getField,
+                        FieldError::getDefaultMessage,
+                        (existing, replacement) -> existing
+                ));
+
+        log.warn("数据绑定失败：{}", errorMap);
+        return R.error(400, "数据绑定失败", errorMap);
     }
 
     /**

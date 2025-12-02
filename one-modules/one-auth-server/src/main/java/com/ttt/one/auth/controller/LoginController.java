@@ -8,7 +8,6 @@ import com.ttt.one.auth.utils.TokenUtil;
 import com.ttt.one.auth.vo.OperationLogInfo;
 import com.ttt.one.auth.vo.UserLoginVo;
 import com.ttt.one.auth.vo.UserRegistVo;
-import com.ttt.one.auth.aop.LogAnnotation;
 import com.ttt.one.common.utils.Constant;
 import com.ttt.one.common.utils.R;
 import com.ttt.one.common.vo.UserEntity;
@@ -29,8 +28,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -53,16 +50,6 @@ public class LoginController {
     @Autowired
     private TokenUtil tokenUtil;
 
-    /*@GetMapping("/login.html")
-    public String loginPage(){
-        return "login";
-    }
-
-    @GetMapping("/reg.html")
-    public String regPage(){
-        return "reg";
-    }*/
-
     @Value("${spring.ttt.theHost}")
     private String theHost;
 
@@ -79,7 +66,6 @@ public class LoginController {
     @ResponseBody
     @RequestMapping("/test")
     public String createUserTest(@RequestBody OperationLogInfo info){
-        log.info("到這裡了-2222222");
         log.info(info.toString());
         return "ok:"+new Date()+ " ---"+url;
     }
@@ -146,15 +132,12 @@ public class LoginController {
             redirectAttributes.addFlashAttribute("errors",errors);
             return "redirect:http://"+theHost+":88/one-auth-server/login/reg.html";
         }
-
-        //注册成功回到登录页
-      //  return "redirect:/login.html";
     }
 
     @PostMapping("/login")
     @OperationLog(type =OperationLogType.QUERY ,desc = "登录接口")
     public  String login(UserLoginVo vo, RedirectAttributes redirectAttributes, HttpSession session, HttpServletResponse response){
-        log.info("ttturl:{}",url);
+        log.info("tttUrl:{}",url);
         R r = userFeginServer.login(vo);
         if(r.getCode()==0){
             UserEntity data = r.getData("data", new TypeReference<UserEntity>() {
@@ -194,8 +177,7 @@ public class LoginController {
         }
     }
 
-    @GetMapping(value = "/loguot.html")
-    //   @LogAnnotation(module = "logout",operator = "退出登录接口")
+    @GetMapping(value = "/logout.html")
     @OperationLog(type =OperationLogType.QUERY ,desc = "退出登录接口")
     public String logout(HttpServletRequest request) {
          request.getSession().removeAttribute(Constant.LOGIN_USER);

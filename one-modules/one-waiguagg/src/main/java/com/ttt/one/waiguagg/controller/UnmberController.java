@@ -5,8 +5,10 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.*;
 
+import com.ttt.one.common.exception.BizException;
 import com.ttt.one.common.utils.PageUtils;
 import com.ttt.one.common.utils.R;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -15,6 +17,8 @@ import org.springframework.web.bind.annotation.*;
 import com.ttt.one.waiguagg.entity.UnmberEntity;
 import com.ttt.one.waiguagg.service.UnmberService;
 
+import javax.validation.Valid;
+
 /**
  * 外挂账号
  *
@@ -22,6 +26,7 @@ import com.ttt.one.waiguagg.service.UnmberService;
  * @email 496427196@qq.com
  * @date 2021-08-09 10:17:14
  */
+@Slf4j
 @RestController
 @RefreshScope
 @RequestMapping("waiguagg/unmber")
@@ -38,7 +43,19 @@ public class UnmberController {
     private Integer age;
 
     @GetMapping("/test")
-    public R test(){
+    public R test(@Valid @RequestBody UnmberEntity unmber){
+        log.info("unmber="+unmber);
+       /* String name = null;
+        try {
+            if(name.equals("1")){
+
+            }else {
+                throw  new BizException("用户不存在", 200);
+            }
+        } catch (Exception e) {
+            throw  new BizException("eeee", 300);
+
+        }*/
         return R.ok().put("name",name).put("age",age);
     }
 
