@@ -2,7 +2,6 @@ package com.ttt.one.auth.aop;
 
 import com.alibaba.fastjson.JSON;
 import com.ttt.one.common.utils.HttpContextUtils;
-import com.ttt.one.common.utils.IpUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -47,7 +46,6 @@ public class LogAspect {
         log.info("params:{}",params);
         //获取request 设置ip地址
         HttpServletRequest request = HttpContextUtils.getHttpServletRequest();
-        log.info("ip:{}", IpUtils.getIp(request));
         log.info("excute time :{}ms",time);
     }
 }

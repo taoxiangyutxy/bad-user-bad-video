@@ -11,7 +11,6 @@ import org.springframework.session.data.redis.config.annotation.web.http.EnableR
 @EnableFeignClients
 @EnableDiscoveryClient
 @SpringBootApplication
-@ComponentScan(basePackages = {"com.qdport.core.oplog.*","com.qdport.*","com.ttt.*"})
 public class OneAuthServerApplication {
 
     public static void main(String[] args) {

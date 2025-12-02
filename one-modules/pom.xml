@@ -24,8 +24,19 @@
     <description>
         one-modules业务模块
     </description>
-<dependencies>
-    <!-- Spring Cloud组件 -->
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>knife4j-openapi3-spring-boot-starter</artifactId>
+            <version>4.3.0</version>
+        </dependency>
+
+        <!-- Spring Cloud组件 -->
     <dependency>
         <groupId>org.springframework.cloud</groupId>
         <artifactId>spring-cloud-starter-openfeign</artifactId>

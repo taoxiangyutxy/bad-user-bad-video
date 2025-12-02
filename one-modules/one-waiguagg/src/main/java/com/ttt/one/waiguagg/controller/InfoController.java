@@ -8,6 +8,9 @@ import com.ttt.one.common.utils.R;
 import com.ttt.one.waiguagg.entity.GivelikeEntity;
 import com.ttt.one.waiguagg.vo.VideoPreviewVO;
 import com.ttt.one.waiguagg.vo.WaiGuaInfoVO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,12 +18,13 @@ import com.ttt.one.waiguagg.entity.InfoEntity;
 import com.ttt.one.waiguagg.service.InfoService;
 
 /**
- * 一个外挂账号，会有多个举报信息,直到被永封该账号不会再接受新的举报信息。
+ * 一个外挂账号,会有多个举报信息,直到被永封该账号不会再接受新的举报信息。
  *
  * @author ttt
  * @email 496427196@qq.com
  * @date 2021-08-09 10:17:14
  */
+@Tag(name = "外挂举报信息管理", description = "外挂账号举报信息相关接口")
 @RestController
 @RequestMapping("waiguagg/info")
 public class InfoController {
@@ -30,8 +34,9 @@ public class InfoController {
     /**
      * 返回视频预览 信息列表  根据外挂信息id
      */
+    @Operation(summary = "获取视频预览列表", description = "根据外挂信息ID获取视频预览列表")
     @RequestMapping("/videoList/{id}")
-    public R videoList(@PathVariable("id") Long id){
+    public R videoList(@Parameter(description = "外挂信息ID") @PathVariable("id") Long id){
         List<VideoPreviewVO> videolist = infoService.videolistByInfoId(id);
         return R.ok().put("videolist", videolist);
     }
@@ -42,6 +47,7 @@ public class InfoController {
      * @param waiGuaInfoVO
      * @return
      */
+    @Operation(summary = "更新审核状态", description = "更新外挂举报的审核状态")
     @RequestMapping("/updateReview")
     public R updateReview(@RequestBody WaiGuaInfoVO waiGuaInfoVO){
         infoService.updateByIdAndReview(waiGuaInfoVO);
@@ -55,8 +61,10 @@ public class InfoController {
      * @param reviewVal
      * @return
      */
+    @Operation(summary = "查询审核列表", description = "根据审核状态查询待审核数据列表")
     @GetMapping("/listReview/{reviewVal}")
-    public R listReview(@RequestParam Map<String, Object> params,@PathVariable("reviewVal")Long reviewVal){
+    public R listReview(@RequestParam Map<String, Object> params,
+                        @Parameter(description = "审核状态值") @PathVariable("reviewVal")Long reviewVal){
         PageUtils page = infoService.queryPageAllByReview(params,reviewVal);
 
         return R.ok().put("page", page);
@@ -65,6 +73,7 @@ public class InfoController {
     /**
      * 列表
      */
+    @Operation(summary = "获取列表", description = "获取所有外挂举报信息列表")
     @RequestMapping("/list")
     //@RequiresPermissions("waiguagg:info:list")
     public R list(@RequestParam Map<String, Object> params){
@@ -76,9 +85,10 @@ public class InfoController {
     /**
      * 信息
      */
+    @Operation(summary = "获取详细信息", description = "根据ID获取外挂举报详细信息")
     @RequestMapping("/info/{id}")
    // @RequiresPermissions("waiguagg:info:info")
-    public R info(@PathVariable("id") Long id){
+    public R info(@Parameter(description = "举报信息ID") @PathVariable("id") Long id){
         WaiGuaInfoVO infoVO = infoService.getByIdAndUnmber(id,-1L);
         return R.ok().put("info", infoVO);
     }
@@ -86,6 +96,7 @@ public class InfoController {
     /**
      * 保存   管理员管理平台
      */
+    @Operation(summary = "保存举报信息", description = "管理员平台保存外挂举报信息")
     @RequestMapping("/save")
   //  @RequiresPermissions("waiguagg:info:save")
     public R save(@RequestBody WaiGuaInfoVO waiGuaInfoVO){
@@ -96,6 +107,7 @@ public class InfoController {
     /**
      * 保存   前台
      */
+    @Operation(summary = "前台保存并更新文件", description = "前台用户提交举报信息并上传文件")
     @RequestMapping("/saveAndUpdateFile")
     public R saveAndUpdateFile(@RequestBody WaiGuaInfoVO waiGuaInfoVO){
         infoService.saveAndUpdateFile(waiGuaInfoVO);
@@ -104,6 +116,7 @@ public class InfoController {
     /**
      * 修改
      */
+    @Operation(summary = "修改举报信息", description = "修改外挂举报信息")
     @RequestMapping("/update")
    // @RequiresPermissions("waiguagg:info:update")
     public R update(@RequestBody WaiGuaInfoVO waiGuaInfoVO){
@@ -115,9 +128,10 @@ public class InfoController {
     /**
      * 删除
      */
+    @Operation(summary = "批量删除", description = "批量删除外挂举报信息")
     @RequestMapping("/delete")
    // @RequiresPermissions("waiguagg:info:delete")
-    public R delete(@RequestBody Long[] ids){
+    public R delete(@Parameter(description = "要删除的ID数组") @RequestBody Long[] ids){
 		infoService.removeByIdsAllIn(Arrays.asList(ids));
 
         return R.ok();
@@ -130,6 +144,7 @@ public class InfoController {
      * @description
      * @date 2021/11/22 16:52
      */
+    @Operation(summary = "点赞", description = "对外挂举报信息进行点赞")
     @RequestMapping(value = "/giveLikeInfo",method = RequestMethod.POST)
     public R giveLikeInfo(@RequestBody GivelikeEntity givelikeEntity){
         infoService.giveLikeInfo(givelikeEntity.getRelationId(),givelikeEntity.getUserId(),givelikeEntity.getType());
@@ -143,6 +158,7 @@ public class InfoController {
      * @description
      * @date 2021/11/22 16:52
      */
+    @Operation(summary = "取消点赞", description = "取消对外挂举报信息的点赞")
     @RequestMapping(value = "/unGiveLikeInfo",method = RequestMethod.POST)
     public R unGiveLikeInfo(@RequestBody GivelikeEntity givelikeEntity){
         infoService.unGiveLikeInfo(givelikeEntity.getRelationId(),givelikeEntity.getUserId(),givelikeEntity.getType());
@@ -154,6 +170,7 @@ public class InfoController {
      * @param params
      * @return
      */
+    @Operation(summary = "查询用户视频列表", description = "返回用户的所有视频列表,包含缩略图、视频时长和举报信息")
     @RequestMapping(value = "/findListByUser",method = RequestMethod.GET)
     public R findListByUser(@RequestParam Map<String, Object> params){
         boolean b = Optional.ofNullable(params).isPresent();
@@ -181,6 +198,7 @@ public class InfoController {
      * @param params
      * @return
      */
+    @Operation(summary = "查询所有视频列表", description = "返回所有视频列表,包含缩略图、视频时长和举报信息")
     @RequestMapping(value = "/findListAll",method = RequestMethod.GET)
     public R findListAll (@RequestParam Map<String, Object> params){
         boolean b = Optional.ofNullable(params).isPresent();

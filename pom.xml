@@ -20,6 +20,9 @@
         <module>one-modules</module>
     </modules>
     <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <java.version>17</java.version>
         <swagger.fox.version>3.0.0</swagger.fox.version>
         <spring-boot.version>2.7.3</spring-boot.version>
         <spring-cloud.version>2021.0.4</spring-cloud.version>

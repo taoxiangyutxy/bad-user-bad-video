@@ -11,6 +11,9 @@ import com.ttt.one.auth.vo.UserRegistVo;
 import com.ttt.one.common.utils.Constant;
 import com.ttt.one.common.utils.R;
 import com.ttt.one.common.vo.UserEntity;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +35,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
-
+@Tag(name = "登录接口")
 @Controller
 @RequestMapping("/login")
 @RefreshScope
@@ -55,14 +58,15 @@ public class LoginController {
 
     @Value("${spring.ttt.log.url}")
     private String url;
-
+    @Operation(summary = "发送验证码")
     @ResponseBody
     @GetMapping("/sms/sendcode")
     public R sendCode(String phone){
         authService.sendCode(phone);
         return R.ok();
     }
-
+    @Operation(summary = "测试接口")
+    @Parameter(name = "info",description ="日志信息类")
     @ResponseBody
     @RequestMapping("/test")
     public String createUserTest(@RequestBody OperationLogInfo info){
@@ -77,6 +81,8 @@ public class LoginController {
      * @param redirectAttributes
      * @return
      */
+    @Operation(summary = "用户注册")
+    @Parameter(name = "vo",description ="用户注册实体")
     @PostMapping("/regist")
     public String regist(@Valid UserRegistVo vo, BindingResult result, RedirectAttributes redirectAttributes){
         if(result.hasErrors()){
@@ -135,6 +141,8 @@ public class LoginController {
     }
 
     @PostMapping("/login")
+    @Operation(summary = "用户登录")
+    @Parameter(name = "vo",description ="用户登录实体")
     @OperationLog(type =OperationLogType.QUERY ,desc = "登录接口")
     public  String login(UserLoginVo vo, RedirectAttributes redirectAttributes, HttpSession session, HttpServletResponse response){
         log.info("tttUrl:{}",url);
@@ -178,6 +186,7 @@ public class LoginController {
     }
 
     @GetMapping(value = "/logout.html")
+    @Operation(summary = "退出登录")
     @OperationLog(type =OperationLogType.QUERY ,desc = "退出登录接口")
     public String logout(HttpServletRequest request) {
          request.getSession().removeAttribute(Constant.LOGIN_USER);

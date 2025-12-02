@@ -8,85 +8,182 @@ import com.ttt.one.fileServer.service.ChunkService;
 import com.ttt.one.fileServer.service.FileInfoService;
 import com.ttt.one.fileServer.utils.MinIoUtils;
 import com.ttt.one.fileServer.utils.StrUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import java.text.SimpleDateFormat;
+import org.springframework.util.CollectionUtils;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Component //组件
-@Slf4j //日志
+/**
+ * 分片文件定时任务处理类
+ * <p>负责定期清理无用分片数据和刷新视频访问链接</p>
+ *
+ * @author ttt
+ */
+@Component
+@Slf4j
+@RequiredArgsConstructor
 public class ChunkScheduleTask {
-    @Autowired
-    private ChunkService chunkService;
-    @Autowired
-    private  FileInfoService fileInfoService;
-    @Autowired
-    private EsSearchFeginServer esSearchFeginServer;
-    // @SchedulerLock注解里面对于任务独占锁的时间有两个配置项：
-    //lockAtLeastFor : 成功执行定时任务时任务节点所能拥有独占锁的最短时间。
-    //lockAtMostFor : 成功执行定时任务时任务节点所能拥有独占锁的最长时间。
-    @Scheduled(cron = "0 0 0 1/6 * ?") // 每天凌晨1点出发一次任务
-    @SchedulerLock(name = "chunk-task",lockAtLeastFor = "2000") //2秒后开启其他任务
-    public void task(){ //CRON任务
-        log.info("【CRON任务:清空无用的分片数据】{}",new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date()));
+    
+    private final ChunkService chunkService;
+    private final FileInfoService fileInfoService;
+    private final EsSearchFeginServer esSearchFeginServer;
+    
+    /**
+     * MinIO链接有效期：7天（分钟数）
+     */
+    private static final int MINIO_URL_EXPIRY_MINUTES = 60 * 24 * 7;
+    
+    /**
+     * 存储桶名称
+     */
+    private static final String BUCKET_NAME = "uploadtest";
+    
+    /**
+     * 图片目录前缀
+     */
+    private static final String IMAGE_PREFIX = "images/";
+    
+    /**
+     * 时间格式化器
+     */
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+    /**
+     * 定时清理无用的分片数据
+     * <p>每6天凌晨0点执行一次，清理系统中未合并的无效分片文件</p>
+     * <p>使用ShedLock确保分布式环境下任务只执行一次</p>
+     *
+     * @SchedulerLock注解说明：
+     * - lockAtLeastFor：任务执行后锁的最小持有时间
+     * - lockAtMostFor：锁的最大持有时间（防止任务异常导致锁无法释放）
+     */
+    @Scheduled(cron = "0 0 0 1/6 * ?")
+    @SchedulerLock(name = "chunk-cleanup-task", lockAtLeastFor = "PT2S", lockAtMostFor = "PT10M")
+    public void cleanupUnusedChunks() {
+        String currentTime = LocalDateTime.now().format(DATE_TIME_FORMATTER);
+        log.info("[定时任务-清理无用分片] 开始执行，执行时间: {}", currentTime);
+        
         try {
-            //要执行的 定时任务 删除无用的分片数据
             chunkService.deleAllByTask();
-            //TimeUnit.SECONDS.sleep(1);
+            log.info("[定时任务-清理无用分片] 执行成功");
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("[定时任务-清理无用分片] 执行失败", e);
         }
     }
-    @Scheduled(cron = "0 0/5 * * * ?") // 0 0 0 1/6 * ?  1号开始每6天出发一次任务   0 0/5 * * * ? 5分钟执行一次
-    @SchedulerLock(name = "videoUrlDate-task",lockAtLeastFor = "2000") //2秒后开启其他任务
-    public void task2(){ //CRON任务
-        log.info("【CRON任务:每周刷新下视频访问链接】{}",new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date()));
+    /**
+     * 定时刷新视频访问链接
+     * <p>每5分钟执行一次，刷新已审核通过且链接已过期的视频访问URL</p>
+     * <p>MinIO预签名URL有效期为7天，需要定期刷新以保证前端可访问</p>
+     * <p>同时更新MySQL数据库和Elasticsearch索引中的链接</p>
+     */
+    @Scheduled(cron = "0 0/5 * * * ?")
+    @SchedulerLock(name = "video-url-refresh-task", lockAtLeastFor = "PT2S", lockAtMostFor = "PT30M")
+    public void refreshVideoAccessUrls() {
+        String currentTime = LocalDateTime.now().format(DATE_TIME_FORMATTER);
+        log.info("[定时任务-刷新视频链接] 开始执行，执行时间: {}", currentTime);
+        
         try {
-            /**
-             * 获取库里所有的视频数据  应该是审核通过前台可展示的所有视频 并且是已经到期的（Minio 7天链接失效）
-             */
-            List<FileInfoEntity> list = fileInfoService.listByPassAndExpired();
-            list = list.stream().map(fileInfoEntity -> {
-                String url = MinIoUtils.getObjectUrl("uploadtest", fileInfoEntity.getIdentifier()+"/"+fileInfoEntity.getFilename(), 60 * 24*7);
-                fileInfoEntity.setCreateTime(new Date());
-                fileInfoEntity.setLocation(url);
-
-                //同时更新封面图片链接
-                String previewUrl = MinIoUtils.getObjectPreviewUrl("uploadtest",
-                        "images/" + StrUtil.extractFileName(fileInfoEntity.getCover()), 60 * 24 * 7, "image/jpeg");
-                fileInfoEntity.setCover(previewUrl);
-                return fileInfoEntity;
-            }).collect(Collectors.toList());
-            //循环更新sql 不要一条一条的更新
-            fileInfoService.updateBatchById(list);
-            /**
-             * ES库里 也要更新下链接
-             */
-            List<WaiguaEsModel> esModelList =list.stream().map(fileInof->{
-                WaiguaEsModel esModel = new WaiguaEsModel();
-                esModel.setInfoId(fileInof.getWaiguaInfoId());
-                esModel.setLocation(fileInof.getLocation());
-                esModel.setCreateTime(fileInof.getCreateTime());
-                return esModel;
-            }).collect(Collectors.toList());
-            R r = null;
-            try {
-                r = esSearchFeginServer.waiguaInfoBatchUpdate(esModelList);
-                if(r.getCode()==0){
-                    log.info("调用成功！");
-                }
-            } catch (Exception e) {
-                log.error("远程调用失败！waiguaInfoBatchUpdate");
-                e.printStackTrace();
+            // 获取审核通过且链接已过期的视频列表
+            List<FileInfoEntity> expiredVideoList = fileInfoService.listByPassAndExpired();
+            
+            if (CollectionUtils.isEmpty(expiredVideoList)) {
+                log.info("[定时任务-刷新视频链接] 无需刷新的视频，任务结束");
+                return;
             }
-            //TimeUnit.SECONDS.sleep(1);
+            
+            log.info("[定时任务-刷新视频链接] 找到{}个需要刷新的视频", expiredVideoList.size());
+            
+            // 批量更新视频和封面图片的访问链接
+            List<FileInfoEntity> updatedVideoList = refreshVideoAndCoverUrls(expiredVideoList);
+            
+            // 批量更新数据库
+            fileInfoService.updateBatchById(updatedVideoList);
+            log.info("[定时任务-刷新视频链接] 数据库更新成功");
+            
+            // 同步更新Elasticsearch索引
+            updateElasticsearchIndex(updatedVideoList);
+            
+            log.info("[定时任务-刷新视频链接] 执行成功，共刷新{}个视频", updatedVideoList.size());
+            
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("[定时任务-刷新视频链接] 执行失败", e);
         }
+    }
+    
+    /**
+     * 刷新视频和封面图片的访问URL
+     *
+     * @param videoList 需要刷新的视频列表
+     * @return 更新后的视频列表
+     */
+    private List<FileInfoEntity> refreshVideoAndCoverUrls(List<FileInfoEntity> videoList) {
+        return videoList.stream()
+                .map(this::refreshSingleVideoUrls)
+                .collect(Collectors.toList());
+    }
+    
+    /**
+     * 刷新单个视频的访问URL（包括视频和封面）
+     *
+     * @param video 视频实体
+     * @return 更新后的视频实体
+     */
+    private FileInfoEntity refreshSingleVideoUrls(FileInfoEntity video) {
+        // 生成视频访问链接
+        String videoPath = video.getIdentifier() + "/" + video.getFilename();
+        String videoUrl = MinIoUtils.getObjectUrl(BUCKET_NAME, videoPath, MINIO_URL_EXPIRY_MINUTES);
+        video.setLocation(videoUrl);
+        video.setCreateTime(new Date());
+        
+        // 生成封面图片访问链接
+        String coverFileName = StrUtil.extractFileName(video.getCover());
+        String coverPath = IMAGE_PREFIX + coverFileName;
+        String coverUrl = MinIoUtils.getObjectPreviewUrl(BUCKET_NAME, coverPath, MINIO_URL_EXPIRY_MINUTES, "image/jpeg");
+        video.setCover(coverUrl);
+        
+        return video;
+    }
+    
+    /**
+     * 更新Elasticsearch索引中的视频链接信息
+     *
+     * @param videoList 已更新的视频列表
+     */
+    private void updateElasticsearchIndex(List<FileInfoEntity> videoList) {
+        List<WaiguaEsModel> esModelList = videoList.stream()
+                .map(this::convertToEsModel)
+                .collect(Collectors.toList());
+        
+        try {
+            R response = esSearchFeginServer.waiguaInfoBatchUpdate(esModelList);
+            if (response != null && response.getCode() == 0) {
+                log.info("[定时任务-刷新视频链接] Elasticsearch索引更新成功");
+            } else {
+                log.warn("[定时任务-刷新视频链接] Elasticsearch索引更新返回异常: {}", response);
+            }
+        } catch (Exception e) {
+            log.error("[定时任务-刷新视频链接] Elasticsearch索引更新失败，远程调用异常", e);
+        }
+    }
+    
+    /**
+     * 将FileInfoEntity转换为WaiguaEsModel
+     *
+     * @param fileInfo 文件信息实体
+     * @return ES模型对象
+     */
+    private WaiguaEsModel convertToEsModel(FileInfoEntity fileInfo) {
+        WaiguaEsModel esModel = new WaiguaEsModel();
+        esModel.setInfoId(fileInfo.getWaiguaInfoId());
+        esModel.setLocation(fileInfo.getLocation());
+        esModel.setCreateTime(fileInfo.getCreateTime());
+        return esModel;
     }
 }

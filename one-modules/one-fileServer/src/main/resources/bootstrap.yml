@@ -47,3 +47,17 @@ spring:
 
     profiles:
         active: '@profile.name@'
+
+# springdoc-openapi配置
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+  api-docs:
+    path: /v3/api-docs
+    enabled: true
+  group-configs:
+    - group: 'default'
+      paths-to-match: '/**'
+      packages-to-scan: com.ttt.one.fileServer.controller  # 指定接口文档展示接口包路径扫描
