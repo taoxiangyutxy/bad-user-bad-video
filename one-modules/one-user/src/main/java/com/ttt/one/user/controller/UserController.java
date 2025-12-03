@@ -3,15 +3,16 @@ package com.ttt.one.user.controller;
 import java.util.Arrays;
 import java.util.Map;
 
-//import org.apache.shiro.authz.annotation.RequiresPermissions;
 import com.ttt.one.common.exception.BizExceptionEnum;
 import com.ttt.one.common.utils.PageUtils;
 import com.ttt.one.common.utils.R;
 import com.ttt.one.user.exception.PhoneExistException;
 import com.ttt.one.user.exception.UsernameExistException;
 import com.ttt.one.user.vo.UserLoginVo;
-import com.ttt.one.user.vo.UserRegistVo;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.ttt.one.user.vo.UserRegisterVo;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import com.ttt.one.user.entity.UserEntity;
@@ -20,53 +21,65 @@ import com.ttt.one.user.service.UserService;
 
 
 /**
- * 会员
+ * 会员管理控制器
  *
- * @author ttt
- * @email 496427196@qq.com
- * @date 2021-10-17 16:24:20
+ * 提供会员的注册、登录、增删改查等功能
  */
+@Tag(name = "会员", description = "会员管理")
 @RestController
-@RequestMapping("user/user")
+@RequestMapping("/user/user")
+@RequiredArgsConstructor
 public class UserController {
-    @Autowired
-    private UserService userService;
+
+    private final UserService userService;
     /**
      * 用户登录
+     *
+     * @param vo 登录参数
+     * @return 登录结果
      */
+    @Operation(summary = "用户登录", description = "根据用户名和密码进行用户登录验证")
     @PostMapping("/login")
-    public R login(@RequestBody UserLoginVo vo){
-       UserEntity userEntity =  userService.login(vo);
-       if(userEntity!=null){
-           return R.ok().setData(userEntity);
-       }else {
-           return R.error(BizExceptionEnum.LOGIN_ACCOUNT_PASSWORD_EXCEPTION.getCode(), BizExceptionEnum.LOGIN_ACCOUNT_PASSWORD_EXCEPTION.getMsg());
-       }
+    public R login(@RequestBody UserLoginVo vo) {
+        UserEntity userEntity = userService.login(vo);
+        if (userEntity != null) {
+            return R.ok().setData(userEntity);
+        } else {
+            return R.error(
+                BizExceptionEnum.LOGIN_ACCOUNT_PASSWORD_EXCEPTION.getCode(), 
+                BizExceptionEnum.LOGIN_ACCOUNT_PASSWORD_EXCEPTION.getMsg()
+            );
+        }
     }
 
     /**
-     * 注册用户
-     * @param vo
-     * @return
+     * 用户注册
+     *
+     * @param vo 注册参数
+     * @return 注册结果
      */
+    @Operation(summary = "用户注册", description = "注册新用户账号")
     @PostMapping("/regist")
-    public R regist(@RequestBody UserRegistVo vo){
+    public R regist(@RequestBody UserRegisterVo vo) {
         try {
             userService.regist(vo);
-        }catch (PhoneExistException e){
-            return R.error("手机号异常！");
-        }catch (UsernameExistException e){
-            return R.error("用户名异常！");
+            return R.ok();
+        } catch (PhoneExistException e) {
+            return R.error("手机号已被注册！");
+        } catch (UsernameExistException e) {
+            return R.error("用户名已被占用！");
         }
-        return R.ok();
     }
 
     /**
-     * 列表
+     * 获取会员列表
+     *
+     * @param params 查询参数
+     * @return 会员列表
      */
-    @RequestMapping("/list")
-   // @RequiresPermissions("user:user:list")
-    public R list(@RequestParam Map<String, Object> params){
+    @Operation(summary = "获取会员列表", description = "分页查询系统中的所有会员信息")
+    @GetMapping("/list")
+    public R list(@RequestParam Map<String, Object> params) {
         PageUtils page = userService.queryPage(params);
 
         return R.ok().put("page", page);
@@ -74,44 +87,56 @@ public class UserController {
 
 
     /**
-     * 信息
+     * 根据ID获取会员信息
+     *
+     * @param id 会员ID
+     * @return 会员信息
      */
-    @RequestMapping("/info/{id}")
-   // @RequiresPermissions("user:user:info")
-    public R info(@PathVariable("id") Long id){
+    @Operation(summary = "根据ID获取会员信息", description = "通过会员ID查询指定会员的详细信息")
+    @GetMapping("/info/{id}")
+    public R info(@PathVariable("id") Long id) {
 		UserEntity user = userService.getById(id);
 
         return R.ok().put("user", user);
     }
 
     /**
-     * 保存
+     * 保存会员
+     *
+     * @param user 会员实体
+     * @return 操作结果
      */
-    @RequestMapping("/save")
-   // @RequiresPermissions("user:user:save")
-    public R save(@RequestBody UserEntity user){
+    @Operation(summary = "保存会员", description = "创建新的会员信息")
+    @PostMapping("/save")
+    public R save(@RequestBody UserEntity user) {
 		userService.save(user);
 
         return R.ok();
     }
 
     /**
-     * 修改
+     * 更新会员
+     *
+     * @param user 会员实体
+     * @return 操作结果
      */
-    @RequestMapping("/update")
-   // @RequiresPermissions("user:user:update")
-    public R update(@RequestBody UserEntity user){
+    @Operation(summary = "更新会员", description = "修改现有会员的信息")
+    @PostMapping("/update")
+    public R update(@RequestBody UserEntity user) {
 		userService.updateById(user);
 
         return R.ok();
     }
 
     /**
-     * 删除
+     * 批量删除会员
+     *
+     * @param ids 会员ID数组
+     * @return 操作结果
      */
-    @RequestMapping("/delete")
-  //  @RequiresPermissions("user:user:delete")
-    public R delete(@RequestBody Long[] ids){
+    @Operation(summary = "批量删除会员", description = "根据会员ID数组批量删除会员信息")
+    @PostMapping("/delete")
+    public R delete(@RequestBody Long[] ids) {
 		userService.removeByIds(Arrays.asList(ids));
 
         return R.ok();

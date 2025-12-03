@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
 @EnableTransactionManagement
-@MapperScan("com/ttt/one/waiguagg/dao")
+@MapperScan("com.ttt.one.waiguagg.dao")
 public class MyBatisConfig {
     // 旧版  分页插件
     @Bean

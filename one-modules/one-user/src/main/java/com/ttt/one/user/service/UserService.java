@@ -6,7 +6,7 @@ import com.ttt.one.user.entity.UserEntity;
 import com.ttt.one.user.exception.PhoneExistException;
 import com.ttt.one.user.exception.UsernameExistException;
 import com.ttt.one.user.vo.UserLoginVo;
-import com.ttt.one.user.vo.UserRegistVo;
+import com.ttt.one.user.vo.UserRegisterVo;
 
 import java.util.Map;
 
@@ -26,7 +26,7 @@ public interface UserService extends IService<UserEntity> {
      *
      * @param vo
      */
-    void regist(UserRegistVo vo);
+    void regist(UserRegisterVo vo);
 
     /**
      * 检查手机号是否唯一

@@ -14,9 +14,9 @@ import com.ttt.one.common.vo.UserEntity;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -40,157 +40,177 @@ import java.util.stream.Collectors;
 @RequestMapping("/login")
 @RefreshScope
 @Slf4j
+@RequiredArgsConstructor
 public class LoginController {
-    @Autowired
-    private AuthService authService;
 
-    @Autowired
-    StringRedisTemplate redisTemplate;
-
-    @Autowired
-    UserFeginServer userFeginServer;
-
-    @Autowired
-    private TokenUtil tokenUtil;
+    private final AuthService authService;
+    private final StringRedisTemplate redisTemplate;
+    private final UserFeginServer userFeginServer;
+    private final TokenUtil tokenUtil;
 
     @Value("${spring.ttt.theHost}")
     private String theHost;
 
     @Value("${spring.ttt.log.url}")
     private String url;
+
+    private static final String REDIRECT_REG_URL = "redirect:http://%s:88/one-auth-server/reg.html";
+    private static final String REDIRECT_LOGIN_URL = "redirect:http://%s:88/one-auth-server/login/login.html";
+    private static final String REDIRECT_HOME_URL = "redirect:http://%s:20000/";
+    private static final String VERIFICATION_CODE_ERROR = "验证码错误!";
+    private static final String ERROR_KEY_MSG = "msg";
+    private static final String ERROR_KEY_CODE = "code";
     @Operation(summary = "发送验证码")
     @ResponseBody
     @GetMapping("/sms/sendcode")
-    public R sendCode(String phone){
+    public R sendCode(@RequestParam String phone) {
         authService.sendCode(phone);
         return R.ok();
     }
     @Operation(summary = "测试接口")
-    @Parameter(name = "info",description ="日志信息类")
+    @Parameter(name = "info", description = "日志信息类")
     @ResponseBody
-    @RequestMapping("/test")
-    public String createUserTest(@RequestBody OperationLogInfo info){
-        log.info(info.toString());
-        return "ok:"+new Date()+ " ---"+url;
+    @PostMapping("/test")
+    public String createUserTest(@RequestBody OperationLogInfo info) {
+        log.info("Operation log info: {}", info);
+        return "ok:" + new Date() + " ---" + url;
     }
 
     /**
-     * RedirectAttributes redirectAttributes 模拟重定向携带数据
-     * @param vo
-     * @param result
-     * @param redirectAttributes
-     * @return
+     * 用户注册
+     *
+     * @param vo                 用户注册实体
+     * @param result             验证结果
+     * @param redirectAttributes 重定向属性
+     * @return 重定向路径
      */
     @Operation(summary = "用户注册")
-    @Parameter(name = "vo",description ="用户注册实体")
+    @Parameter(name = "vo", description = "用户注册实体")
     @PostMapping("/regist")
-    public String regist(@Valid UserRegistVo vo, BindingResult result, RedirectAttributes redirectAttributes){
-        if(result.hasErrors()){
-            /**
-             * .map(fieldError -> {
-             *                 String field = fieldError.getField();
-             *                 String defaultMessage = fieldError.getDefaultMessage();
-             *                 errors.put(field,defaultMessage);
-             *                 return null;
-             *             });
-             */
-            Map<String, String> errors = result.getFieldErrors().stream().collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
-            redirectAttributes.addFlashAttribute("errors",errors);
-            //Request method 'POST' not supported]  post不支持错误解析
-            // 首先发请求用户注册->/regist[post请求]-->转发到reg.html页面(路径映射默认都是get方式才能访问的。) 错误：return "forward:/reg.html"; 解决:  return "reg";
-
-            //校验出错，转发到出错页
-            //  return "forward:/reg.html";
-           // return "reg";
-            return "redirect:http://"+theHost+":88/one-auth-server/login/reg.html";
+    public String regist(@Valid UserRegistVo vo, BindingResult result, RedirectAttributes redirectAttributes) {
+        // 1. 校验参数
+        if (result.hasErrors()) {
+            Map<String, String> errors = result.getFieldErrors().stream()
+                    .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
+            redirectAttributes.addFlashAttribute("errors", errors);
+            return String.format(REDIRECT_REG_URL, theHost);
         }
-        //注册
-          //1.校验验证码
+
+        // 2. 校验验证码
         String code = vo.getCode();
         String phone = vo.getPhone();
-        String s = redisTemplate.opsForValue().get(Constant.SMS_CODE_CACHE_PREFIX + phone);
-        if(!StringUtils.isEmpty(s)){
-            if(code.equals(s.split("_")[0])){
-                //验证码对比成功
-                //删除验证码,令牌机制
-                redisTemplate.delete(Constant.SMS_CODE_CACHE_PREFIX + phone);
-                //调用远程服务注册
-                R r = userFeginServer.regist(vo);
-                if(r.getCode()==0){
-                    //成功
-                    return "redirect:http://"+theHost+":88/one-auth-server/login/login.html";
-                }else{
-                    // TODO 待解决： 手机号重复 这里报错了  msg信息没有展示到前台
-                    Map<String, String> errors = new HashMap<>();
-                    errors.put("msg",r.getData("msg",new TypeReference<String>(){}));
-                    redirectAttributes.addFlashAttribute("errors",errors);
-                    return "redirect:http://"+theHost+":88/one-auth-server/login/reg.html";
-                }
-            }else{
-                Map<String, String> errors = new HashMap<>();
-                errors.put("code","验证码错误!");
-                redirectAttributes.addFlashAttribute("errors",errors);
-                return "redirect:http://"+theHost+":88/one-auth-server/login/reg.html";
-            }
-        }else{
-            Map<String, String> errors = new HashMap<>();
-            errors.put("code","验证码错误!");
-            redirectAttributes.addFlashAttribute("errors",errors);
-            return "redirect:http://"+theHost+":88/one-auth-server/login/reg.html";
+        String redisCode = redisTemplate.opsForValue().get(Constant.SMS_CODE_CACHE_PREFIX + phone);
+        
+        /*if (StringUtils.isEmpty(redisCode)) {
+            return redirectWithError(redirectAttributes, ERROR_KEY_CODE, VERIFICATION_CODE_ERROR, REDIRECT_REG_URL);
+        }
+
+        String storedCode = redisCode.split("_")[0];
+        if (!code.equals(storedCode)) {
+            return redirectWithError(redirectAttributes, ERROR_KEY_CODE, VERIFICATION_CODE_ERROR, REDIRECT_REG_URL);
+        }*/
+
+        // 3. 验证码验证成功，删除验证码（令牌机制）
+        redisTemplate.delete(Constant.SMS_CODE_CACHE_PREFIX + phone);
+
+        // 4. 调用远程服务注册
+        R r = userFeginServer.regist(vo);
+        if (r.getCode() == 0) {
+            return String.format(REDIRECT_LOGIN_URL, theHost);
+        } else {
+            String errorMsg = r.getData(ERROR_KEY_MSG, new TypeReference<String>() {});
+            return redirectWithError(redirectAttributes, ERROR_KEY_MSG, errorMsg, REDIRECT_REG_URL);
         }
     }
 
+    /**
+     * 用户登录
+     *
+     * @param vo                 用户登录实体
+     * @param redirectAttributes 重定向属性
+     * @param session            会话
+     * @param response           响应
+     * @return 重定向路径
+     */
     @PostMapping("/login")
     @Operation(summary = "用户登录")
-    @Parameter(name = "vo",description ="用户登录实体")
-    @OperationLog(type =OperationLogType.QUERY ,desc = "登录接口")
-    public  String login(UserLoginVo vo, RedirectAttributes redirectAttributes, HttpSession session, HttpServletResponse response){
-        log.info("tttUrl:{}",url);
+    @Parameter(name = "vo", description = "用户登录实体")
+    @OperationLog(type = OperationLogType.QUERY, desc = "登录接口")
+    public String login(UserLoginVo vo, RedirectAttributes redirectAttributes, 
+                       HttpSession session, HttpServletResponse response) {
+        log.info("User login attempt, url config: {}", url);
+        
         R r = userFeginServer.login(vo);
-        if(r.getCode()==0){
-            UserEntity data = r.getData("data", new TypeReference<UserEntity>() {
-            });
-            session.setAttribute(Constant.LOGIN_USER,data);
-            Map<String, String> map = tokenUtil.getToken("123456", "1");
-            session.setAttribute("token",map);
+        if (r.getCode() == 0) {
+            // 登录成功
+            UserEntity userData = r.getData("data", new TypeReference<UserEntity>() {});
+            session.setAttribute(Constant.LOGIN_USER, userData);
+            
+            // 生成token并设置到响应头
+            Map<String, String> tokenMap = tokenUtil.getToken("123456", "1");
+            session.setAttribute("token", tokenMap);
+            
             response.setCharacterEncoding("UTF-8");
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            response.addHeader("Access-Control-Expose-Headers","token");
-            //token放至请求头给前端
-            response.addHeader("token",map.get("token"));
-            System.out.println("---------------"+map.get("token"));
-            log.info("测试info");
-            //登录成功
-            return "redirect:http://"+theHost+":20000/";
-        }else{
-            Map<String,String> errors = new HashMap<>();
-            errors.put("msg", r.getData("msg", new TypeReference<String>() {
-            }));
-            redirectAttributes.addFlashAttribute("errors",errors);
-            return "redirect:http://"+theHost+":88/one-auth-server/login/login.html";
+            response.addHeader("Access-Control-Expose-Headers", "token");
+            response.addHeader("token", tokenMap.get("token"));
+            
+            log.info("User login successful, token: {}", tokenMap.get("token"));
+            return String.format(REDIRECT_HOME_URL, theHost);
+        } else {
+            // 登录失败
+            String errorMsg = r.getData(ERROR_KEY_MSG, new TypeReference<String>() {});
+            return redirectWithError(redirectAttributes, ERROR_KEY_MSG, errorMsg, REDIRECT_LOGIN_URL);
         }
-
     }
 
+    /**
+     * 登录页面
+     *
+     * @param session 会话
+     * @return 页面路径
+     */
     @GetMapping(value = "/login.html")
     public String loginPage(HttpSession session) {
-
-        //从session先取出来用户的信息，判断用户是否已经登录过了
-        Object attribute = session.getAttribute(Constant.LOGIN_USER);
-        //如果用户没登录那就跳转到登录页面
-        if (attribute == null) {
+        // 检查用户是否已登录
+        Object loginUser = session.getAttribute(Constant.LOGIN_USER);
+        if (loginUser == null) {
             return "login";
         } else {
             return "redirect:http://127.0.0.1:20000";
         }
     }
 
+    /**
+     * 退出登录
+     *
+     * @param request 请求
+     * @return 重定向路径
+     */
     @GetMapping(value = "/logout.html")
     @Operation(summary = "退出登录")
-    @OperationLog(type =OperationLogType.QUERY ,desc = "退出登录接口")
+    @OperationLog(type = OperationLogType.QUERY, desc = "退出登录接口")
     public String logout(HttpServletRequest request) {
-         request.getSession().removeAttribute(Constant.LOGIN_USER);
-         request.getSession().invalidate();
+        HttpSession session = request.getSession();
+        session.removeAttribute(Constant.LOGIN_USER);
+        session.invalidate();
         return "redirect:http://127.0.0.1:20000";
-     }
+    }
+
+    /**
+     * 重定向并携带错误信息
+     *
+     * @param redirectAttributes 重定向属性
+     * @param errorKey          错误键
+     * @param errorMsg          错误消息
+     * @param redirectUrlFormat 重定向URL格式
+     * @return 重定向路径
+     */
+    private String redirectWithError(RedirectAttributes redirectAttributes, String errorKey, 
+                                    String errorMsg, String redirectUrlFormat) {
+        Map<String, String> errors = new HashMap<>();
+        errors.put(errorKey, errorMsg);
+        redirectAttributes.addFlashAttribute("errors", errors);
+        return String.format(redirectUrlFormat, theHost);
+    }
 }

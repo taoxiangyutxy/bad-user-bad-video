@@ -3,13 +3,10 @@ package com.ttt.one.user.controller;
 import java.util.Arrays;
 import java.util.Map;
 
-//import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
 
 import com.ttt.one.user.entity.SysRoleEntity;
 import com.ttt.one.user.service.SysRoleService;
@@ -19,72 +16,81 @@ import com.ttt.one.common.utils.R;
 
 
 /**
- * 角色表
+ * 角色管理控制器
  *
- * @author ttt
- * @email 496427196@qq.com
- * @date 2022-05-02 19:24:18
+ * 提供角色的增删改查功能
  */
+@Tag(name = "角色管理", description = "管理系统中的角色信息")
 @RestController
-@RequestMapping("order/sysrole")
+@RequestMapping("/order/sysrole")
+@RequiredArgsConstructor
 public class SysRoleController {
-    @Autowired
-    private SysRoleService sysRoleService;
+
+    private final SysRoleService sysRoleService;
 
     /**
-     * 列表
+     * 获取角色列表
+     *
+     * @param params 查询参数
+     * @return 角色列表
      */
-    @RequestMapping("/list")
-   // @RequiresPermissions("order:sysrole:list")
-    public R list(@RequestParam Map<String, Object> params){
+    @Operation(summary = "获取角色列表", description = "分页查询系统中的所有角色信息")
+    @GetMapping("/list")
+    public R list(@RequestParam Map<String, Object> params) {
         PageUtils page = sysRoleService.queryPage(params);
-
         return R.ok().put("page", page);
     }
 
 
     /**
-     * 信息
+     * 根据ID获取角色信息
+     *
+     * @param id 角色ID
+     * @return 角色信息
      */
-    @RequestMapping("/info/{id}")
-   // @RequiresPermissions("order:sysrole:info")
-    public R info(@PathVariable("id") Integer id){
-		SysRoleEntity sysRole = sysRoleService.getById(id);
-
+    @Operation(summary = "根据ID获取角色信息", description = "通过角色ID查询指定角色的详细信息")
+    @GetMapping("/info/{id}")
+    public R info(@PathVariable("id") Integer id) {
+        SysRoleEntity sysRole = sysRoleService.getById(id);
         return R.ok().put("sysRole", sysRole);
     }
 
     /**
-     * 保存
+     * 保存角色
+     *
+     * @param sysRole 角色实体
+     * @return 操作结果
      */
-    @RequestMapping("/save")
-   // @RequiresPermissions("order:sysrole:save")
-    public R save(@RequestBody SysRoleEntity sysRole){
-		sysRoleService.save(sysRole);
-
+    @Operation(summary = "保存角色", description = "创建新的角色信息")
+    @PostMapping("/save")
+    public R save(@RequestBody SysRoleEntity sysRole) {
+        sysRoleService.save(sysRole);
         return R.ok();
     }
 
     /**
-     * 修改
+     * 更新角色
+     *
+     * @param sysRole 角色实体
+     * @return 操作结果
      */
-    @RequestMapping("/update")
-   // @RequiresPermissions("order:sysrole:update")
-    public R update(@RequestBody SysRoleEntity sysRole){
-		sysRoleService.updateById(sysRole);
-
+    @Operation(summary = "更新角色", description = "修改现有角色的信息")
+    @PostMapping("/update")
+    public R update(@RequestBody SysRoleEntity sysRole) {
+        sysRoleService.updateById(sysRole);
         return R.ok();
     }
 
     /**
-     * 删除
+     * 批量删除角色
+     *
+     * @param ids 角色ID数组
+     * @return 操作结果
      */
-    @RequestMapping("/delete")
-  //  @RequiresPermissions("order:sysrole:delete")
-    public R delete(@RequestBody Integer[] ids){
-		sysRoleService.removeByIds(Arrays.asList(ids));
-
+    @Operation(summary = "批量删除角色", description = "根据角色ID数组批量删除角色信息")
+    @PostMapping("/delete")
+    public R delete(@RequestBody Integer[] ids) {
+        sysRoleService.removeByIds(Arrays.asList(ids));
         return R.ok();
     }
-
 }

@@ -375,7 +375,7 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
                     this.updateById(infoEntity);
                 }else{
                     //失败
-                    log.error("远程服务调用失败:{esSearchFeginServer.waiguaInfoSaveES}");
+                    log.error("远程服务调用失败:{esSearchFeginServer.waiguaInfoSaveES}"+r.getMsg());
                 }
 
             }else if(waiGuaInfoVO.getReviewStatus()==3){

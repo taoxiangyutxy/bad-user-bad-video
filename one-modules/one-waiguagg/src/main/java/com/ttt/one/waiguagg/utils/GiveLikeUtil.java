@@ -3,75 +3,79 @@ package com.ttt.one.waiguagg.utils;
 import com.ttt.one.common.exception.BizException;
 import com.ttt.one.common.utils.constant.InfoConstant;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- *点赞工具类
+ * 点赞工具类
  */
 @Slf4j
+@Component
 public class GiveLikeUtil {
+    
     @Autowired
-    private static StringRedisTemplate redisTemplate;
+    private StringRedisTemplate redisTemplate;
     /**
-     *  描述: 统计评论的总点赞数
-     * @param relationId:
-     * @return Long
-     * @author txy
-     * @description
-     * @date 2021/11/9 16:02
+     * 统计评论的总点赞数
+     *
+     * @param relationId 关联ID
+     * @param type       类型
+     * @return 点赞总数
      */
-    public static synchronized Long countRelationLike(Long relationId, Integer type) {
+    public synchronized Long countRelationLike(Long relationId, Integer type) {
         validateParam(relationId);
-        String relationLikedResult = (String) redisTemplate.opsForHash().get(InfoConstant.TOTAL_LIKE_COUNT_KEY, relationId+"::"+type);
-        Long likeCount = 0L;
-        if(!org.apache.commons.lang.StringUtils.isEmpty(relationLikedResult)){
-            likeCount = Long.parseLong(relationLikedResult);
-            if (likeCount == null) {
+        String relationLikedResult = (String) redisTemplate.opsForHash().get(
+                InfoConstant.TOTAL_LIKE_COUNT_KEY, 
+                relationId + "::" + type);
+        
+        if (relationLikedResult != null && !relationLikedResult.isEmpty()) {
+            try {
+                return Long.parseLong(relationLikedResult);
+            } catch (NumberFormatException e) {
+                log.warn("解析点赞数失败: {}", relationLikedResult);
                 return 0L;
             }
         }
-        return likeCount;
+        return 0L;
     }
     /**
-     *  描述: 该用户对该评论是否点过赞
-     * @param relationId:
-     * @param likedUserId:
-     * @param type:
-     * @return Integer
-     * @author txy
-     * @description
-     * @date 2021/11/22 14:41
+     * 检查用户是否对评论点过赞
+     *
+     * @param relationId  关联ID
+     * @param likedUserId 用户ID
+     * @param type        类型
+     * @return 点赞状态(1-已点赞, 0-未点赞, null-未找到)
      */
-    public static  Integer whetherThumbUp(Long relationId,Long likedUserId,Integer type) {
-        /**
-         * 先去缓存  缓存有 直接按缓存的 return
-         */
-        //获取缓存值
-        String value =(String) redisTemplate.opsForHash()
-                .get(InfoConstant.INFO_LIKED_USER_KEY, relationId + "::" + likedUserId+"::"+type);
-        if(!org.apache.commons.lang.StringUtils.isEmpty(value)){
-            return Integer.valueOf(value);
+    public Integer whetherThumbUp(Long relationId, Long likedUserId, Integer type) {
+        // 先从缓存中查找
+        String value = (String) redisTemplate.opsForHash()
+                .get(InfoConstant.INFO_LIKED_USER_KEY, 
+                     relationId + "::" + likedUserId + "::" + type);
+        
+        if (value != null && !value.isEmpty()) {
+            try {
+                return Integer.valueOf(value);
+            } catch (NumberFormatException e) {
+                log.warn("解析点赞状态失败: {}", value);
+                return null;
+            }
         }
-        /**
-         * 缓存没有  去数据库查
-         */
-        /*likeCount  = givelikeService.getBaseMapper().selectCount(new QueryWrapper<GivelikeEntity>()
+        
+        // 缓存中没有，需要从数据库查询（当前被注释掉）
+          /*likeCount  = givelikeService.getBaseMapper().selectCount(new QueryWrapper<GivelikeEntity>()
                 .eq("relation_id",relationId).eq("user_id",likedUserId)
                 .eq("type",type).eq("del_flag",Constant.STATUS_0));*/
         return null;
     }
     /**
-     *  描述: 入参验证
-     * @param params:
-     * @return void
-     * @author txy
-     * @description
-     * @date 2021/11/9 16:03
+     * 入参验证
+     *
+     * @param params 参数数组
      */
-    private static void validateParam(Long... params) {
+    private void validateParam(Long... params) {
         for (Long param : params) {
-            if (null == param) {
+            if (param == null) {
                 log.error("入参存在null值");
                 throw new BizException("参数不能为null!");
             }

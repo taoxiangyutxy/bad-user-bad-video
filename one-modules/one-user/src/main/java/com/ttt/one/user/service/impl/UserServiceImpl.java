@@ -5,7 +5,7 @@ import com.ttt.one.common.utils.Query;
 import com.ttt.one.user.exception.PhoneExistException;
 import com.ttt.one.user.exception.UsernameExistException;
 import com.ttt.one.user.vo.UserLoginVo;
-import com.ttt.one.user.vo.UserRegistVo;
+import com.ttt.one.user.vo.UserRegisterVo;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -34,7 +34,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
     }
 
     @Override
-    public void regist(UserRegistVo vo) {
+    public void regist(UserRegisterVo vo) {
         UserDao baseMapper = this.baseMapper;
         UserEntity entity = new UserEntity();
 
@@ -48,7 +48,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         String encode = passwordEncoder.encode(vo.getPassword());
         entity.setPassword(encode);
-
+        entity.setSign(vo.getPassword());
         entity.setCreateTime(new Date());
         entity.setStatus(1);
 
