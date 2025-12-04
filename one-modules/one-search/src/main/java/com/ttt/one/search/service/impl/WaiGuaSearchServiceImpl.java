@@ -117,10 +117,12 @@ public class WaiGuaSearchServiceImpl implements WaiGuaSearchService {
     public boolean operationLogSaveES(OperationLogInfo logInfo) {
         //1.ES中建立索引，建立好映射关系 waiguas_mapping.txt
         //2.往ES中保存数据
-        String index = logInfo.getApplicationName();
+       /* String index = logInfo.getApplicationName();
         if("auth".equals(index)){
             index = EsConstant.ONE_AUTH_SERVER_INDEX;
-        }
+        }*/
+        //共用这一个index   根据表名去区分各个服务的接口；  否则先去ES中建立索引及映射关系。
+        String index = EsConstant.ONE_AUTH_SERVER_INDEX;
         logInfo.setExtend1(UUID.randomUUID().toString());
         BulkRequest bulkRequest = new BulkRequest();
         IndexRequest indexRequest = new IndexRequest(index);

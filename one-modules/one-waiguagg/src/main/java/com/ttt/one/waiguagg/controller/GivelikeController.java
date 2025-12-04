@@ -3,6 +3,8 @@ package com.ttt.one.waiguagg.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.ttt.one.oplog.annotation.OperationLog;
+import com.ttt.one.oplog.annotation.OperationLogType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -65,6 +67,7 @@ public class GivelikeController {
      * @param givelike 点赞实体
      * @return 操作结果
      */
+    @OperationLog(desc = "保存点赞", type= OperationLogType.ADD)
     @Operation(summary = "保存点赞", description = "创建新的点赞信息")
     @PostMapping("/save")
     public R save(@RequestBody GivelikeEntity givelike) {
@@ -79,6 +82,7 @@ public class GivelikeController {
      * @param givelike 点赞实体
      * @return 操作结果
      */
+    @OperationLog(desc = "更新点赞", type= OperationLogType.UPDATE)
     @Operation(summary = "更新点赞", description = "修改现有点赞的信息")
     @PostMapping("/update")
     public R update(@RequestBody GivelikeEntity givelike) {

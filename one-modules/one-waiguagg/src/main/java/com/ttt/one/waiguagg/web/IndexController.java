@@ -2,6 +2,8 @@ package com.ttt.one.waiguagg.web;
 
 import com.ttt.one.common.utils.Constant;
 import com.ttt.one.common.vo.UserEntity;
+import com.ttt.one.oplog.annotation.OperationLog;
+import com.ttt.one.oplog.annotation.OperationLogType;
 import com.ttt.one.waiguagg.entity.CommentEntity;
 import com.ttt.one.waiguagg.entity.InfoEntity;
 import com.ttt.one.waiguagg.service.CommentService;
@@ -66,6 +68,7 @@ public class IndexController {
      * @param model  模型对象
      * @return 首页视图
      */
+    @OperationLog(type = OperationLogType.QUERY, desc = "展示外挂信息列表首页")
     @Operation(summary = "首页", description = "展示外挂信息列表首页")
     @GetMapping({"/", "/index.html"})
     public String indexPage(@RequestParam Map<String, Object> params, Model model) {

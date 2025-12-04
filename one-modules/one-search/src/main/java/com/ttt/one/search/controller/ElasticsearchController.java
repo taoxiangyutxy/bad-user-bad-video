@@ -65,6 +65,7 @@ public class ElasticsearchController {
     @Operation(summary = "操作日志单条插入ES")
     @PostMapping("/operationLogSaveES")
     public R operationLogSaveES(@RequestBody OperationLogInfo logInfo) {
+        log.info("操作日志信息: {}", logInfo);
         try {
             boolean success = waiGuaSearchService.operationLogSaveES(logInfo);
             return success ? R.ok() : R.error("日志存入ES失败");

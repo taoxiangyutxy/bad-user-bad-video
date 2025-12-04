@@ -39,6 +39,10 @@ spring:
                   -  data-id: plumelog.yml
                      group: '@config.group@'
                      refresh: true
+
+                  -  data-id: waiguagg.yml
+                     group: '@config.group@'
+                     refresh: true
     profiles:
         active: '@profile.name@'
 

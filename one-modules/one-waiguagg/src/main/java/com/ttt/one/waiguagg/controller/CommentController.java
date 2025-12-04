@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.ttt.one.common.utils.Constant;
+import com.ttt.one.oplog.annotation.OperationLog;
+import com.ttt.one.oplog.annotation.OperationLogType;
 import com.ttt.one.waiguagg.fegin.UserFeginServer;
 import com.ttt.one.waiguagg.vo.UserEntityVO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -93,6 +95,7 @@ public class CommentController {
      * @return 操作结果
      */
     @Operation(summary = "保存评论", description = "创建新的评论信息")
+    @OperationLog(desc = "保存评论", type= OperationLogType.ADD)
     @Parameter(name = "comment", description = "评论实体")
     @PostMapping("/save")
     public R save(@RequestBody CommentEntity comment) {

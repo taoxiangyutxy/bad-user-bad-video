@@ -21,8 +21,8 @@
     <dependencies>
         <!-- 项目内部依赖 -->
         <dependency>
-            <groupId>com.qdport.core.oplog</groupId>
-            <artifactId>one-oplog</artifactId>
+            <groupId>com.ttt.one.oplog</groupId>
+            <artifactId>ttt-one-oplog</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
 

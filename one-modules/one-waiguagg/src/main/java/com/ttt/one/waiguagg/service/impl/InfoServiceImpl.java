@@ -236,7 +236,7 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
                     waiGuaInfoVO.setLocation(fileList.get(0).getLocation());
                 }
             } else {
-                log.error("远程服务调用失败--- fileServer.videoInfo");
+                log.error("远程服务调用失败--- fileServer.videoInfo"+r.getMsg());
             }
             /**
              * 该info信息有多少条评论
@@ -357,7 +357,7 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
                         infoVO.setLocation(fileList.get(0).getLocation());
                     }
                 } else {
-                    log.error("远程服务调用失败--- fileServer.videoInfo");
+                    log.error("远程服务调用失败--- fileServer.videoInfo"+rFile.getMsg());
                 }
                 //存入ES数据
                 WaiguaEsModel waiguaEsModel = new WaiguaEsModel();
@@ -407,7 +407,7 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
                 voList.add(videoPreviewVO);
             }
         }else{
-            log.error("调用远程服务fileServer.videoInfo失败");
+            log.error("调用远程服务fileServer.videoInfo失败"+r.getMsg());
         }
         return voList;
     }
@@ -862,7 +862,8 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
                         waiGuaInfoVO.setLocation(fileList.get(0).getLocation());
                     }
                 } else {
-                    log.error("远程服务调用失败--- fileServer.videoInfo");
+                    log.error("远程服务调用失败--- fileServer.videoInfo"+r.getMsg());
+                    throw new BizException(r.getMsg());
                 }
                 return waiGuaInfoVO;
             }).collect(Collectors.toList());

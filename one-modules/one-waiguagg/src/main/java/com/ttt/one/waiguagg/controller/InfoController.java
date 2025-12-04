@@ -4,6 +4,8 @@ import java.util.*;
 
 import com.ttt.one.common.utils.PageUtils;
 import com.ttt.one.common.utils.R;
+import com.ttt.one.oplog.annotation.OperationLog;
+import com.ttt.one.oplog.annotation.OperationLogType;
 import com.ttt.one.waiguagg.entity.GivelikeEntity;
 import com.ttt.one.waiguagg.entity.InfoEntity;
 import com.ttt.one.waiguagg.service.InfoService;
@@ -14,6 +16,8 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 /**
  * 外挂举报信息管理控制器
@@ -108,7 +112,7 @@ public class InfoController {
      */
     @Operation(summary = "保存举报信息", description = "管理员平台保存外挂举报信息")
     @PostMapping("/save")
-    public R save(@RequestBody WaiGuaInfoVO waiGuaInfoVO) {
+    public R save( @RequestBody WaiGuaInfoVO waiGuaInfoVO) {
 		infoService.saveUnmberAndInfo(waiGuaInfoVO);
 
         return R.ok();
@@ -121,7 +125,7 @@ public class InfoController {
      */
     @Operation(summary = "前台保存并更新文件", description = "前台用户提交举报信息并上传文件")
     @PostMapping("/saveAndUpdateFile")
-    public R saveAndUpdateFile(@RequestBody WaiGuaInfoVO waiGuaInfoVO) {
+    public R saveAndUpdateFile(@Valid @RequestBody WaiGuaInfoVO waiGuaInfoVO) {
         infoService.saveAndUpdateFile(waiGuaInfoVO);
         return R.ok();
     }
@@ -183,6 +187,7 @@ public class InfoController {
      * @param params 查询参数
      * @return 用户视频列表
      */
+    @OperationLog(desc = "查询用户视频列表", type = OperationLogType.QUERY)
     @Operation(summary = "查询用户视频列表", description = "返回用户的所有视频列表,包含缩略图、视频时长和举报信息")
     @GetMapping("/findListByUser")
     public R findListByUser(@RequestParam Map<String, Object> params) {
@@ -211,6 +216,7 @@ public class InfoController {
      * @param params 查询参数
      * @return 所有视频列表
      */
+    @OperationLog(desc = "查询所有视频列表", type = OperationLogType.QUERY)
     @Operation(summary = "查询所有视频列表", description = "返回所有视频列表,包含缩略图、视频时长和举报信息")
     @GetMapping("/findListAll")
     public R findListAll(@RequestParam Map<String, Object> params) {

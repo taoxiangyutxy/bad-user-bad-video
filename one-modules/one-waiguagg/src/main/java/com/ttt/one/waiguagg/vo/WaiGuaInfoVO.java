@@ -1,5 +1,6 @@
 package com.ttt.one.waiguagg.vo;
 
+import com.ttt.one.waiguagg.annotation.WaiGuaName;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -19,6 +20,7 @@ public class WaiGuaInfoVO {
     /**
      * 外挂账号名
      */
+    @WaiGuaName
     @Schema(description = "外挂账号名")
     private String waiguaUsername;
     /**
