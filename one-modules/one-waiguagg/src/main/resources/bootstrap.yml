@@ -66,3 +66,16 @@ knife4j:
   setting:
     language: zh_cn
     swagger-model-name: 实体类列表
+feign:
+  sentinel:
+    enabled: true
+
+
+seata:
+  enabled: true
+  application-id: ${spring.application.name}
+  tx-service-group: default_tx_group  # 这个名称要与file.conf中的配置对应
+  enable-auto-data-source-proxy: false
+  service:
+    vgroup-mapping:
+      default_tx_group: default  # 与file.conf中保持一致

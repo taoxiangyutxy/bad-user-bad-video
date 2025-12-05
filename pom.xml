@@ -64,12 +64,6 @@
             <type>pom</type>
             <scope>import</scope>
         </dependency>
-        <!--one - common -->
-        <dependency>
-        <groupId>com.ttt.one</groupId>
-        <artifactId>one-common-core</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
-    </dependency>
 
         <!-- 代码生成使用模板 -->
         <dependency>

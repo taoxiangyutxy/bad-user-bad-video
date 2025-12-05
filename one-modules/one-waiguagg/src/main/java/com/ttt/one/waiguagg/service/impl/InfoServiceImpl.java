@@ -18,10 +18,10 @@ import com.ttt.one.waiguagg.dto.InfoDTO;
 import com.ttt.one.waiguagg.entity.CommentEntity;
 import com.ttt.one.waiguagg.entity.GivelikeEntity;
 import com.ttt.one.waiguagg.entity.UnmberEntity;
-import com.ttt.one.waiguagg.fegin.EsSearchFeginServer;
-import com.ttt.one.waiguagg.fegin.FileServer;
-import com.ttt.one.waiguagg.fegin.ThirdPartyFeginServer;
-import com.ttt.one.waiguagg.fegin.UserFeginServer;
+import com.ttt.one.waiguagg.feign.EsSearchFeignServer;
+import com.ttt.one.waiguagg.feign.FileServer;
+import com.ttt.one.waiguagg.feign.ThirdPartyFeignServer;
+import com.ttt.one.waiguagg.feign.UserFeignServer;
 import com.ttt.one.waiguagg.service.CommentService;
 import com.ttt.one.waiguagg.service.GivelikeService;
 import com.ttt.one.waiguagg.service.UnmberService;
@@ -29,6 +29,7 @@ import com.ttt.one.waiguagg.utils.GGFileUtil;
 import com.ttt.one.waiguagg.vo.FileInfoVO;
 import com.ttt.one.waiguagg.vo.VideoPreviewVO;
 import com.ttt.one.waiguagg.vo.WaiGuaInfoVO;
+import io.seata.spring.annotation.GlobalTransactional;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
@@ -62,18 +63,18 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
     private UnmberService unmberService;
 
     @Autowired
-    private UserFeginServer userFeginServer;
+    private UserFeignServer userFeignServer;
 
     @Autowired
     private FileServer fileServer;
     @Autowired
-    private ThirdPartyFeginServer thirdPartyFeginServer;
+    private ThirdPartyFeignServer thirdPartyFeignServer;
     @Autowired
     private StringRedisTemplate redisTemplate;
     @Autowired
     RedissonClient redisson;
     @Autowired
-    private EsSearchFeginServer esSearchFeginServer;
+    private EsSearchFeignServer esSearchFeignServer;
     @Autowired
     private GivelikeService givelikeService;
     @Autowired
@@ -279,6 +280,8 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
         unmberService.updateById(unmberEntity);
     }
 
+    @GlobalTransactional
+    @Transactional
     @Override
     public void removeByIdsAllIn(List<Long> asList) {
         if(asList.size()>0){
@@ -286,12 +289,19 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
                 //1 查出info数据
                 InfoEntity infoEntity = this.getById(aLong);
                 //2 根据外挂id 删除外挂信息
-                unmberService.removeById(infoEntity.getWaiguaId());
+                unmberService.removeByIdWithTransaction(infoEntity.getWaiguaId());
                 //3 关联视频文件信息、分片表全删   远程调用
                 try {
-                    fileServer.deleAllIn(infoEntity.getId());
+                    R r = fileServer.deleAllIn(infoEntity.getId());
+                    if(r.getCode() == 0){
+                        log.info("远程服务调用成功--- fileServer.deleAllIn");
+                    }else {
+                        log.error("远程服务调用失败--- fileServer.deleAllIn"+r.getMsg());
+                        throw new BizException("调用文件上传远程服务fileServer.deleAllIn报错"+r.getMsg());
+                    }
                 }catch (Exception e){
                     log.error("调用文件上传远程服务fileServer.deleAllIn报错:{}",e);
+                    throw new BizException("调用文件上传远程服务fileServer.deleAllIn报错"+e.getMessage());
                 }
                 //4 根据info id删info信息
                 this.removeById(infoEntity.getId());
@@ -367,7 +377,7 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
                 waiguaEsModel.setCreateTime(infoVO.getCreateTime());
                 waiguaEsModel.setLocation(infoVO.getLocation());
                 waiguaEsModel.setWaiguaUsername(infoVO.getWaiguaUsername());
-                R r = esSearchFeginServer.waiguaInfoSaveES(waiguaEsModel);
+                R r = esSearchFeignServer.waiguaInfoSaveES(waiguaEsModel);
                 if(r.getCode() == 0){
                     //成功
                     //审核通过  门户网站数据多一条  将缓存清空

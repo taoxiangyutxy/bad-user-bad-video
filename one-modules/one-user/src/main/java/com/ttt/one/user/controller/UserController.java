@@ -2,6 +2,7 @@ package com.ttt.one.user.controller;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import com.ttt.one.common.exception.BizExceptionEnum;
 import com.ttt.one.common.utils.PageUtils;
@@ -41,6 +42,13 @@ public class UserController {
     @Operation(summary = "用户登录", description = "根据用户名和密码进行用户登录验证")
     @PostMapping("/login")
     public R login(@RequestBody UserLoginVo vo) {
+        /*try {
+            TimeUnit.SECONDS.sleep(8); // 延时25秒
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt(); // 恢复中断状态
+            e.printStackTrace();
+        }*/
+
         UserEntity userEntity = userService.login(vo);
         if (userEntity != null) {
             return R.ok().setData(userEntity);

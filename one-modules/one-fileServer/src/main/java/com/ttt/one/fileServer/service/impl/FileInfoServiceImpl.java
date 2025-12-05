@@ -1,6 +1,7 @@
 package com.ttt.one.fileServer.service.impl;
 
 import com.ttt.one.fileServer.service.ChunkService;
+import io.seata.spring.annotation.GlobalTransactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -47,9 +48,10 @@ public class FileInfoServiceImpl extends ServiceImpl<FileInfoDao, FileInfoEntity
         FileInfoDao infoDao = this.getBaseMapper();
         infoDao.updateByIdentifiers(waiguaInfoId,new Date(),cover, identifiers);
     }
-
+    
     @Override
     public void deleAllIn(Long infoId) {
+       // int i = 10/0;
         FileInfoDao infoDao = this.getBaseMapper();
         List<FileInfoEntity> infoEntities = infoDao.selectList(new QueryWrapper<FileInfoEntity>().eq("waigua_info_id", infoId));
         for (FileInfoEntity infoEntity : infoEntities) {

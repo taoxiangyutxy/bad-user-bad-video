@@ -1,5 +1,6 @@
 package com.ttt.one.auth.fegin;
 
+import com.ttt.one.auth.fegin.fallback.UserFeignServerFallback;
 import com.ttt.one.auth.vo.UserLoginVo;
 import com.ttt.one.auth.vo.UserRegistVo;
 import com.ttt.one.common.utils.R;
@@ -10,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 /**
  * 用户模块
  */
-@FeignClient("one-user")
-public interface UserFeginServer {
+@FeignClient(value = "one-user" ,fallback = UserFeignServerFallback.class)
+public interface UserFeignServer {
     /**
      * 用户注册
      * @param vo

@@ -2,7 +2,7 @@ package com.ttt.one.auth.controller;
 import com.alibaba.fastjson.TypeReference;
 import com.ttt.one.oplog.annotation.OperationLog;
 import com.ttt.one.oplog.annotation.OperationLogType;
-import com.ttt.one.auth.fegin.UserFeginServer;
+import com.ttt.one.auth.fegin.UserFeignServer;
 import com.ttt.one.auth.service.AuthService;
 import com.ttt.one.auth.utils.TokenUtil;
 import com.ttt.one.auth.vo.OperationLogInfo;
@@ -16,7 +16,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -45,7 +44,7 @@ public class LoginController {
 
     private final AuthService authService;
     private final StringRedisTemplate redisTemplate;
-    private final UserFeginServer userFeginServer;
+    private final UserFeignServer userFeignServer;
     private final TokenUtil tokenUtil;
 
     @Value("${spring.ttt.theHost}")
@@ -114,7 +113,7 @@ public class LoginController {
         redisTemplate.delete(Constant.SMS_CODE_CACHE_PREFIX + phone);
 
         // 4. 调用远程服务注册
-        R r = userFeginServer.regist(vo);
+        R r = userFeignServer.regist(vo);
         if (r.getCode() == 0) {
             return String.format(REDIRECT_LOGIN_URL, theHost);
         } else {
@@ -140,7 +139,7 @@ public class LoginController {
                        HttpSession session, HttpServletResponse response) {
         log.info("User login attempt, url config: {}", url);
         
-        R r = userFeginServer.login(vo);
+        R r = userFeignServer.login(vo);
         if (r.getCode() == 0) {
             // 登录成功
             UserEntity userData = r.getData("data", new TypeReference<UserEntity>() {});
@@ -154,7 +153,7 @@ public class LoginController {
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             response.addHeader("Access-Control-Expose-Headers", "token");
             response.addHeader("token", tokenMap.get("token"));
-            
+
             log.info("User login successful, token: {}", tokenMap.get("token"));
             return String.format(REDIRECT_HOME_URL, theHost);
         } else {

@@ -4,7 +4,6 @@ server:
     session:
       timeout: 30m
 
-
 spring:
   application:
     name: one-auth-server
@@ -67,3 +66,18 @@ knife4j:
     language: zh_cn
     swagger-model-name: 实体类列表
 
+logging:
+  level:
+    com.ttt.one.auth.fegin: debug
+
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 1000
+        readTimeout: 3000
+  sentinel:
+    enabled: true
+
+seata:
+  enabled: false

@@ -42,6 +42,7 @@
         <dependency>
             <groupId>com.ttt.one</groupId>
             <artifactId>one-common-core</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

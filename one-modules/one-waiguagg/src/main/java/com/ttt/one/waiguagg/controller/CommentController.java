@@ -8,7 +8,7 @@ import java.util.Map;
 import com.ttt.one.common.utils.Constant;
 import com.ttt.one.oplog.annotation.OperationLog;
 import com.ttt.one.oplog.annotation.OperationLogType;
-import com.ttt.one.waiguagg.fegin.UserFeginServer;
+import com.ttt.one.waiguagg.feign.UserFeignServer;
 import com.ttt.one.waiguagg.vo.UserEntityVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -35,7 +35,7 @@ import javax.servlet.http.HttpServletRequest;
 public class CommentController {
 
     private final CommentService commentService;
-    private final UserFeginServer userFeginServer;
+    private final UserFeignServer userFeignServer;
 
     /**
      * 获取指定外挂信息的评论列表

@@ -26,10 +26,16 @@
         <pagehelper-spring-boot-starter.version>1.4.1</pagehelper-spring-boot-starter.version>
     </properties>
     <dependencies>
+      <!--  <dependency>
+            <groupId>com.ttt.one.oplog</groupId>
+            <artifactId>ttt-one-oplog</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>-->
         <!--common-core-->
         <dependency>
             <groupId>com.ttt.one</groupId>
             <artifactId>one-common-core</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <!--RabbitMQ-->
         <dependency>

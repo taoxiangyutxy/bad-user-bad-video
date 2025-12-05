@@ -3,7 +3,9 @@ package com.ttt.one.waiguagg.service.impl;
 import com.rabbitmq.client.Channel;
 import com.ttt.one.common.utils.PageUtils;
 import com.ttt.one.common.utils.Query;
+import com.ttt.one.common.utils.R;
 import com.ttt.one.waiguagg.entity.InfoEntity;
+import io.seata.spring.annotation.GlobalTransactional;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ttt.one.waiguagg.dao.UnmberDao;
 import com.ttt.one.waiguagg.entity.UnmberEntity;
 import com.ttt.one.waiguagg.service.UnmberService;
+import org.springframework.transaction.annotation.Transactional;
+
 //先创建队列
 //@RabbitListener(queues = {"hello-java-queue"})
 @Service("unmberService")
@@ -48,6 +52,22 @@ public class UnmberServiceImpl extends ServiceImpl<UnmberDao, UnmberEntity> impl
             return unmberEntity;
         }else{
             return null;
+        }
+    }
+    
+    @Transactional
+    @Override
+    public R removeByIdWithTransaction(Long id) {
+        try {
+            // 执行删除操作
+            boolean result = this.removeById(id);
+            if (result) {
+                return R.ok();
+            } else {
+                return R.error("删除失败，未找到指定记录");
+            }
+        } catch (Exception e) {
+            return R.error("删除异常：" + e.getMessage());
         }
     }
 

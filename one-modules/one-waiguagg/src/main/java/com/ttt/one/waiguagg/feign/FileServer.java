@@ -1,11 +1,12 @@
-package com.ttt.one.waiguagg.fegin;
+package com.ttt.one.waiguagg.feign;
 
 import com.ttt.one.common.utils.R;
+import com.ttt.one.waiguagg.feign.fallback.FileServerFallback;
 import com.ttt.one.waiguagg.vo.FileInfoVO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
-@FeignClient("one-fileServer")
+@FeignClient(value = "one-fileServer",fallback = FileServerFallback.class)
 public interface FileServer {
 
     @PostMapping("/fileServer/uploader/deleAllIn")

@@ -27,7 +27,7 @@ import javax.validation.Valid;
  */
 @Tag(name = "外挂举报信息管理", description = "外挂账号举报信息相关接口")
 @RestController
-@RequestMapping("/waiguagg/info")
+@RequestMapping("/info")
 @RequiredArgsConstructor
 public class InfoController {
 

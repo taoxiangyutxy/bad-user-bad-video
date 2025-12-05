@@ -26,7 +26,7 @@ import com.ttt.one.waiguagg.service.UnmberService;
 @Slf4j
 @RestController
 @RefreshScope
-@RequestMapping("/waiguagg/unmber")
+@RequestMapping("/unmber")
 @RequiredArgsConstructor
 public class UnmberController {
 

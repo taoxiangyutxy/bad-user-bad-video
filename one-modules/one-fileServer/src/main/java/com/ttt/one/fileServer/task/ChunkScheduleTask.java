@@ -3,7 +3,7 @@ package com.ttt.one.fileServer.task;
 import com.ttt.one.common.to.es.WaiguaEsModel;
 import com.ttt.one.common.utils.R;
 import com.ttt.one.fileServer.entity.FileInfoEntity;
-import com.ttt.one.fileServer.fegin.EsSearchFeginServer;
+import com.ttt.one.fileServer.fegin.EsSearchFeignServer;
 import com.ttt.one.fileServer.service.ChunkService;
 import com.ttt.one.fileServer.service.FileInfoService;
 import com.ttt.one.fileServer.utils.MinIoUtils;
@@ -34,7 +34,7 @@ public class ChunkScheduleTask {
     
     private final ChunkService chunkService;
     private final FileInfoService fileInfoService;
-    private final EsSearchFeginServer esSearchFeginServer;
+    private final EsSearchFeignServer esSearchFeignServer;
     
     /**
      * MinIO链接有效期：7天（分钟数）
@@ -162,7 +162,7 @@ public class ChunkScheduleTask {
                 .collect(Collectors.toList());
         
         try {
-            R response = esSearchFeginServer.waiguaInfoBatchUpdate(esModelList);
+            R response = esSearchFeignServer.waiguaInfoBatchUpdate(esModelList);
             if (response != null && response.getCode() == 0) {
                 log.info("[定时任务-刷新视频链接] Elasticsearch索引更新成功");
             } else {

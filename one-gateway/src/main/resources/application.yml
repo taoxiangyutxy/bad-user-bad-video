@@ -38,9 +38,11 @@ spring:
 
             #按照路径断言 http
             - Path=/api/waiguagg/**
+            - Vip=accept-encoding,br
           filters:
             #过滤掉api前缀 使得后端服务只需要处理剩下的路径部分(剩下的需要跟接口路径匹配)
-            - RewritePath=/api/(?<segment>.*),/$\{segment}
+            - RewritePath=/api/waiguagg/(?<segment>.*),/$\{segment}
+            - OnceToken=ont-token,jwt
 
         - id: third_party_route
           uri: lb://one-third-party

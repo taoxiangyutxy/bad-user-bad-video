@@ -1,12 +1,13 @@
-package com.ttt.one.waiguagg.fegin;
+package com.ttt.one.waiguagg.feign;
 
 import com.ttt.one.common.utils.R;
+import com.ttt.one.waiguagg.feign.fallback.ThirdPartyFeignServerFallback;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@FeignClient("one-third-party")
-public interface ThirdPartyFeginServer {
+@FeignClient(value = "one-third-party",fallback = ThirdPartyFeignServerFallback.class)
+public interface ThirdPartyFeignServer {
     /**
      * 发送短信
      * @param phone
