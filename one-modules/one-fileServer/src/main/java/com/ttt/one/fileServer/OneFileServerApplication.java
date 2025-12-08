@@ -8,7 +8,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-
+@EnableTransactionManagement
 @EnableRabbit
 @EnableScheduling //启动定时任务调度
 @MapperScan(basePackages = {"com.ttt.one.fileServer.dao"})

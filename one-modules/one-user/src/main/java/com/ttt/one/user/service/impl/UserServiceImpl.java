@@ -18,6 +18,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ttt.one.user.dao.UserDao;
 import com.ttt.one.user.entity.UserEntity;
 import com.ttt.one.user.service.UserService;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service("userService")
@@ -90,6 +91,11 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
                 return null;
             }
         }
+    }
+    // @Transactional
+    @Override
+    public void updateByUserId(UserEntity user) {
+        this.baseMapper.updateById(user);
     }
 
 }

@@ -18,6 +18,7 @@ import com.ttt.one.common.utils.Query;
 import com.ttt.one.fileServer.dao.FileInfoDao;
 import com.ttt.one.fileServer.entity.FileInfoEntity;
 import com.ttt.one.fileServer.service.FileInfoService;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service("fileInfoService")
@@ -48,10 +49,9 @@ public class FileInfoServiceImpl extends ServiceImpl<FileInfoDao, FileInfoEntity
         FileInfoDao infoDao = this.getBaseMapper();
         infoDao.updateByIdentifiers(waiguaInfoId,new Date(),cover, identifiers);
     }
-    
+    //@Transactional
     @Override
     public void deleAllIn(Long infoId) {
-       // int i = 10/0;
         FileInfoDao infoDao = this.getBaseMapper();
         List<FileInfoEntity> infoEntities = infoDao.selectList(new QueryWrapper<FileInfoEntity>().eq("waigua_info_id", infoId));
         for (FileInfoEntity infoEntity : infoEntities) {
@@ -60,6 +60,9 @@ public class FileInfoServiceImpl extends ServiceImpl<FileInfoDao, FileInfoEntity
             //删除文件信息
             infoDao.deleteById(infoEntity.getId());
         }
+        //测试分布式事务seata
+        //throw new RuntimeException("删除所有文件信息失败");
+
     }
 
     @Override

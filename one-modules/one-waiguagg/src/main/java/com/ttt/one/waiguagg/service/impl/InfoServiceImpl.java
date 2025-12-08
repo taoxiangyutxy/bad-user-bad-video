@@ -14,6 +14,7 @@ import com.ttt.one.common.utils.PageUtils;
 import com.ttt.one.common.utils.Query;
 import com.ttt.one.common.utils.R;
 import com.ttt.one.common.utils.constant.InfoConstant;
+import com.ttt.one.common.vo.UserEntity;
 import com.ttt.one.waiguagg.dto.InfoDTO;
 import com.ttt.one.waiguagg.entity.CommentEntity;
 import com.ttt.one.waiguagg.entity.GivelikeEntity;
@@ -281,13 +282,18 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
     }
 
     @GlobalTransactional
-    @Transactional
+    //@Transactional
     @Override
     public void removeByIdsAllIn(List<Long> asList) {
         if(asList.size()>0){
             for (Long aLong : asList) {
                 //1 查出info数据
                 InfoEntity infoEntity = this.getById(aLong);
+                //测试分布式事务 seata
+                /*UserEntity user = new UserEntity();
+                user.setId(4L);
+                user.setUsername("taoxiangyu444");
+                userFeignServer.update(user);*/
                 //2 根据外挂id 删除外挂信息
                 unmberService.removeByIdWithTransaction(infoEntity.getWaiguaId());
                 //3 关联视频文件信息、分片表全删   远程调用
@@ -303,6 +309,7 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
                     log.error("调用文件上传远程服务fileServer.deleAllIn报错:{}",e);
                     throw new BizException("调用文件上传远程服务fileServer.deleAllIn报错"+e.getMessage());
                 }
+
                 //4 根据info id删info信息
                 this.removeById(infoEntity.getId());
                 //5 TODO 使用工具删除 MINIO服务器视频文件

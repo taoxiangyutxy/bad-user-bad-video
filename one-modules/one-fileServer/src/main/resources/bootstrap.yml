@@ -68,7 +68,7 @@ seata:
   enabled: true
   application-id: ${spring.application.name}
   tx-service-group: default_tx_group  # 这个名称要与file.conf中的配置对应
-  enable-auto-data-source-proxy: false
+  enable-auto-data-source-proxy: true
   service:
     vgroup-mapping:
       default_tx_group: default  # 与file.conf中保持一致

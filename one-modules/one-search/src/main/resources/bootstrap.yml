@@ -49,3 +49,6 @@ springdoc:
     - group: 'default'
       paths-to-match: '/**'
       packages-to-scan: com.ttt.one.search.controller  # 指定接口文档展示接口包路径扫描
+
+seata:
+  enabled: false

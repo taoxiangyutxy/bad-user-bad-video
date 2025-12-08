@@ -51,5 +51,7 @@ public interface UserService extends IService<UserEntity> {
      * @date 2021/11/6 19:08
      */
     UserEntity login(UserLoginVo vo);
+
+    void updateByUserId(UserEntity user);
 }
 

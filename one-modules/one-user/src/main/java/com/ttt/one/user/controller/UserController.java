@@ -131,7 +131,7 @@ public class UserController {
     @Operation(summary = "更新会员", description = "修改现有会员的信息")
     @PostMapping("/update")
     public R update(@RequestBody UserEntity user) {
-		userService.updateById(user);
+		userService.updateByUserId(user);
 
         return R.ok();
     }

@@ -47,3 +47,12 @@ springdoc:
     - group: 'default'
       paths-to-match: '/**'
       packages-to-scan: com.ttt.one.user.controller  # 指定接口文档展示接口包路径扫描
+
+seata:
+  enabled: true
+  application-id: ${spring.application.name}
+  tx-service-group: default_tx_group  # 这个名称要与file.conf中的配置对应
+  enable-auto-data-source-proxy: true
+  service:
+    vgroup-mapping:
+      default_tx_group: default  # 与file.conf中保持一致
