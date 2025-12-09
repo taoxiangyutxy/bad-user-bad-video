@@ -26,10 +26,10 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
             <exclusions><!--排除 lettuce-->
-                <exclusion>
+               <!-- <exclusion>
                     <groupId>io.lettuce</groupId>
                     <artifactId>lettuce-core</artifactId>
-                </exclusion>
+                </exclusion>-->
                     <exclusion>
                         <groupId>org.springframework.boot</groupId>
                         <artifactId>spring-boot-starter-logging</artifactId>
@@ -37,10 +37,10 @@
             </exclusions>
         </dependency>
         <!--引入jedis操作redis-->
-        <dependency>
+     <!--   <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
-        </dependency>
+        </dependency>-->
         <!--分布式session共享-->
         <dependency>
             <groupId>org.springframework.session</groupId>

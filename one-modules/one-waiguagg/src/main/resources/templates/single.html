@@ -347,10 +347,10 @@
             let url;
             if (isLiked) {
                 newCountLike = parseInt(countLike) + 1;
-                url = "/waiguagg/info/giveLikeInfo";
+                url = "/info/giveLikeInfo";
             } else {
                 newCountLike = parseInt(countLike) - 1;
-                url = "/waiguagg/info/unGiveLikeInfo";
+                url = "/info/unGiveLikeInfo";
             }
             document.getElementById('countLike').innerHTML = newCountLike;
             giveLikePost(url,relationId,userId,1);
@@ -407,10 +407,10 @@
             let url;
             if (isLikedComment) {
                 newCountLike = parseInt(countLike) + 1;
-                url = "/waiguagg/info/giveLikeInfo";
+                url = "/info/giveLikeInfo";
             } else {
                 newCountLike = parseInt(countLike) - 1;
-                url = "/waiguagg/info/unGiveLikeInfo";
+                url = "/info/unGiveLikeInfo";
             }
             document.getElementById("countLike"+relationId+"").innerHTML = newCountLike;
             giveLikePost(url,relationId,userId,2);

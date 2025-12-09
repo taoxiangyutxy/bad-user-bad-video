@@ -1,7 +1,9 @@
 package com.ttt.one.common.exception;
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.ttt.one.common.utils.R;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -100,5 +102,47 @@ public class GlobalExceptionHandler {
         }
         
         return R.error(500, message);
+    }
+
+
+    /**
+     * 处理 JSON 反序列化异常（类型不匹配）
+     * 例如：将字符串 "asd" 转换为 Integer
+     * 这种情况发生在参数绑定之前，@Valid 注解不会生效
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public R handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+        log.error("JSON反序列化异常: {}", ex.getMessage(), ex);
+
+        // 检查是否是 InvalidFormatException（类型转换错误）
+        Throwable cause = ex.getCause();
+        if (cause instanceof InvalidFormatException) {
+            InvalidFormatException ife = (InvalidFormatException) cause;
+
+            // 获取出错的字段名
+            String fieldName = "未知字段";
+            if (ife.getPath() != null && !ife.getPath().isEmpty()) {
+                fieldName = ife.getPath().stream()
+                        .map(ref -> ref.getFieldName())
+                        .reduce((first, second) -> second)  // 取最后一个
+                        .orElse("未知字段");
+            }
+
+            // 获取期望的类型
+            String expectedType = ife.getTargetType() != null ?
+                    ife.getTargetType().getSimpleName() : "未知类型";
+
+            // 获取实际传入的值
+            Object value = ife.getValue();
+            String valueStr = value != null ? value.toString() : "null";
+
+            String errorMsg = String.format("字段 '%s' 类型错误，期望 %s 类型，但收到 '%s'",
+                    fieldName, expectedType, valueStr);
+
+            return R.error(400, errorMsg);
+        } else {
+            // 其他类型的 JSON 解析错误
+            return R.error(400, "请求参数格式错误，请检查JSON格式");
+        }
     }
 }

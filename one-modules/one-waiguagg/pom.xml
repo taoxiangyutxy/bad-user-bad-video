@@ -16,6 +16,8 @@
         <shedlock.version>4.25.0</shedlock.version>
         <commons-pool2.version>2.11.1</commons-pool2.version>
         <redisson.version>3.17.7</redisson.version>
+        <jedis.version>3.8.0</jedis.version>
+
     </properties>
     <dependencies>
         <!-- 项目内部依赖 -->
@@ -70,17 +72,22 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
             <exclusions>
-                <exclusion>
+                <!--<exclusion>
                     <groupId>io.lettuce</groupId>
                     <artifactId>lettuce-core</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>redis.clients</groupId>
+                    <artifactId>jedis</artifactId>
+                </exclusion>-->
             </exclusions>
         </dependency>
 
-        <dependency>
+     <!--   <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
-        </dependency>
+            <version>${jedis.version}</version>
+        </dependency>-->
 
         <dependency>
             <groupId>org.apache.commons</groupId>

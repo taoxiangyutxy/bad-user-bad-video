@@ -4,6 +4,9 @@ import com.ttt.one.waiguagg.annotation.WaiGuaName;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 /**
@@ -26,6 +29,9 @@ public class WaiGuaInfoVO {
     /**
      * 账号等级
      */
+    @NotNull(message = "账号等级不能为空")
+    @Min(value = 0, message = "账号等级不能小于0")
+    @Max(value = 999, message = "账号等级不能大于999")
     @Schema(description = "账号等级")
     private Integer waiguaGrade;
     /**
