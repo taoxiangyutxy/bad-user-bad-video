@@ -6,7 +6,7 @@ import com.ttt.one.waiguagg.feign.fallback.EsSearchFeignServerFallback;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-@FeignClient(value = "one-search",fallback = EsSearchFeignServerFallback.class)
+@FeignClient(name = "one-search",fallback = EsSearchFeignServerFallback.class)
 public interface EsSearchFeignServer {
     @RequestMapping("/search/waiguaInfoSaveES")
      R waiguaInfoSaveES(@RequestBody WaiguaEsModel esModel);

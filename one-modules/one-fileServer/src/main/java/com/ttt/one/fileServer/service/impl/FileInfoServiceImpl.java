@@ -2,6 +2,7 @@ package com.ttt.one.fileServer.service.impl;
 
 import com.ttt.one.fileServer.service.ChunkService;
 import io.seata.spring.annotation.GlobalTransactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

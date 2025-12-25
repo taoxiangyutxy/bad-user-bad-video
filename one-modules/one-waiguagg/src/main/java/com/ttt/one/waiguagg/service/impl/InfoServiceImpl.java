@@ -14,7 +14,6 @@ import com.ttt.one.common.utils.PageUtils;
 import com.ttt.one.common.utils.Query;
 import com.ttt.one.common.utils.R;
 import com.ttt.one.common.utils.constant.InfoConstant;
-import com.ttt.one.common.vo.UserEntity;
 import com.ttt.one.waiguagg.dto.InfoDTO;
 import com.ttt.one.waiguagg.entity.CommentEntity;
 import com.ttt.one.waiguagg.entity.GivelikeEntity;
@@ -38,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -63,17 +63,21 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
     @Autowired
     private UnmberService unmberService;
 
+    @Qualifier("com.ttt.one.waiguagg.feign.UserFeignServer")
     @Autowired
     private UserFeignServer userFeignServer;
 
+    @Qualifier("com.ttt.one.waiguagg.feign.FileServer")
     @Autowired
     private FileServer fileServer;
+    @Qualifier("com.ttt.one.waiguagg.feign.ThirdPartyFeignServer")
     @Autowired
     private ThirdPartyFeignServer thirdPartyFeignServer;
     @Autowired
     private StringRedisTemplate redisTemplate;
     @Autowired
     RedissonClient redisson;
+    @Qualifier("com.ttt.one.waiguagg.feign.EsSearchFeignServer")
     @Autowired
     private EsSearchFeignServer esSearchFeignServer;
     @Autowired

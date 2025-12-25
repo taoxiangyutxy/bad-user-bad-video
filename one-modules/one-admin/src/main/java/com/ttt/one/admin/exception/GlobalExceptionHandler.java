@@ -1,9 +1,12 @@
-package com.ttt.one.common.exception;
+package com.ttt.one.admin.exception;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.ttt.one.common.exception.BizException;
 import com.ttt.one.common.utils.R;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -15,12 +18,26 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * 全局异常处理器
+ * 全局异常处理器  每个微服务一个最好
  * 统一处理各类异常并返回标准格式的响应
  */
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    // 1. 专门处理认证异常（401）
+    @ExceptionHandler(AuthenticationException.class)
+    public R handleAuthenticationException(AuthenticationException e) {
+        log.error("认证异常：{}", e.getMessage(), e);
+        return R.error(401, "未认证，请先登录");
+    }
+
+    // 2. 专门处理权限异常（403）
+    @ExceptionHandler(AccessDeniedException.class)
+    public R handleAccessDeniedException(AccessDeniedException e) {
+        log.error("权限异常：{}", e.getMessage(), e);
+        return R.error(403, "权限不足，无法访问此资源");
+    }
 
     /**
      * 处理算术异常（如除零错误）
@@ -53,7 +70,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
     public R handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
         BindingResult result = ex.getBindingResult();
-        
+
         // 使用Stream简化错误信息收集
         Map<String, String> errorMap = result.getFieldErrors().stream()
                 .collect(Collectors.toMap(
@@ -61,7 +78,7 @@ public class GlobalExceptionHandler {
                         FieldError::getDefaultMessage,
                         (existing, replacement) -> existing // 如果有重复字段，保留第一个错误
                 ));
-        
+
         log.warn("参数校验失败：{}", errorMap);
         return R.error(400, "参数校验失败", errorMap);
     }

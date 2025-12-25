@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ttt.one.admin.dao.SysRoleMenuMapper">
+
+    <!-- 批量插入角色权限关系 -->
+    <insert id="batchInsert" parameterType="java.util.List">
+        INSERT INTO sys_role_menu (role_id, menu_id) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.roleId}, #{item.menuId})
+        </foreach>
+    </insert>
+
+    <!-- 根据角色ID删除权限 -->
+    <delete id="deleteByRoleId">
+        DELETE FROM sys_role_menu
+        WHERE role_id = #{roleId}
+        <if test="menuIds != null and menuIds.size() > 0">
+            AND menu_id IN
+            <foreach collection="menuIds" item="menuId" open="(" separator="," close=")">
+                #{menuId}
+            </foreach>
+        </if>
+    </delete>
+</mapper>

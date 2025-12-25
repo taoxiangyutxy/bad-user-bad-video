@@ -65,11 +65,20 @@ public class Constant {
      * 登录成功的用户 session-key
      */
     public static final String LOGIN_USER ="loginUser";
+
+    public static final String LOGIN_SYS_USER ="loginSysUser";
     /**
      * 点赞类型
      */
     public static final int LIKETYPE_INFO = 1;
     public static final int LIKETYPE_COMMENT = 2;
+    /**
+     *  0 隐藏  1 显示
+     */
+    public static final  int IS_VISIBLE_0 = 0;
+    public static final  int IS_VISIBLE_1 = 1;
+
+
 
     /**
 	 * 菜单类型

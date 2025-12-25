@@ -13,16 +13,16 @@ import java.util.List;
  *
  */
 @Data
-public class PageUtils implements Serializable {
+public class PageAdminUtils implements Serializable {
 	private static final long serialVersionUID = 1L;
 	/**
 	 * 总记录数
 	 */
-	private int totalCount;
+	private int total;
 	/**
 	 * 每页记录数
 	 */
-	private int pageSize;
+	private int size;
 	/**
 	 * 总页数
 	 */
@@ -30,12 +30,12 @@ public class PageUtils implements Serializable {
 	/**
 	 * 当前页数
 	 */
-	private int currPage;
+	private int current;
 	/**
 	 * 列表数据
 	 */
-	private List<?> list;
-	
+	private List<?> records;
+
 	/**
 	 * 分页
 	 * @param list        列表数据
@@ -43,22 +43,22 @@ public class PageUtils implements Serializable {
 	 * @param pageSize    每页记录数
 	 * @param currPage    当前页数
 	 */
-	public PageUtils(List<?> list, int totalCount, int pageSize, int currPage) {
-		this.list = list;
-		this.totalCount = totalCount;
-		this.pageSize = pageSize;
-		this.currPage = currPage;
+	public PageAdminUtils(List<?> list, int totalCount, int pageSize, int currPage) {
+		this.records = list;
+		this.total = totalCount;
+		this.size = pageSize;
+		this.current = currPage;
 		this.totalPage = (int)Math.ceil((double)totalCount/pageSize);
 	}
 
 	/**
 	 * 分页
 	 */
-	public PageUtils(IPage<?> page) {
-		this.list = page.getRecords();
-		this.totalCount = (int)page.getTotal();
-		this.pageSize = (int)page.getSize();
-		this.currPage = (int)page.getCurrent();
+	public PageAdminUtils(IPage<?> page) {
+		this.records = page.getRecords();
+		this.total = (int)page.getTotal();
+		this.size = (int)page.getSize();
+		this.current = (int)page.getCurrent();
 		this.totalPage = (int)page.getPages();
 	}
 }
