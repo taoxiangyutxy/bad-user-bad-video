@@ -2,7 +2,9 @@ package com.ttt.one.admin.utils;
 
 import com.ttt.one.admin.dao.SysUserMapper;
 import com.ttt.one.admin.entity.SysUser;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -12,12 +14,14 @@ import org.springframework.stereotype.Component;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-
+@Slf4j
 @Component
 public class SecurityUtil {
 
     @Autowired
     private SysUserMapper sysUserMapper;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     /**
      * 获取当前认证的用户名
@@ -108,5 +112,17 @@ public class SecurityUtil {
         return authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
+    }
+
+
+    /**
+     * 清理指定用户的缓存
+     */
+    public void clearUserCache(String username) {
+        String cacheKey = "user:auth:" + username;
+        Boolean deleted = redisTemplate.delete(cacheKey);
+        if (Boolean.TRUE.equals(deleted)) {
+            log.info("✅ 已清理用户缓存: {}", cacheKey);
+        }
     }
 }

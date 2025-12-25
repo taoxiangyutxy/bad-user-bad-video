@@ -95,6 +95,8 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
         if (!rolePermissions.isEmpty()) {
             sysRoleMenuMapper.batchInsert(rolePermissions);
         }
+        //清除缓存
+        securityUtil.clearUserCache(SecurityUtil.getCurrentUsername());
     }
 
     @Override

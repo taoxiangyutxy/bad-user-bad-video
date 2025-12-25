@@ -31,6 +31,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -76,6 +77,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     }
 
     @Override
+    @Transactional
     public SysUser createUser(SysUserVO user) {
         //校验用户名是否唯一
         QueryWrapper<SysUser> wrapper = new QueryWrapper<>();
@@ -116,10 +118,13 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                 sysUserRoleMapper.batchInsert(userRoleList);
             }
         }
+        //清除缓存
+        securityUtil.clearUserCache(SecurityUtil.getCurrentUsername());
         return userDb;
     }
 
     @Override
+    @Transactional
     public SysUser updateUser(SysUserVO user) {
         SysUser userDb = new SysUser();
         BeanUtils.copyProperties(user, userDb);
@@ -143,6 +148,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                 sysUserRoleMapper.batchInsert(userRoleList);
             }
         }
+
+        //清除缓存
+        securityUtil.clearUserCache(SecurityUtil.getCurrentUsername());
 
         return userDb;
     }
