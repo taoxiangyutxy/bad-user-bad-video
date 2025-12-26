@@ -65,10 +65,10 @@ spring:
 
           uri: lb://one-search
           predicates:
-            - Path=/api/search/**
+            - Path=/one-search/**
           filters:
             #过滤掉api前缀
-            - RewritePath=/api/(?<segment>.*),/$\{segment}
+            - RewritePath=/one-search/(?<segment>.*),/$\{segment}
 
 
         - id:  waigua_auth_route
@@ -81,6 +81,17 @@ spring:
             - AddRequestHeader=handle-server, one-auth-server
             #过滤掉api前缀
             - RewritePath=/one-auth-server/(?<path>.*),/$\{path}
+
+        - id: admin_route
+          uri:
+            lb://one-admin
+          predicates:
+            #按照路径断言 http
+            - Path=/one-admin/**
+          filters:
+            - AddRequestHeader=handle-server, one-admin
+            #过滤掉api前缀
+            - RewritePath=/one-admin/(?<segment>.*),/$\{segment}
 
 
 #        - id:  waigua_order_route

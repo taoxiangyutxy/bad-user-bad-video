@@ -11,7 +11,7 @@ import java.util.List;
  */
 @Data
 public class LogSearchResult {
-    private List<OperationLogInfo> logInfos;
+    private List<OperationLogInfo> records;
     private Integer pageNum; //页码
     private Long total; //总记录数
     private Integer totalPages; //总页码

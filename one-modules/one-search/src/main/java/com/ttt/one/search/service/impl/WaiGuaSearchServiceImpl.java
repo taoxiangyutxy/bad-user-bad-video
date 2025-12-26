@@ -352,8 +352,8 @@ public class WaiGuaSearchServiceImpl implements WaiGuaSearchService {
             sourceBuilder.sort(s[0],sortOrder);
         }
         //分页  form 从哪开始  size 每页显示几个
-        sourceBuilder.from((param.getPageNum()-1)*EsConstant.WAIGUA_PAGESIZE);
-        sourceBuilder.size(EsConstant.WAIGUA_PAGESIZE);
+        sourceBuilder.from((param.getPageNum()-1)*param.getSize());
+        sourceBuilder.size(param.getSize());
         System.out.println("构建的DSL语句="+sourceBuilder.toString());
 
         SearchRequest searchRequest = new SearchRequest(new String[]{EsConstant.ONE_AUTH_SERVER_INDEX},sourceBuilder);
@@ -378,7 +378,7 @@ public class WaiGuaSearchServiceImpl implements WaiGuaSearchService {
             logInfo.setDateStr(sdf.format(logInfo.getOpTime()));
             logInfos.add(logInfo);
         }
-        result.setLogInfos(logInfos);
+        result.setRecords(logInfos);
         //分页信息-页码
         result.setPageNum(param.getPageNum());
         //分页信息-总记录数

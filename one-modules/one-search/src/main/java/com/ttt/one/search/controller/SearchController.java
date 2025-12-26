@@ -1,5 +1,6 @@
 package com.ttt.one.search.controller;
 
+import com.ttt.one.common.utils.R;
 import com.ttt.one.search.service.WaiGuaSearchService;
 import com.ttt.one.search.vo.LogSearchParam;
 import com.ttt.one.search.vo.LogSearchResult;
@@ -56,7 +57,8 @@ public class SearchController {
     @Operation(summary = "日志搜索")
     @GetMapping("/logSearch")
     @ResponseBody
-    public LogSearchResult logSearch(LogSearchParam logSearchParam) {
-        return waiGuaSearchService.searchLog(logSearchParam);
+    public R logSearch(LogSearchParam logSearchParam) {
+        LogSearchResult logSearchResult = waiGuaSearchService.searchLog(logSearchParam);
+        return R.ok().put("data", logSearchResult);
     }
 }

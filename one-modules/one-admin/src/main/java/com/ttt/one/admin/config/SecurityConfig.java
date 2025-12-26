@@ -98,7 +98,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         configuration.setAllowedOrigins(Arrays.asList(
                 "http://localhost:3000",  // Vue开发服务器
                 "http://localhost:3006",  // Vite开发服务器
-                "http://localhost:8080"   // 本地测试
+                "http://localhost:8080",   // 本地测试
+                "http://localhost:88"  // 测试服务器
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList(

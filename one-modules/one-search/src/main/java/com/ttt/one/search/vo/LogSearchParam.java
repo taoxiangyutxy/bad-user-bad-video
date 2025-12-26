@@ -70,5 +70,7 @@ public class LogSearchParam {
     private Date endTime;
     @Schema(description = "聚合分析类型")
     private Integer pageNum = 1; // 页码
+    @Schema(description = "页数")
+    private Integer size =10;
 
 }
