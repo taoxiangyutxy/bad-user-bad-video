@@ -633,10 +633,10 @@ public class InfoServiceImpl extends ServiceImpl<InfoDao, InfoEntity> implements
         if(!StringUtils.isEmpty(key)){
             infoDTO.setWaiguaUsername(key);
         }
-        String reviewStatus = (String) params.get("reviewStatus");
+       /* String reviewStatus = (String) params.get("reviewStatus");
         if(Optional.ofNullable(reviewStatus).isPresent()&&!StringUtils.isEmpty(reviewStatus)){
             infoDTO.setReviewStatus(Integer.parseInt(reviewStatus));
-        }
+        }*/
         List<InfoEntity> infoEntities =  this.baseMapper.findListByUser(infoDTO);
         return infoEntities;
     }

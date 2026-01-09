@@ -1,5 +1,6 @@
 package com.ttt.one.fileServer.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ttt.one.common.utils.FileUploadConstant;
 import com.ttt.one.common.utils.R;
 import com.ttt.one.fileServer.entity.ChunkEntity;
@@ -18,6 +19,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -257,10 +259,17 @@ public class UploadController {
             // 生成文件访问URL
             String fileUrl = MinIoUtils.getObjectUrl(BUCKET_NAME, mergedObjectName, 60 * 24 * URL_EXPIRY_DAYS);
             fileInfo.setLocation(fileUrl);
-            
+
             // 保存文件信息
-            FileInfoEntity savedFile = fileInfoService.saveFile(fileInfo);
-            
+            FileInfoEntity savedFile = new FileInfoEntity();
+            FileInfoEntity oldFileInfo = fileInfoService.getOne(new QueryWrapper<FileInfoEntity>().eq("identifier", fileInfo.getIdentifier()));
+            if(ObjectUtils.isEmpty(oldFileInfo)){
+                savedFile =  fileInfoService.saveFile(fileInfo);
+            }else{
+                fileInfo.setId(oldFileInfo.getId());
+                savedFile = fileInfoService.updateFileById(fileInfo);
+            }
+
             // 生成视频封面(如果是视频文件)
             generateVideoCover(file, filename, savedFile);
             

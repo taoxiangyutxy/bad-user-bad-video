@@ -2,19 +2,24 @@ package com.ttt.one.waiguagg.controller;
 
 import java.util.*;
 
+import com.alibaba.fastjson.TypeReference;
 import com.ttt.one.common.utils.PageUtils;
 import com.ttt.one.common.utils.R;
 import com.ttt.one.oplog.annotation.OperationLog;
 import com.ttt.one.oplog.annotation.OperationLogType;
 import com.ttt.one.waiguagg.entity.GivelikeEntity;
 import com.ttt.one.waiguagg.entity.InfoEntity;
+import com.ttt.one.waiguagg.feign.AdminUserFeignServer;
 import com.ttt.one.waiguagg.service.InfoService;
+import com.ttt.one.waiguagg.utils.TokenUtils;
+import com.ttt.one.waiguagg.vo.SysUserVO;
 import com.ttt.one.waiguagg.vo.VideoPreviewVO;
 import com.ttt.one.waiguagg.vo.WaiGuaInfoVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -32,7 +37,7 @@ import javax.validation.Valid;
 public class InfoController {
 
     private final InfoService infoService;
-
+    private final AdminUserFeignServer adminUserFeignServer;
     /**
      * 根据外挂信息ID获取视频预览列表
      *
@@ -126,6 +131,15 @@ public class InfoController {
     @Operation(summary = "前台保存并更新文件", description = "前台用户提交举报信息并上传文件")
     @PostMapping("/saveAndUpdateFile")
     public R saveAndUpdateFile(@Valid @RequestBody WaiGuaInfoVO waiGuaInfoVO) {
+           if(ObjectUtils.isEmpty(waiGuaInfoVO.getReportuserId())){
+            R r = adminUserFeignServer.getCurrentUser();
+            if(r.getCode() == 0){
+                SysUserVO sysUser = r.getData("data",new TypeReference<SysUserVO>(){});
+                waiGuaInfoVO.setReportuserId(sysUser.getUserId());
+            }else{
+                return R.error(500,"后台管理平台服务远程调用失败");
+            }
+        }
         infoService.saveAndUpdateFile(waiGuaInfoVO);
         return R.ok();
     }
@@ -150,6 +164,7 @@ public class InfoController {
      * @return 操作结果
      */
     @Operation(summary = "批量删除", description = "批量删除外挂举报信息")
+    @OperationLog(desc = "批量删除外挂举报信息", type = OperationLogType.DELETE)
     @PostMapping("/delete")
     public R delete(@Parameter(description = "要删除的ID数组") @RequestBody Long[] ids) {
 		infoService.removeByIdsAllIn(Arrays.asList(ids));
@@ -203,7 +218,7 @@ public class InfoController {
         long count1 = list.stream().filter(s -> s.getReviewStatus() == 0).count();
         long count2 = list.stream().filter(s -> s.getReviewStatus() == 2).count();
         long count3 = list.stream().filter(s -> s.getReviewStatus() == 3).count();
-        counts.put("allConut",page.getTotalCount());
+        counts.put("allCount",count1+count2+count3);
         counts.put("count1",count1);
         counts.put("count2",count2);
         counts.put("count3",count3);
@@ -232,7 +247,7 @@ public class InfoController {
         long count1 = list.stream().filter(s -> s.getReviewStatus() == 0).count();
         long count2 = list.stream().filter(s -> s.getReviewStatus() == 2).count();
         long count3 = list.stream().filter(s -> s.getReviewStatus() == 3).count();
-        counts.put("allConut",page.getTotalCount());
+        counts.put("allCount",count1+count2+count3);
         counts.put("count1",count1);
         counts.put("count2",count2);
         counts.put("count3",count3);

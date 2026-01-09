@@ -89,4 +89,10 @@ public class FileInfoServiceImpl extends ServiceImpl<FileInfoDao, FileInfoEntity
         return this.baseMapper.listByPassAndExpired();
     }
 
+    @Override
+    public FileInfoEntity updateFileById(FileInfoEntity entity) {
+        this.baseMapper.updateFileById(entity);
+        return entity;
+    }
+
 }

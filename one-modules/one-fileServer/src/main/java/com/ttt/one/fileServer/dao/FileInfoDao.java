@@ -38,4 +38,6 @@ public interface FileInfoDao extends BaseMapper<FileInfoEntity> {
      * @return
      */
     List<FileInfoEntity> listByPassAndExpired();
+
+    void updateFileById(FileInfoEntity entity);
 }

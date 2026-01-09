@@ -55,7 +55,7 @@
         <if test="reportuserId != null ">
             AND i.reportuser_id = #{reportuserId}
         </if>
-        <if test="reviewStatus != null and reviewStatus != ''">
+        <if test="reviewStatus != null ">
             AND i.review_status = #{reviewStatus}
         </if>
         <if test="key != null and key != ''">

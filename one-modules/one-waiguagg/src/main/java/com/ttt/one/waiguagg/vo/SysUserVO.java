@@ -5,4 +5,5 @@ import lombok.Data;
 @Data
 public class SysUserVO {
     private String username;
+    private Long userId;
 }

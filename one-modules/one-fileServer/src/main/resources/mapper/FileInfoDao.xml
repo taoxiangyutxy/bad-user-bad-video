@@ -27,6 +27,12 @@
             #{item}
         </foreach>
     </update>
+    <update id="updateFileById" parameterType="com.ttt.one.fileServer.entity.FileInfoEntity"
+            useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        UPDATE  waigua_file_info  SET  waigua_info_id = #{waiguaInfoId}  , create_time= #{createTime} ,  cover = #{cover}, identifier = #{identifier}
+                                  ,filename = #{filename} , location = #{location} ,total_size = #{totalSize} ,type = #{type} ,audio_duration = #{audioDuration}
+                                  WHERE  id = #{id}
+    </update>
     <select id="listByPass" resultType="com.ttt.one.fileServer.entity.FileInfoEntity">
         SELECT f.* FROM `waigua_file_info` f
         LEFT JOIN  waigua_info i ON i.id = f.waigua_info_id

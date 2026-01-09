@@ -61,5 +61,7 @@ public interface FileInfoService extends IService<FileInfoEntity> {
      * @return
      */
     List<FileInfoEntity> listByPassAndExpired();
+
+    FileInfoEntity updateFileById(FileInfoEntity fileInfo);
 }
 

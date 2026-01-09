@@ -16,6 +16,13 @@
         <result property="createTime" column="create_time"/>
         <result property="updateTime" column="update_time"/>
         <result property="updateUserId" column="update_user_id"/>
+        <collection property="roles" ofType="com.ttt.one.admin.entity.SysRole">
+            <result property="roleId" column="role_id"/>
+            <result property="roleName" column="role_name"/>
+            <result property="description" column="description"/>
+            <result property="createTime" column="create_time"/>
+            <result property="roleCode" column="role_code"/>
+        </collection>
     </resultMap>
 
     <!-- 根据用户ID查询角色列表，支持动态条件 -->
@@ -83,9 +90,12 @@
             </if>
         </where>
     </select>
-    <select id="findByUsername" resultType="com.ttt.one.admin.entity.SysUser">
-        SELECT * FROM sys_user WHERE username = #{username}
-        AND status = 1 LIMIT 1
+    <select id="findByUsername" resultMap="sysUserMap">
+        SELECT * FROM sys_user u
+              LEFT JOIN sys_user_role ur ON u.user_id = ur.user_id
+              LEFT JOIN sys_role r ON ur.role_id = r.role_id
+                 WHERE u.username = #{username}
+        AND u.status = 1
     </select>
     <select id="getUsersByRoleId" resultType="com.ttt.one.admin.entity.SysUser">
         SELECT * FROM sys_user u
