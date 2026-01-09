@@ -13,8 +13,7 @@
 - one-search         搜索服务（Elasticsearch全文检索）
 - one-third-party    第三方服务(短信接口)
 - one-waiguagg       外挂信息服务(业务模块)
-- renren-fast        人人开源后台管理服务
-- renren-fast-vue    人人开源前台页面(视频上传等页面)
+- one-admin          后台管理服务
 
 
 
@@ -38,6 +37,16 @@
 3.  xxxx
 
 #### 使用说明
+
+**新版后台管理平台**
+![输入图片说明](https://gitee.com/yyyyxt/typoraImages/raw/master/images/20260109151522569.png)
+
+**vue3.0版本上传图**
+![输入图片说明](https://gitee.com/yyyyxt/typoraImages/raw/master/images/20260109152112997.png)
+
+![输入图片说明](https://gitee.com/yyyyxt/typoraImages/raw/master/images/20260109152516014.png)
+
+![输入图片说明](https://gitee.com/yyyyxt/typoraImages/raw/master/images/20260109152650860.png)
 
 
 **第1.2版前端上传测试** 
