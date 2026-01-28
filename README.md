@@ -42,13 +42,6 @@
 
 ![输入图片说明](https://gitee.com/yyyyxt/typoraImages/raw/master/images/20260109151522569.png)
 
-**vue3.0版本上传图**
-
-![输入图片说明](https://gitee.com/yyyyxt/typoraImages/raw/master/images/20260109152112997.png)
-
-![输入图片说明](https://gitee.com/yyyyxt/typoraImages/raw/master/images/20260109152516014.png)
-
-![输入图片说明](https://gitee.com/yyyyxt/typoraImages/raw/master/images/20260109152650860.png)
 
 **AOP切面配合ES记录日志**
 
