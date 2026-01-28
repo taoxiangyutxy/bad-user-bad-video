@@ -74,3 +74,11 @@
 
  **搜索服务** 
 ![输入图片说明](https://images.gitee.com/uploads/images/2021/1006/131409_50bc523d_2217964.png "111.PNG")
+
+ **举报列表** 
+
+![举报列表](https://images.gitee.com/uploads/images/2021/0912/184423_0a60dd84_2217964.png "project2.PNG")
+
+ **举报表单** 
+
+![举报表单](https://images.gitee.com/uploads/images/2021/0912/184149_f3bdcc5b_2217964.png "project-ttt1.PNG")
