@@ -82,3 +82,6 @@
 
 
 
+ **断点续传** 
+
+![断点续传](https://images.gitee.com/uploads/images/2021/0912/213603_f8942566_2217964.gif "2.gif")
