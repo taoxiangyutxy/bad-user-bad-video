@@ -1,35 +1,5 @@
 
 
-#### 软件架构
-
-- one-common         公共的依赖，bean，工具类等
-- one-fileServer     文件上传下载服务(分片上传、秒传及断点续传功能)
-- one-gateway        网关服务
-- one-search         搜索服务（Elasticsearch全文检索）
-- one-third-party    第三方服务(短信接口)
-- one-waiguagg       外挂信息服务(业务模块)
-- one-admin          后台管理服务
-
-
-
-技术选型：
-
-- 核心框架：Spring Boot
-- 注册中心：alibaba-nacos-discovery
-- 配置中心：alibaba-nacos-config
-- 视图框架：Spring MVC
-- 持久层框架：MyBatis
-- 文件服务器：Minio
-- 定时任务：ShedLock
-- 页面交互：Vue
-- 全文检索：Elasticsearch
-
-
-#### 安装教程
-
-1.  xxxx
-2.  xxxx
-3.  xxxx
 
 #### 使用说明
 
