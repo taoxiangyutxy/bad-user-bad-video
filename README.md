@@ -82,6 +82,3 @@
 
 
 
- **视频预览** 
-
-![视频预览](https://images.gitee.com/uploads/images/2021/0912/215415_8e363a18_2217964.gif "7.gif")
