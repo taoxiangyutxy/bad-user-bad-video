@@ -80,9 +80,7 @@
 
 ![上传视频](https://images.gitee.com/uploads/images/2021/0912/213327_02271871_2217964.gif "1.gif")
 
- **断点续传** 
 
-![断点续传](https://images.gitee.com/uploads/images/2021/0912/213603_f8942566_2217964.gif "2.gif")
 
  **视频预览** 
 
