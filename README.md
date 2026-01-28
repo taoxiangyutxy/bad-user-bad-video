@@ -86,8 +86,3 @@
 
 ![断点续传](https://images.gitee.com/uploads/images/2021/0912/213603_f8942566_2217964.gif "2.gif")
 
-
- **视频查看** 
-
-![视频查看](https://images.gitee.com/uploads/images/2021/0912/215415_8e363a18_2217964.gif "7.gif")
-
