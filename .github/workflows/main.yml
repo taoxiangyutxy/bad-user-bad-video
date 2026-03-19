@@ -1,0 +1,49 @@
+name: 双向自动同步 Gitee ↔ GitHub
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ master ]
+  schedule:
+    - cron: '0 18 * * *'
+
+jobs:
+  sync-github-to-gitee:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 拉取 GitHub 代码
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 配置 Git 信息
+        run: |
+          git config --global user.name "taoxiangyutxy"
+          git config --global user.email "496427196@qq.com"
+
+      - name: 同步到 Gitee
+        env:
+          # 替换成你的 Gitee 用户名
+          GITEE_REPO: https://yyyyxt:${{ secrets.GITEE_TOKEN }}@gitee.com/yyyyxt/ttt-one.git
+        run: |
+          git remote add gitee $GITEE_REPO
+          git push gitee master --force
+
+  sync-gitee-to-github:
+    runs-on: ubuntu-latest
+    needs: sync-github-to-gitee
+    steps:
+      - name: 拉取 Gitee 代码
+        uses: actions/checkout@v4
+        with:
+          repository: https://yyyyxt:${{ secrets.GITEE_TOKEN }}@gitee.com/yyyyxt/ttt-one.git
+          fetch-depth: 0
+          ref: master
+
+      - name: 同步到 GitHub
+        env:
+          # 关键修改：GH_TOKEN 对应你新命名的 Secret
+          GITHUB_REPO: https://${{ secrets.GH_TOKEN }}@github.com/taoxiangyutxy/bad-user-bad-video.git
+        run: |
+          git remote add github $GITHUB_REPO
+          git push github master --force
