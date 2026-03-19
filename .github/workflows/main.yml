@@ -1,75 +1,57 @@
 name: 双向自动同步 Gitee ↔ GitHub
 
-# 触发条件：手动触发 + GitHub提交 + 每天凌晨2点定时同步
 on:
-  workflow_dispatch:
+  workflow_dispatch:  # 手动触发
   push:
-    branches: [ master ]
+    branches: [ master ]  # GitHub提交触发
   schedule:
-    - cron: '0 18 * * *'  # 北京时间凌晨2点 = UTC时间18点
+    - cron: '0 18 * * *'  # 每天凌晨2点定时同步
 
 jobs:
-  # 任务1：GitHub → Gitee 同步（命名唯一）
-  sync-github-to-gitee:
+  bidirectional-sync:
     runs-on: ubuntu-latest
     steps:
-      # 拉取GitHub当前仓库代码
-      - name: 拉取GitHub代码
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # 拉取所有历史提交
-
-      # 配置Git用户名/邮箱
-      - name: 配置Git信息
+      # 步骤1：配置Git（解决中文/权限问题）
+      - name: 基础配置
         run: |
           git config --global user.name "taoxiangyutxy"
           git config --global user.email "496427196@qq.com"
+          git config --global core.quotepath false
 
-      # 推送到Gitee（免密）
-      - name: 同步到Gitee
+      # 步骤2：克隆Gitee仓库到本地（核心！不用checkout，直接git clone）
+      - name: 克隆Gitee仓库
         env:
-          GITEE_USER: yyyyxt
-          GITEE_REPO: ttt-one
           GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
         run: |
-          # 拼接Gitee HTTPS地址（带令牌免密）
-          GITEE_URL="https://${GITEE_USER}:${GITEE_TOKEN}@gitee.com/${GITEE_USER}/${GITEE_REPO}.git"
-          # 避免远程仓库已存在的报错
-          git remote remove gitee || true
-          git remote add gitee $GITEE_URL
-          # 强制推送（解决小冲突）
-          git push gitee master --force
+          # 拼接Gitee免密克隆地址
+          GITEE_CLONE_URL="https://yyyyxt:${GITEE_TOKEN}@gitee.com/yyyyxt/ttt-one.git"
+          git clone $GITEE_CLONE_URL gitee-repo
+          cd gitee-repo
 
-  # 任务2：Gitee → GitHub 同步（修正命名：sync-gitee-to-github，唯一）
-  sync-gitee-to-github:  # ← 这里改对了，和任务1不重复
-    runs-on: ubuntu-latest
-    needs: sync-github-to-gitee  # 依赖任务1完成，命名对应正确
-    steps:
-      # 拉取Gitee代码（无重复参数）
-      - name: 拉取Gitee代码
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          ref: master
-          # 直接用完整Gitee地址拉取（免密）
-          repository: https://yyyyxt:${{ secrets.GITEE_TOKEN }}@gitee.com/yyyyxt/ttt-one.git
-
-      # 配置Git信息
-      - name: 配置Git信息
-        run: |
-          git config --global user.name "taoxiangyutxy"
-          git config --global user.email "496427196@qq.com"
-
-      # 推送到GitHub（免密）
-      - name: 同步到GitHub
+      # 步骤3：添加GitHub远程地址，推送到GitHub（Gitee → GitHub）
+      - name: 同步Gitee到GitHub
         env:
-          GH_USER: taoxiangyutxy
-          GH_REPO: bad-user-bad-video
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
-          # 拼接GitHub HTTPS地址（带令牌免密）
-          GH_URL="https://${GH_USER}:${GH_TOKEN}@github.com/${GH_USER}/${GH_REPO}.git"
-          # 避免远程仓库已存在的报错
-          git remote remove github || true
-          git remote add github $GH_URL
+          cd gitee-repo
+          # 添加GitHub远程地址
+          GH_PUSH_URL="https://taoxiangyutxy:${GH_TOKEN}@github.com/taoxiangyutxy/bad-user-bad-video.git"
+          git remote add github $GH_PUSH_URL
+          # 强制推送（确保同步最新）
           git push github master --force
+
+      # 步骤4：克隆GitHub仓库，推送到Gitee（GitHub → Gitee）
+      - name: 同步GitHub到Gitee
+        env:
+          GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          # 克隆GitHub仓库
+          GH_CLONE_URL="https://taoxiangyutxy:${GH_TOKEN}@github.com/taoxiangyutxy/bad-user-bad-video.git"
+          git clone $GH_CLONE_URL github-repo
+          cd github-repo
+          # 添加Gitee远程地址
+          GITEE_PUSH_URL="https://yyyyxt:${GITEE_TOKEN}@gitee.com/yyyyxt/ttt-one.git"
+          git remote add gitee $GITEE_PUSH_URL
+          # 强制推送
+          git push gitee master --force
