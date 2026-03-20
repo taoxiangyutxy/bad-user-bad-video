@@ -42,6 +42,20 @@ spring:
              refresh: true
   profiles:
     active: '@profile.name@'
+  mail:
+    host: smtp.163.com
+    username: 13210216906@163.com
+    password: FZgah9WcVGnZeMV6
+    default-encoding: UTF-8
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          ssl:
+            enable: false
 
 # springdoc-openapi配置
 springdoc:
@@ -56,6 +70,6 @@ springdoc:
     - group: 'default'
       paths-to-match: '/**'
       packages-to-scan: com.ttt.one.admin  # 指定接口文档展示接口包路径扫描
-
+  # 邮件配置
 seata:
   enabled: false

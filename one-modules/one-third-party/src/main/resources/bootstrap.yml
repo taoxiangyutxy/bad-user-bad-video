@@ -1,0 +1,57 @@
+spring:
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.133.101:8848
+      config:
+        file-extension: yaml
+        server-addr: '@discovery.server-addr@'
+        namespace: '@config.namespace@'
+        group: '@config.group@'
+        ext-config:
+          -  data-id: redis.yml
+             group: '@config.group@'
+             refresh: true
+    alicloud:
+      sms:
+        host: http://dingxin.market.alicloudapi.com
+        path: /dx/sendSms
+        appcode: 9ed2bc748bdf471599d8b2cd7b16eeba
+        tpl_id: TP1711063
+
+  application:
+    name: one-third-party
+  
+  # 邮件配置
+  mail:
+    host: smtp.163.com
+    username: 13210216906@163.com
+    password: FZgah9WcVGnZeMV6
+    default-encoding: UTF-8
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          ssl:
+            enable: false
+
+  # Redis配置
+  redis:
+    host: 192.168.133.101
+    port: 6379
+    database: 0
+    timeout: 2000ms
+    lettuce:
+      pool:
+        max-active: 8
+        max-wait: -1ms
+        max-idle: 8
+        min-idle: 0
+
+server:
+  port: 33333
+seata:
+  enabled: false

@@ -12,7 +12,7 @@ import org.springframework.session.data.redis.config.annotation.web.http.EnableR
 @EnableRedisHttpSession//整合redis作为session存储
 @EnableFeignClients
 @EnableDiscoveryClient
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {"com.ttt.one.auth", "com.ttt.one.thirdparty"})
 //@Import(OperationLogAutoConfiguration.class)
 //@ComponentScan(basePackages = {"com.ttt.one.oplog","com.ttt.one.auth"})
 public class OneAuthServerApplication {

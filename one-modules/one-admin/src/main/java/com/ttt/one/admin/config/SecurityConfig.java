@@ -78,7 +78,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // 设置权限规则
         http.authorizeRequests()
                 // 公开接口 - Vue前后端分离不需要页面
-                .antMatchers("/api/admin/login","/api/admin/register").permitAll()
+                .antMatchers("/api/admin/login","/api/admin/register","/api/admin/forgot-password","/api/admin/reset-password").permitAll()
                 .antMatchers("/v2/api-docs", "/swagger-resources/**",
                         "/swagger-ui/**", "/webjars/**").permitAll()
                 .antMatchers("/actuator/health").permitAll()

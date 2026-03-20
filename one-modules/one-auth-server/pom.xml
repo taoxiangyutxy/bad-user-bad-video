@@ -17,6 +17,15 @@
         <hutool.version>5.8.13</hutool.version>
     </properties>
     <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.ttt.one</groupId>
+            <artifactId>one-third-party</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
         <!-- 项目内部依赖 -->
         <dependency>
             <groupId>com.ttt.one.oplog</groupId>

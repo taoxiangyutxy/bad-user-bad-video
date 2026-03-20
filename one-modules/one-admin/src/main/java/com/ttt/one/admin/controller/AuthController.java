@@ -9,10 +9,13 @@ import com.ttt.one.admin.utils.JwtUtil;
 import com.ttt.one.admin.vo.SysUserVO;
 import com.ttt.one.common.utils.Constant;
 import com.ttt.one.common.utils.R;
+import com.ttt.one.thirdparty.component.EmailComponent;
+import com.ttt.one.thirdparty.service.VerificationCodeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -48,6 +51,10 @@ public class AuthController {
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
+
+    private final EmailComponent emailComponent;
+    
+    private final VerificationCodeService verificationCodeService;
 
     @PostMapping("/register")
     @Operation(summary = "注册")
@@ -184,6 +191,83 @@ public class AuthController {
         } catch (Exception e) {
             e.printStackTrace();
             return R.error(500, e.getMessage());
+        }
+    }
+
+    /**
+     * 请求密码重置验证码
+     *
+     * @param username 用户名
+     * @return 操作结果
+     */
+    @Operation(summary = "请求密码重置验证码")
+    @PostMapping("/forgot-password")
+    @ResponseBody
+    public R forgotPassword(@RequestParam String username) {
+        try {
+            // 1. 验证用户名是否存在
+            SysUser user = sysUserService.getUserByUsername(username);
+            if (user == null) {
+                return R.error("用户不存在");
+            }
+
+            if (user.getEmail() == null || user.getEmail().isEmpty()) {
+                return R.error("用户未绑定邮箱");
+            }
+
+            // 2. 检查是否可以发送验证码
+            String emailKey = "admin:email:" + user.getEmail();
+            if (!verificationCodeService.canSendCode(emailKey)) {
+                return R.error("请求过于频繁，请稍后再试");
+            }
+
+            // 3. 生成验证码
+            String verificationCode = verificationCodeService.generateVerificationCode();
+            
+            // 4. 存储验证码
+            verificationCodeService.storeVerificationCode(username, verificationCode);
+            
+            // 5. 发送邮件
+            emailComponent.sendPasswordResetEmail(user.getEmail(), username, verificationCode);
+            
+            return R.ok("验证码已发送到您的邮箱");
+        } catch (Exception e) {
+            log.error("Forgot password error", e);
+            return R.error("发送验证码失败：" + e.getMessage());
+        }
+    }
+
+    /**
+     * 重置密码
+     *
+     * @param username 用户名
+     * @param verificationCode 验证码
+     * @param newPassword 新密码
+     * @return 操作结果
+     */
+    @Operation(summary = "重置密码")
+    @PostMapping("/reset-password")
+    @ResponseBody
+    public R resetPassword(@RequestParam String username, 
+                          @RequestParam String verificationCode,
+                          @RequestParam String newPassword) {
+        try {
+            // 1. 验证密码强度
+            if (newPassword == null || newPassword.length() < 8) {
+                return R.error("密码长度至少8位");
+            }
+
+            // 2. 验证验证码
+            if (!verificationCodeService.verifyCode(username, verificationCode)) {
+                return R.error("验证码错误或已过期");
+            }
+
+            // 3. 更新密码
+            sysUserService.resetPassword(username, newPassword);
+            return R.ok("密码重置成功");
+        } catch (Exception e) {
+            log.error("Reset password error", e);
+            return R.error("密码重置失败：" + e.getMessage());
         }
     }
 }

@@ -11,11 +11,14 @@ import com.ttt.one.auth.vo.UserRegistVo;
 import com.ttt.one.common.utils.Constant;
 import com.ttt.one.common.utils.R;
 import com.ttt.one.common.vo.UserEntity;
+import com.ttt.one.thirdparty.component.EmailComponent;
+import com.ttt.one.thirdparty.service.VerificationCodeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -46,6 +49,12 @@ public class LoginController {
     private final StringRedisTemplate redisTemplate;
     private final UserFeignServer userFeignServer;
     private final TokenUtil tokenUtil;
+    
+    @Autowired
+    private EmailComponent emailComponent;
+    
+    @Autowired
+    private VerificationCodeService verificationCodeService;
 
     @Value("${spring.ttt.theHost}")
     private String theHost;
@@ -181,6 +190,16 @@ public class LoginController {
     }
 
     /**
+     * 忘记密码页面
+     *
+     * @return 页面路径
+     */
+    @GetMapping(value = "/forgot-password.html")
+    public String forgotPasswordPage() {
+        return "forgot-password";
+    }
+
+    /**
      * 退出登录
      *
      * @param request 请求
@@ -211,5 +230,91 @@ public class LoginController {
         errors.put(errorKey, errorMsg);
         redirectAttributes.addFlashAttribute("errors", errors);
         return String.format(redirectUrlFormat, theHost);
+    }
+
+    /**
+     * 请求密码重置验证码
+     *
+     * @param username 用户名
+     * @return 操作结果
+     */
+    @Operation(summary = "请求密码重置验证码")
+    @Parameter(name = "username", description = "用户名")
+    @PostMapping("/forgot-password")
+    @ResponseBody
+    public R forgotPassword(@RequestParam String username) {
+        try {
+            // 1. 验证用户名是否存在
+            R userResult = userFeignServer.getUserByUsername(username);
+            if (userResult.getCode() != 200) {
+                return R.error("用户不存在");
+            }
+            
+            UserEntity user = userResult.getData("data", new TypeReference<UserEntity>() {});
+            if (user == null || user.getEmail() == null || user.getEmail().isEmpty()) {
+                return R.error("用户未绑定邮箱");
+            }
+
+            // 2. 检查是否可以发送验证码
+            String emailKey = "email:" + user.getEmail();
+            if (!verificationCodeService.canSendCode(emailKey)) {
+                return R.error("请求过于频繁，请稍后再试");
+            }
+
+            // 3. 生成验证码
+            String verificationCode = verificationCodeService.generateVerificationCode();
+            
+            // 4. 存储验证码
+            verificationCodeService.storeVerificationCode(username, verificationCode);
+            
+            // 5. 发送邮件
+            emailComponent.sendPasswordResetEmail(user.getEmail(), username, verificationCode);
+            
+            return R.ok("验证码已发送到您的邮箱");
+        } catch (Exception e) {
+            log.error("Forgot password error", e);
+            return R.error("发送验证码失败：" + e.getMessage());
+        }
+    }
+
+    /**
+     * 重置密码
+     *
+     * @param username 用户名
+     * @param verificationCode 验证码
+     * @param newPassword 新密码
+     * @return 操作结果
+     */
+    @Operation(summary = "重置密码")
+    @Parameter(name = "username", description = "用户名")
+    @Parameter(name = "verificationCode", description = "验证码")
+    @Parameter(name = "newPassword", description = "新密码")
+    @PostMapping("/reset-password")
+    @ResponseBody
+    public R resetPassword(@RequestParam String username, 
+                          @RequestParam String verificationCode,
+                          @RequestParam String newPassword) {
+        try {
+            // 1. 验证密码强度
+            if (newPassword == null || newPassword.length() < 8) {
+                return R.error("密码长度至少8位");
+            }
+
+            // 2. 验证验证码
+            if (!verificationCodeService.verifyCode(username, verificationCode)) {
+                return R.error("验证码错误或已过期");
+            }
+
+            // 3. 调用远程服务更新密码
+            R result = userFeignServer.resetPassword(username, newPassword);
+            if (result.getCode() == 200) {
+                return R.ok("密码重置成功");
+            } else {
+                return R.error(result.getData("msg", new TypeReference<String>() {}));
+            }
+        } catch (Exception e) {
+            log.error("Reset password error", e);
+            return R.error("密码重置失败：" + e.getMessage());
+        }
     }
 }

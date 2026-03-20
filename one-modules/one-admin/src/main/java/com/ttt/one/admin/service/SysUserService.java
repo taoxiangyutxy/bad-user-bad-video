@@ -87,4 +87,20 @@ public interface SysUserService extends IService<SysUser> {
 
 
     List<SysUser> getUsersByRoleId(Long roleId);
+
+    /**
+     * 根据用户名获取用户信息
+     *
+     * @param username 用户名
+     * @return 用户实体
+     */
+    SysUser getUserByUsername(String username);
+
+    /**
+     * 重置用户密码
+     *
+     * @param username 用户名
+     * @param newPassword 新密码
+     */
+    void resetPassword(String username, String newPassword);
 }

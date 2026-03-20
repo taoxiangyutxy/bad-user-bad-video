@@ -44,6 +44,20 @@ spring:
     active: '@profile.name@'
   thymeleaf:
     cache: false
+  mail:
+    host: smtp.163.com
+    username: 13210216906@163.com
+    password: FZgah9WcVGnZeMV6
+    default-encoding: UTF-8
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          ssl:
+            enable: false
 
 # springdoc-openapi配置
 springdoc:
@@ -78,6 +92,5 @@ feign:
         readTimeout: 3000
   sentinel:
     enabled: true
-
 seata:
   enabled: false

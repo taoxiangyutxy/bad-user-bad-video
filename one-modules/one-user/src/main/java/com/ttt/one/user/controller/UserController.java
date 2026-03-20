@@ -80,6 +80,41 @@ public class UserController {
     }
 
     /**
+     * 根据用户名获取用户信息
+     *
+     * @param username 用户名
+     * @return 用户信息
+     */
+    @Operation(summary = "根据用户名获取用户信息", description = "通过用户名查询用户详细信息")
+    @GetMapping("/getByUsername")
+    public R getUserByUsername(@RequestParam String username) {
+        UserEntity user = userService.getUserByUsername(username);
+        if (user != null) {
+            return R.ok().setData(user);
+        } else {
+            return R.error("用户不存在");
+        }
+    }
+
+    /**
+     * 重置用户密码
+     *
+     * @param username 用户名
+     * @param newPassword 新密码
+     * @return 操作结果
+     */
+    @Operation(summary = "重置用户密码", description = "通过用户名重置用户密码")
+    @PostMapping("/resetPassword")
+    public R resetPassword(@RequestParam String username, @RequestParam String newPassword) {
+        try {
+            userService.resetPassword(username, newPassword);
+            return R.ok("密码重置成功");
+        } catch (Exception e) {
+            return R.error("密码重置失败：" + e.getMessage());
+        }
+    }
+
+    /**
      * 获取会员列表
      *
      * @param params 查询参数

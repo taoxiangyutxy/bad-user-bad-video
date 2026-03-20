@@ -259,6 +259,30 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         return this.baseMapper.getUsersByRoleId(roleId);
     }
 
+    @Override
+    public SysUser getUserByUsername(String username) {
+        QueryWrapper<SysUser> wrapper = new QueryWrapper<>();
+        wrapper.eq("username", username);
+        return this.baseMapper.selectOne(wrapper);
+    }
+
+    @Override
+    public void resetPassword(String username, String newPassword) {
+        SysUser user = getUserByUsername(username);
+        if (user == null) {
+            throw new RuntimeException("用户不存在");
+        }
+
+        // 使用BCrypt加密新密码
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        String encodedPassword = passwordEncoder.encode(newPassword);
+
+        user.setPassword(encodedPassword);
+        user.setUpdateTime(new Date());
+
+        this.baseMapper.updateById(user);
+    }
+
     /**
      * 构建查询条件
      */

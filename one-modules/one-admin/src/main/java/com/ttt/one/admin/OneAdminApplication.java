@@ -5,12 +5,11 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.ComponentScan;
-
 @MapperScan("com.ttt.one.admin.dao")
 //使全局异常处理器在该服务生效
 //@ComponentScan(basePackages = {"com.ttt.one.admin.exception", "com.ttt.one.admin"})
 @EnableDiscoveryClient
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {"com.ttt.one.admin", "com.ttt.one.thirdparty"})
 public class OneAdminApplication {
 
     public static void main(String[] args) {

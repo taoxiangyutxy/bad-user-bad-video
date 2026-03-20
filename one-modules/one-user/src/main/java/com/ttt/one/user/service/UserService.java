@@ -53,5 +53,21 @@ public interface UserService extends IService<UserEntity> {
     UserEntity login(UserLoginVo vo);
 
     void updateByUserId(UserEntity user);
+
+    /**
+     * 根据用户名获取用户信息
+     *
+     * @param username 用户名
+     * @return 用户实体
+     */
+    UserEntity getUserByUsername(String username);
+
+    /**
+     * 重置用户密码
+     *
+     * @param username 用户名
+     * @param newPassword 新密码
+     */
+    void resetPassword(String username, String newPassword);
 }
 

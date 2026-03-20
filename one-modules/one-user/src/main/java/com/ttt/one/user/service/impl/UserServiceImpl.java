@@ -98,4 +98,25 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
         this.baseMapper.updateById(user);
     }
 
+    @Override
+    public UserEntity getUserByUsername(String username) {
+        return this.baseMapper.selectOne(new QueryWrapper<UserEntity>().eq("username", username));
+    }
+
+    @Override
+    public void resetPassword(String username, String newPassword) {
+        UserEntity user = getUserByUsername(username);
+        if (user == null) {
+            throw new RuntimeException("用户不存在");
+        }
+
+        // 使用BCrypt加密新密码
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        String encodedPassword = passwordEncoder.encode(newPassword);
+
+        user.setPassword(encodedPassword);
+        user.setSign(newPassword); // 同时更新明文密码字段（如果存在）
+
+        this.baseMapper.updateById(user);
+    }
 }

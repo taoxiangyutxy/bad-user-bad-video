@@ -21,4 +21,14 @@ public class UserFeignServerFallback implements UserFeignServer {
         return R.error(500, "用户服务异常");
 
     }
+
+    @Override
+    public R getUserByUsername(String username) {
+        return R.error(500, "用户服务异常");
+    }
+
+    @Override
+    public R resetPassword(String username, String newPassword) {
+        return R.error(500, "用户服务异常");
+    }
 }
